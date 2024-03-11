@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://7p01lqx0eat7"]
+
+[ext_resource type="StyleBox" uid="uid://bt2dlubrthyw8" path="res://theme/styleboxes/button_stylebox.tres" id="2_wftyd"]
+
+[resource]
+PanelContainer/styles/panel = ExtResource("2_wftyd")
+RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
+RichTextLabel/constants/padding_font_size = 8
+RichTextLabel/styles/normal = ExtResource("2_wftyd")
+VBoxContainer/constants/separation = 8

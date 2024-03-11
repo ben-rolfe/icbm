@@ -1,0 +1,48 @@
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://clanbtt7hrhjb"]
+
+[ext_resource type="FontFile" uid="uid://wbpda6tspm4v" path="res://theme/fonts/label/Bangers-Regular.ttf" id="1_qjjdx"]
+[ext_resource type="FontVariation" uid="uid://djt5ukb7wrtng" path="res://theme/fonts/ICBMComic-FauxBold.tres" id="1_rm8jc"]
+[ext_resource type="FontVariation" uid="uid://f0xti67u7ix2" path="res://theme/fonts/ICBMComic-FauxBoldItalic.tres" id="2_a4gec"]
+[ext_resource type="FontVariation" uid="uid://dto1412w0nfym" path="res://theme/fonts/ICBMComic-FauxItalic.tres" id="3_btap7"]
+[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="4_77otb"]
+
+[resource]
+Balloon/colors/caption_fill_color = Color(1, 1, 0.6, 1)
+Balloon/colors/edge_color = Color(0, 0, 0, 1)
+Balloon/colors/fill_color = Color(1, 1, 1, 1)
+Balloon/constants/box_margin_x = 16
+Balloon/constants/box_margin_y = 4
+Balloon/constants/edge_thickness = 2
+Balloon/constants/layer = 0
+Balloon/constants/small_scale = 75
+Balloon/constants/squirk = 50
+Balloon/constants/tail_width = 8
+Balloon/constants/width = 288
+Frame/colors/edge_color = Color(0, 0, 0, 1)
+Frame/colors/fill_color = Color(1, 1, 1, 1)
+Frame/constants/auto_page_border = 1
+Frame/constants/edge_width = 2
+Frame/constants/fill_width = 8
+Frame/constants/layer = 1
+Label/colors/font_color = Color(1, 1, 0, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/constants/layer = 2
+Label/constants/outline_size = 8
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("1_qjjdx")
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/bold_font_size = 32
+RichTextLabel/font_sizes/bold_italics_font_size = 32
+RichTextLabel/font_sizes/italics_font_size = 28
+RichTextLabel/font_sizes/mono_font_size = 28
+RichTextLabel/font_sizes/normal_font_size = 28
+RichTextLabel/fonts/bold_font = ExtResource("1_rm8jc")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_a4gec")
+RichTextLabel/fonts/italics_font = ExtResource("3_btap7")
+RichTextLabel/fonts/normal_font = ExtResource("4_77otb")
+Settings/constants/hidef_multiplier = 24
+Settings/constants/history_size = 10
+Settings/constants/image_px_per_unit = 12
+Settings/constants/layer_depth = 2
+Settings/constants/replace_capital_i = 1
+Settings/constants/units_in_width = 160

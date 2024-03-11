@@ -1,0 +1,161 @@
+[gd_scene load_steps=10 format=3 uid="uid://2xtslp8w8ril"]
+
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
+[ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_uwmni"]
+[ext_resource type="Theme" uid="uid://cfh5p5iowtmg7" path="res://addons/icbm_editor/theme/editor.tres" id="3_wlsv2"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_balloon_properties.gd" id="4_nq2jk"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_page_properties.gd" id="4_nx1jt"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/controls/bb_text_edit.gd" id="5_cheip"]
+[ext_resource type="LabelSettings" uid="uid://nsfq3aqvbrim" path="res://addons/icbm_editor/theme/label_settings/chapter_label.tres" id="5_hcsqr"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_label_properties.gd" id="7_mktfq"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_button_properties.gd" id="8_lxpup"]
+
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "label_properties", "page_properties", "page_container", "buttons_container")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3vmmw")
+properties_panel = NodePath("Properties Panel")
+balloon_properties = NodePath("Properties Panel/MarginContainer/Balloon Properties")
+button_properties = NodePath("Properties Panel/MarginContainer/Button Properties")
+label_properties = NodePath("Properties Panel/MarginContainer/Label Properties")
+page_properties = NodePath("Properties Panel/MarginContainer/Page Properties")
+page_container = NodePath("Page Container")
+buttons_container = NodePath("Buttons Container")
+
+[node name="Page Container" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="Buttons Container" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -462.0
+offset_top = -1058.0
+offset_right = -22.0
+offset_bottom = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme = ExtResource("2_uwmni")
+alignment = 2
+
+[node name="Properties Panel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -483.0
+offset_top = 21.0
+offset_right = -21.0
+offset_bottom = -21.0
+grow_horizontal = 0
+grow_vertical = 2
+theme = ExtResource("3_wlsv2")
+
+[node name="MarginContainer" type="MarginContainer" parent="Properties Panel"]
+layout_mode = 2
+
+[node name="Balloon Properties" type="VBoxContainer" parent="Properties Panel/MarginContainer" node_paths=PackedStringArray("text_edit")]
+visible = false
+layout_mode = 2
+script = ExtResource("4_nq2jk")
+text_edit = NodePath("BBTextEdit")
+
+[node name="Header" type="Label" parent="Properties Panel/MarginContainer/Balloon Properties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Balloon Properties"
+
+[node name="Base Type" type="HBoxContainer" parent="Properties Panel/MarginContainer/Balloon Properties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties Panel/MarginContainer/Balloon Properties/Base Type"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Base Type:"
+
+[node name="OptionButton" type="OptionButton" parent="Properties Panel/MarginContainer/Balloon Properties/Base Type"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
+
+[node name="Text Label" type="Label" parent="Properties Panel/MarginContainer/Balloon Properties"]
+layout_mode = 2
+text = "Text (BBCode)"
+
+[node name="BBTextEdit" type="TextEdit" parent="Properties Panel/MarginContainer/Balloon Properties"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+wrap_mode = 1
+script = ExtResource("5_cheip")
+
+[node name="Style" type="HBoxContainer" parent="Properties Panel/MarginContainer/Balloon Properties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties Panel/MarginContainer/Balloon Properties/Style"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Style:"
+
+[node name="OptionButton" type="OptionButton" parent="Properties Panel/MarginContainer/Balloon Properties/Style"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
+
+[node name="Page Properties" type="VBoxContainer" parent="Properties Panel/MarginContainer" node_paths=PackedStringArray("ref_label", "ref_field")]
+visible = false
+layout_mode = 2
+script = ExtResource("4_nx1jt")
+ref_label = NodePath("Ref/Ref Label")
+ref_field = NodePath("Ref/Ref LineEdit")
+
+[node name="Header" type="Label" parent="Properties Panel/MarginContainer/Page Properties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Page Properties"
+
+[node name="Ref" type="HBoxContainer" parent="Properties Panel/MarginContainer/Page Properties"]
+layout_mode = 2
+
+[node name="Ref Label" type="Label" parent="Properties Panel/MarginContainer/Page Properties/Ref"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+label_settings = ExtResource("5_hcsqr")
+horizontal_alignment = 2
+vertical_alignment = 1
+clip_text = true
+
+[node name="Ref LineEdit" type="LineEdit" parent="Properties Panel/MarginContainer/Page Properties/Ref"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Allowed chars: a-z 0-9 _"
+
+[node name="Label Properties" type="VBoxContainer" parent="Properties Panel/MarginContainer"]
+visible = false
+layout_mode = 2
+script = ExtResource("7_mktfq")
+
+[node name="Header" type="Label" parent="Properties Panel/MarginContainer/Label Properties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Label Properties"
+
+[node name="Button Properties" type="VBoxContainer" parent="Properties Panel/MarginContainer"]
+visible = false
+layout_mode = 2
+script = ExtResource("8_lxpup")
