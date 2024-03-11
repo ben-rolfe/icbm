@@ -53,7 +53,7 @@ var balloon_presets:Dictionary = {
 		"shape": "box",
 		"italic": true,
 		"fill_color": Color(1,1,0.6),
-		"offset_to": Vector2.ZERO
+		"anchor_to": Vector2.ZERO
 	},
 	"thought": {
 		"editor_name": "Thought",

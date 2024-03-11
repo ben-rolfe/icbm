@@ -35,8 +35,7 @@ func add_o(data:Dictionary) -> Variant:
 	return o
 
 func add_balloon(data:Dictionary = {}):
-	if not data.has("offset"):
-		data.offset = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
 	var balloon:ComicEditorBalloon = ComicEditorBalloon.new(data, self)
 	rebuild_lookups()
 	if data.get("with_tail"):
@@ -58,8 +57,7 @@ func add_line(data:Dictionary = {}):
 
 func add_label(data:Dictionary = {}):
 	data.otype = "label"
-	if not data.has("offset"):
-		data.offset = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
 	var label:ComicLabel = Comic.book.page.add_o(data)
 	label.rebuild(true)
 
