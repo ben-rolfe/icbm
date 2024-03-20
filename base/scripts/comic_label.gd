@@ -18,6 +18,12 @@ var align:int:
 	set(value):
 		_data_set("align", value)
 
+var anchor:Vector2:
+	get:
+		return _data_get("anchor")
+	set(value):
+		_data_set("anchor", value)
+
 var bulge:float:
 	get:
 		return _data_get("bulge")
@@ -35,12 +41,6 @@ var curve_height:float:
 		return _data_get("curve_height")
 	set(value):
 		_data_set("curve_height", value)
-
-var anchor:Vector2:
-	get:
-		return _data_get("anchor")
-	set(value):
-		_data_set("anchor", value)
 
 var font:Font:
 	get:
@@ -97,6 +97,12 @@ var presets:Array:
 		return data.presets
 	set(value):
 		data.presets = value
+
+var r:float:
+	get:
+		return _data_get("r")
+	set(value):
+		_data_set("r", value)
 
 var rotate_chars:bool:
 	get:
@@ -224,8 +230,7 @@ func apply_data():
 
 
 	#Apply rotation
-	#NOTE:Don't forget to rotate align_offset, too.
-
+	rotation = r
 
 	#Apply alignment
 	match align:
@@ -273,6 +278,7 @@ func _get_default_data() -> Dictionary:
 		"layer": Comic.theme.get_constant("layer", "Label"), # We put labels on the top layer by default
 		"outline_color": Comic.theme.get_color("font_outline_color", "Label"),
 		"outline_thickness": Comic.theme.get_constant("outline_size", "Label"),
+		"r": 0,
 		"rotate_chars": true,
 		"spacing": 1.0,
 	}

@@ -7,7 +7,11 @@ enum MenuCommand {
 	ADD_CAPTION,
 	ADD_LINE,
 	ADD_LABEL,
+
 	ADD_BUTTON,
+	ADD_HOTSPOT,
+
+	ADD_NOTE,
 
 	# Layers
 	PUSH_TO_BACK,
@@ -51,7 +55,7 @@ enum MenuCommand {
 	CHANGE_BACKGROUND,
 	#TODO: Test these codes on mac
 	UNDO = 268435546, # Ctrl+Z
-	REDO = 268435545, # Ctrl+Y
+	REDO = 301989978, # Shift+Ctrl+Z
 	SAVE = 268435539, # Ctrl+S
 	SAVE_AND_QUIT = 301989971, # Ctrl+Shift+S
 	QUIT_WITHOUT_SAVING = 268435537, # Ctrl + Q

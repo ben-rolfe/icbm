@@ -33,9 +33,14 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Balloon", ComicEditor.MenuCommand.ADD_BALLOON)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_box.svg")), "Add Caption", ComicEditor.MenuCommand.ADD_CAPTION)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "label.svg")), "Add Label", ComicEditor.MenuCommand.ADD_LABEL)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "frame_border.svg")), "Add Frame Border", ComicEditor.MenuCommand.ADD_LINE)
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "button.svg")), "Add Button", ComicEditor.MenuCommand.ADD_BUTTON)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "hotspot.svg")), "Add Hotspot", ComicEditor.MenuCommand.ADD_HOTSPOT)
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), "Change Background", ComicEditor.MenuCommand.CHANGE_BACKGROUND)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "frame_border.svg")), "Add Frame Border", ComicEditor.MenuCommand.ADD_LINE)
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "note.svg")), "Add Note", ComicEditor.MenuCommand.ADD_NOTE)
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), str("Undo (", OS.get_keycode_string(int(ComicEditor.MenuCommand.UNDO)) , ")"), ComicEditor.MenuCommand.UNDO)
 	if Comic.book.undo_steps.size() == 0:
@@ -50,24 +55,28 @@ func add_menu_items(menu:PopupMenu):
 
 func menu_command_pressed(id:int):
 	match id:
+		ComicEditor.MenuCommand.OPEN_PROPERTIES:
+			Comic.book.open_properties = Comic.book.page_properties
 
 		ComicEditor.MenuCommand.ADD_BALLOON:
 			Comic.book.page.add_balloon({"with_tail":true})
-
 		ComicEditor.MenuCommand.ADD_CAPTION:
 			Comic.book.page.add_balloon({"presets":["caption"]})
-
 		ComicEditor.MenuCommand.ADD_LABEL:
 			Comic.book.page.add_label()
-			
-		ComicEditor.MenuCommand.ADD_LINE:
-			Comic.book.page.add_line()
-			
+
+		ComicEditor.MenuCommand.ADD_BUTTON:
+			Comic.book.page.add_button()
+		ComicEditor.MenuCommand.ADD_HOTSPOT:
+			Comic.book.page.add_hotspot()
+
 		ComicEditor.MenuCommand.CHANGE_BACKGROUND:
 			ComicEditorImageExplorer.open(import_new_image)
+		ComicEditor.MenuCommand.ADD_LINE:
+			Comic.book.page.add_line()
 
-		ComicEditor.MenuCommand.OPEN_PROPERTIES:
-			Comic.book.open_properties = Comic.book.page_properties
+		ComicEditor.MenuCommand.ADD_NOTE:
+			Comic.book.page.add_note()
 
 		ComicEditor.MenuCommand.UNDO:
 			Comic.book.undo()

@@ -23,19 +23,19 @@ func _get_drag_data(at_position:Vector2):
 	super(at_position)
 
 func dragged(global_position:Vector2):
-	serves.rotation = (serves.anchor - global_position).angle()
+	serves.r = (serves.anchor - global_position).angle()
 	serves.rebuild(false)
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), "Reset", ComicEditor.MenuCommand.DEFAULT)
-	if serves.rotation == 0:
+	if serves.r == 0:
 		menu.set_item_disabled(-1, true)
 
 func menu_command_pressed(id:int):
 	match id:
 		ComicEditor.MenuCommand.DEFAULT:
 			Comic.book.add_undo_step([ComicReversionData.new(serves)])
-			serves.rotation = 0
+			serves.r = 0
 			serves.rebuild(false)
 
 func draw_connector(layer):

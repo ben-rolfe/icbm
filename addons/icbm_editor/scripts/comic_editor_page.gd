@@ -31,6 +31,8 @@ func add_o(data:Dictionary) -> Variant:
 			o = ComicEditorLine.new(data, self)
 		"label":
 			o = ComicEditorLabel.new(data, self)
+		"note":
+			o = ComicEditorNote.new(data, self)
 	get_layer(o.layer).add_child(o)
 	return o
 
@@ -62,6 +64,15 @@ func add_label(data:Dictionary = {}):
 	label.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(label, null)])
+	redraw()
+
+func add_note(data:Dictionary = {}):
+	data.otype = "note"
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	var note:ComicEditorNote = Comic.book.page.add_o(data)
+	note.rebuild(true)
+
+	Comic.book.add_undo_step([ComicReversionParent.new(note, null)])
 	redraw()
 
 func redraw(rebuild_lookups_first:bool = false):
