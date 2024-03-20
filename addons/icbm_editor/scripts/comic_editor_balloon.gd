@@ -29,7 +29,6 @@ func apply_data():
 		# Square it for efficiency, so we can compare it with the results of squared distance methods
 		long_r_squared *= long_r_squared
 
-
 func rebuild(rebuild_subobjects:bool = false):
 	apply_data()
 	if rebuild_subobjects:

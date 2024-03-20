@@ -20,8 +20,8 @@ func dropped(global_position:Vector2):
 	if serves.data.linked:
 		super(global_position)
 	else:
-		var balloon:ComicBalloon = Comic.book.page.get_o_at_point(global_position, ComicBalloon, serves.balloon)
-		if balloon == null:
-			super(global_position)
+		var dropped_on:Variant = Comic.book.page.get_o_at_point(global_position, ComicBalloon, serves.balloon)
+		if dropped_on is ComicBalloon:
+			serves.attach_end(dropped_on, serves.v_end.angle())
 		else:
-			serves.attach_end(balloon, serves.v_end.angle())
+			super(global_position)

@@ -79,6 +79,7 @@ func dragged(global_position:Vector2):
 	pass
 
 func _gui_input(event:InputEvent):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_RIGHT:
 			Comic.book.right_clicked(self, event)
 

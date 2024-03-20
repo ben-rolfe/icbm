@@ -10,25 +10,22 @@ extends ComicBackground
 var data:Dictionary = {}
 var undo_refcount:int
 
-func _gui_input(event:InputEvent):
-	var o:Variant
-	if event is InputEventMouseButton:
-		if event.pressed:
-			o = Comic.book.page.get_o_at_point(event.global_position)
-	if o != null:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.is_double_click():
-				Comic.book.double_clicked(o, event)
-			else:
-				Comic.book.left_clicked(o, event)
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			Comic.book.right_clicked(o, event)
-	else:
-		super(event)
-
 func _get_drag_data(at_position:Vector2):
 	if Comic.book.selected_element != self and Comic.book.selected_element is Control:
 		Comic.book.selected_element._get_drag_data(at_position)
+
+func _gui_input(event:InputEvent):
+	if event is InputEventMouseButton and event.pressed:
+		#Nothing is grabbed, and the event is a mouse click (any button, single or double).
+		var o = Comic.book.page.get_o_at_point(get_viewport().get_mouse_position())
+		if o != null:
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				if event.is_double_click():
+					Comic.book.double_clicked(o, event)
+				else:
+					Comic.book.left_clicked(o, event)
+			elif event.button_index == MOUSE_BUTTON_RIGHT:
+				Comic.book.right_clicked(o, event)
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Chapter Properties" if Comic.book.page_properties.is_chapter else "Page Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
@@ -92,9 +89,9 @@ func import_new_image(path:String):
 
 func rebuild():
 	if data.has("new_image_path"):
-		texture = null
-		print(data.new_image_path)
-		texture = load(data.new_image_path)
+#		texture = null
+#		texture = load(data.new_image_path)
+		texture = ImageTexture.create_from_image(Image.load_from_file(data.new_image_path))
 	else:
 		super()
 

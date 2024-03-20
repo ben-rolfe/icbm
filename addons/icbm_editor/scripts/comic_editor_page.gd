@@ -81,8 +81,7 @@ func get_o_at_point(global_position:Vector2, type:Variant = Node, ignore:Variant
 	# We start at the top-most non-widget layer and work our way down until we find an object containing the point.
 	for i in range(Comic.book.page.layers.size() - 2, -1, -1):
 		for child in Comic.book.page.layers[i].get_children():
-			
 #			if child is ComicBalloon and child != ignore and child.get_global_rect().has_point(global_position):
 			if is_instance_of(child, type) and child.has_method("has_point") and child != ignore and child.has_point(global_position):
 				return child
-	return null
+	return background

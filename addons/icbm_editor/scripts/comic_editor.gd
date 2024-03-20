@@ -161,22 +161,22 @@ func right_clicked(target:Control, event:InputEvent):
 	if not target is ComicWidget:
 		#For widgets, the owner is already selected, and we don't want to change that.
 		selected_element = target
-	Comic.book.open_menu(target, event.global_position)
+	Comic.book.open_menu(target, get_viewport().get_mouse_position())
 
 func grab(control:Control, offset:Vector2):
 	_grabbed_element = control
 	_grab_offset = offset
 
-# Override the normal reader input events.
-func _input(event):
+func _input(event:InputEvent):
+	#NOTE: super() is not called - we don't want the normal reader input events.
 	pass
 
 func _gui_input(event:InputEvent):
 	if _grabbed_element != null:
 		if event is InputEventMouseMotion:
-			_grabbed_element.dragged(event.global_position - _grab_offset)
+			_grabbed_element.dragged(get_viewport().get_mouse_position() - _grab_offset)
 		elif event is InputEventMouseButton and event.is_released():
-			_grabbed_element.dropped(event.global_position - _grab_offset)
+			_grabbed_element.dropped(get_viewport().get_mouse_position() - _grab_offset)
 			_grabbed_element = null
 
 func _unhandled_input(event):
