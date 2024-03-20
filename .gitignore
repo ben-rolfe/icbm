@@ -14,7 +14,8 @@ export_presets.cfg
 data_*/
 mono_crash.*.json
 
-# Related Work and build test folders
+# ICBM DEVELOPMENT IGNORES
+# Delete these lines if you've downloaded the project to make your own game and you're using git
 .build/
 .workfiles/
-
+story/
