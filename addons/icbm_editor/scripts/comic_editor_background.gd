@@ -16,7 +16,6 @@ func _get_drag_data(at_position:Vector2):
 
 func _gui_input(event:InputEvent):
 	if event is InputEventMouseButton and event.pressed:
-		#Nothing is grabbed, and the event is a mouse click (any button, single or double).
 		var o = Comic.book.page.get_o_at_point(get_viewport().get_mouse_position())
 		if o != null:
 			if event.button_index == MOUSE_BUTTON_LEFT:

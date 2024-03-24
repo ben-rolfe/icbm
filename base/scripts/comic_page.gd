@@ -58,6 +58,9 @@ func add_o(data:Dictionary):
 			o = ComicBalloon.new(data, self)
 		"line":
 			o = ComicLine.new(data, self)
+		"label":
+			o = ComicLabel.new(data, self)
+		#TODO: Execute Note text here, or elsewhere?
 	get_layer(o.layer).add_child(o)
 
 func rebuild_lookups():

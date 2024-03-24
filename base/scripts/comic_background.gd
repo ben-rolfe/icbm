@@ -6,6 +6,7 @@ func _init():
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _gui_input(event:InputEvent):
+	#TODO: Fix
 	if event is InputEventMouseButton and event.pressed and get_rect().has_point(event.global_position):
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.is_double_click():

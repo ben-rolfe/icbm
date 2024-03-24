@@ -4,6 +4,7 @@ extends CodeEdit
 
 var data:Dictionary
 var default_data:Dictionary
+var anchor_to = Vector2.ZERO
 
 #-------------------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ func _init(data:Dictionary, page:ComicPage):
 	auto_brace_completion_highlight_matching = true
 	text_changed.connect(_on_text_changed)
 	caret_changed.connect(_on_changed)
-	focus_entered.connect(_on_changed)
+	focus_entered.connect(_on_entered)
 	focus_exited.connect(_on_changed)
 
 func _data_get(key:Variant):
@@ -72,6 +73,17 @@ func rebuild(_rebuild_subobjects:bool = false):
 func after_reversion():
 	rebuild()
 
+func rebuild_widgets():
+	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
+	draw_layer.clear()
+	draw_layer.add_child(ComicMoveWidget.new(self))
+	draw_layer.add_child(ComicWidthWidget.new(self))
+
+func add_menu_items(menu:PopupMenu):
+	menu.add_submenu_item("Layer", "layer")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Note", ComicEditor.MenuCommand.DELETE)
+
 func _on_text_changed():
 	if text != _data_get("text"):
 		if not Comic.book.last_undo_matched(self, "text"):
@@ -81,6 +93,10 @@ func _on_text_changed():
 		
 func _on_changed():
 	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
+
+func _on_entered():
+	Comic.book.selected_element = self
+	_on_changed()
 
 static func _get_default_data() -> Dictionary:
 	return {
