@@ -30,9 +30,7 @@ func apply_data():
 		long_r_squared *= long_r_squared
 
 func rebuild(rebuild_subobjects:bool = false):
-	apply_data()
-	if rebuild_subobjects:
-		rebuild_tails(true)
+	super(rebuild_subobjects)
 	Comic.book.page.redraw()
 
 func after_reversion():
@@ -54,32 +52,6 @@ func dragged(global_position:Vector2):
 
 func has_point(point:Vector2) -> bool:
 	return shape.has_point(self, point)
-
-func rebuild_tails(include_backlinked:bool = false):
-	# First, clear out any tails that don't have data (they've been deleted)
-	var to_remove:Array = []
-	for oid in tails:
-		if not data.tails.has(oid):
-			to_remove.push_back(oid)
-	for oid in to_remove:
-		tails.erase(oid)
-	
-	# Now rebuild the tails from the data (this will add any tails that are new)
-	for oid in data.tails:
-		rebuild_tail(oid)
-	if include_backlinked:
-		for oids in tail_backlinks:
-			Comic.book.page.os[oids.x].rebuild_tail(oids.y)
-
-func rebuild_tail(tail_oid:int):
-	if data.tails.has(tail_oid): # Ignore any request to rebuild a tail that isn't in the data
-		if not tails.has(tail_oid):
-			# The tail is in the data but doesn't exist (yet) - add it.
-			tails[tail_oid] = ComicTail.new(tail_oid, self)
-		tails[tail_oid].apply_data()
-		if data.tails[tail_oid].has("end_oid"):
-			if not Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.has(Vector2i(oid, tail_oid)):
-				Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.push_back(Vector2i(oid, tail_oid))
 
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
@@ -299,7 +271,7 @@ func menu_command_pressed(id:int):
 			rebuild(true)
 		ComicEditor.MenuCommand.RANDOMIZE:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			seed = randi()
+			rng_seed = randi()
 			rebuild(false)
 		ComicEditor.MenuCommand.TOGGLE_COLLAPSE:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])

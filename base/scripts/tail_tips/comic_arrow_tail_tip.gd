@@ -13,7 +13,7 @@ func calculate_points(tail:ComicTail, transforms:Array[Transform2D]):
 	super(tail, transforms)
 	
 	# Calculate the length of the arrow
-	var old_length:float
+	var old_length:float = 0
 	var new_length:float
 	var last_center:Vector2
 	for i in LENGTH + 1:

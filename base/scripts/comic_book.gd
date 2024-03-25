@@ -57,7 +57,7 @@ func _input(event):
 			Key.KEY_LEFT:
 				go_back()
 
-func _process(delta:float):
+func _process(_delta:float):
 	if change_page:
 		_show_page()
 

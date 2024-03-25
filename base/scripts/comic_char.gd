@@ -11,22 +11,22 @@ var outline_thickness:int
 var draw_offset:Vector2
 var bounds:PackedVector2Array
 
-func _init(s:String, font:Font, font_size:int, fill_color:Color, outline_color:Color, outline_thickness:int, position:Vector2, size:Vector2, rotation:float):
-	if s == "": # Shouldn't happen, but just in case
-		s = " "
-	self.s = s.left(1)
-	self.font = font
-	self.font_size = font_size
-	self.fill_color = fill_color
-	self.outline_color = outline_color
-	self.outline_thickness = outline_thickness
-	self.size = size
-	self.rotation = rotation
+func _init(_s:String, _font:Font, _font_size:int, _fill_color:Color, _outline_color:Color, _outline_thickness:int, _position:Vector2, _size:Vector2, _rotation:float):
+	if _s == "": # Shouldn't happen, but just in case
+		_s = " "
+	s = _s.left(1)
+	font = _font
+	font_size = _font_size
+	fill_color = _fill_color
+	outline_color = _outline_color
+	outline_thickness = _outline_thickness
+	size = _size
+	rotation = _rotation
 
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	draw_offset = Vector2(size.x * -0.5, size.y * 0.5 - font.get_descent(font_size) if font_size > 0 else 0)
-	self.position = position
+	draw_offset = Vector2(size.x * -0.5, size.y * 0.5 - font.get_descent(font_size) if font_size > 0 else 0.0)
+	position = _position
 
 	# Bounds will be used by parent for has_point
 	bounds = [size / -2, Vector2(size.x, -size.y) / 2, size / 2, Vector2(-size.x, size.y) / 2, size / -2]

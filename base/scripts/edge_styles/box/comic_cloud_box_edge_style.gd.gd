@@ -5,7 +5,7 @@ func _init():
 	super()
 	id = "cloud"
 	editor_name = "Cloud"
-	editor_icon = load(str(ComicEditor.DIR_ICONS, "edge_burst_box.svg"))
+	editor_icon = load(str(ComicEditor.DIR_ICONS, "edge_cloud_box.svg"))
 	tail_style_id = "cloud"
 
 func calculate_points(balloon:ComicBalloon):
@@ -13,7 +13,6 @@ func calculate_points(balloon:ComicBalloon):
 		# Prepare for the sub-curves
 		var curve:Curve2D = Curve2D.new()
 		curve.bake_interval = balloon.edge_segment_length
-		var normal = Vector2.from_angle(TAU * 0.375)
 		for i in balloon.edge_offsets.size() - 1: # Ignore the closing point
 			var point_out:Vector2 = balloon.edge_offsets[i + 1] * 0.1
 			var point_in:Vector2 = -point_out

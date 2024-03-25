@@ -41,8 +41,8 @@ var oid:int:
 
 # ------------------------------------------------------------------------------
 
-func _init(data:Dictionary, page:ComicPage):
-	self.data = data
+func _init(_data:Dictionary, page:ComicPage):
+	data = _data
 	if not data.has("otype"):
 		data.otype = "balloon"
 	if not data.has("oid"):
@@ -51,10 +51,10 @@ func _init(data:Dictionary, page:ComicPage):
 
 	name = str("Line (", oid, ")")
 
-func draw_edge(layer:ComicLayer):
+func draw_edge(draw_layer:ComicLayer):
 	if data.points.size() > 1:
-		layer.draw_polyline(data.points, edge_color, fill_width + 2 * edge_width, true)
+		draw_layer.draw_polyline(data.points, edge_color, fill_width + 2 * edge_width, true)
 
-func draw_fill(layer:ComicLayer):
+func draw_fill(draw_layer:ComicLayer):
 	if data.points.size() > 1:
-		layer.draw_polyline(data.points, fill_color, fill_width, true)
+		draw_layer.draw_polyline(data.points, fill_color, fill_width, true)

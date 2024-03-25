@@ -151,7 +151,7 @@ func menu_command_pressed(id:int):
 			rebuild()
 		ComicEditor.MenuCommand.RANDOMIZE:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			seed = randi()
+			rng_seed = randi()
 			rebuild()
 			
 func rebuild_widgets():

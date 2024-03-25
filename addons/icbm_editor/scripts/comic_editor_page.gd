@@ -6,9 +6,6 @@ func _init(bookmark:String):
 	var layer:ComicLayer = ComicWidgetLayer.new("Widgets", INF)
 	layers.push_back(layer)
 	add_child(layer)
-
-func add_click_line(line:String):
-	super(line)
 	background.mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 func get_save_data() -> Array:

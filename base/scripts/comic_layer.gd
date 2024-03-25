@@ -3,9 +3,9 @@ extends Control
 
 var depth:int
 
-func _init(name:String, depth:int):
-	self.name = name
-	self.depth = depth
+func _init(_name:String, _depth:int):
+	name = _name
+	depth = _depth
 
 func _draw():
 	# First we draw all the edges

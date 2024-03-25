@@ -3,7 +3,7 @@ extends RefCounted
 
 var id:String = "smooth"
 var editor_name:String = "Smooth"
-var editor_icon:Texture2D = load(str(ComicEditor.DIR_ICONS, "tail_smooth.svg"))
+var editor_icon:Texture2D = load(str(ComicEditor.DIR_ICONS, "tail_point.svg"))
 var is_randomized:bool
 var supports_tips:bool = true
 
@@ -77,11 +77,11 @@ func draw_edge(tail:ComicTail, layer:ComicLayer):
 	else:
 		layer.draw_polyline_colors(tail.edge_points, get_edge_colors(tail), tail.edge_thickness * 2)
 
-func draw_fill(tail:ComicTail, layer:ComicLayer, called_by_linked_layer:bool = false):
+func draw_fill(tail:ComicTail, layer:ComicLayer):
 	if tail.fill_color_start == tail.fill_color_end:
 		layer.draw_colored_polygon(tail.edge_points, tail.fill_color_start)
 	else:
 		layer.draw_polygon(tail.edge_points, get_fill_colors(tail))
 
-func adjust_points(tail:ComicTail):
+func adjust_points(_tail:ComicTail):
 	pass

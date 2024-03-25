@@ -25,10 +25,6 @@ var _regex_tag_params:RegEx = RegEx.new()
 var _regex_escape_chars:RegEx = RegEx.new()
 var _regex_sanitize_varname:RegEx = RegEx.new()
 
-var _tts_lines:Array = []
-var _tts_voices:Array = DisplayServer.tts_get_voices_for_language("en")
-var _tts_voice_id = _tts_voices[0]
-
 #These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
 var _image_px_per_unit:float
 var _units_in_width:float
@@ -297,25 +293,6 @@ func _add_replacer(replacer:Dictionary, register_before:String):
 		_replacer_keys_ordered.insert(register_before_pos, replacer.key)
 	else:
 		_replacer_keys_ordered.push_back(replacer.key)
-
-
-func _process(delta:float):
-	if _tts_lines.size() > 0 and not DisplayServer.tts_is_speaking():
-		DisplayServer.tts_speak(_tts_lines.pop_front(), _tts_voice_id)
-
-
-func _tts_queue(message:String):
-	if (prefs.read):
-		var regex = RegEx.new()
-		regex.compile("\\[.+?\\]")
-		message = regex.sub(message, "", true)
-		_tts_lines.push_back(message)
-
-func _tts_interrupt(message:String = ""):
-	_tts_lines = []
-	DisplayServer.tts_stop()
-	if message != "":
-		_tts_queue(message)
 
 func execute(command: String) -> Variant:
 	if Comic.book is ComicEditor:
@@ -716,4 +693,4 @@ func quit():
 	get_tree().quit()
 
 func get_seed_from_position(v:Vector2) -> int:
-	return v.x + v.y * size.x
+	return int(v.x + v.y * size.x)

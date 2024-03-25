@@ -16,7 +16,6 @@ var edge_points:PackedVector2Array
 var edge_segment_length:float
 var frame_half_size:Vector2
 #var _margins:Vector4
-var _refs_resolved:bool
 var rng:RandomNumberGenerator
 var tails:Dictionary = {}
 var tail_backlinks:Array = []
@@ -158,11 +157,11 @@ var shape:ComicShape:
 	set(value):
 		_data_set("shape", value.id)
 
-var seed:int:
+var rng_seed:int:
 	get:
-		return data.seed
+		return data.rng_seed
 	set(value):
-		data.seed = value
+		data.rng_seed = value
 
 var squirk:float:
 	get:
@@ -178,8 +177,8 @@ var width:int:
 
 # ------------------------------------------------------------------------------
 
-func _init(data:Dictionary, page:ComicPage):
-	self.data = data
+func _init(_data:Dictionary, page:ComicPage):
+	data = _data
 	_default_data = _get_default_data()
 	theme = Comic.theme # Not inherited, since we're in a subviewport.
 	bbcode_enabled = true
@@ -190,8 +189,8 @@ func _init(data:Dictionary, page:ComicPage):
 	page.os[oid] = self
 	if not data.has("anchor"):
 		data.anchor = Vector2.ZERO
-	if not data.has("seed"):
-		data.seed = Comic.get_seed_from_position(data.anchor)
+	if not data.has("rng_seed"):
+		data.rng_seed = Comic.get_seed_from_position(data.anchor)
 	if not data.has("tails"):
 		data.tails = {}
 	if not data.has("text"):
@@ -221,7 +220,7 @@ func apply_data():
 	# --------------------------------------------------------------------------
 	if edge_style.is_randomized:
 		rng = RandomNumberGenerator.new()
-		rng.seed = seed
+		rng.seed = rng_seed
 
 	# --------------------------------------------------------------------------
 	# SCALE
@@ -335,7 +334,7 @@ func apply_data():
 	# The FRAME is the *content* of that box (or the whole box, if _final_collapse is false), plus *margins*.
 	# Note that the anchor point is relative to the frame, not the box. (e.g. TL is the top-left of the frame)
 
-	var content_size = Vector2(get_content_width() if _final_collapse else size.x, get_content_height())
+	var content_size = Vector2(float(get_content_width()) if _final_collapse else size.x, get_content_height())
 	frame_half_size = content_size / 2.0
 
 	center_point = anchor + shape.center_adjustment - (anchor_to - Vector2.ONE * 0.5) * frame_half_size * 2
@@ -359,7 +358,7 @@ func apply_data():
 
 	# Collapse the frame width to the content width
 	if _final_collapse and align != HORIZONTAL_ALIGNMENT_LEFT:
-		position.x -= (size.x - content_size.x) * (0.5 if align == HORIZONTAL_ALIGNMENT_CENTER else 1)
+		position.x -= (size.x - content_size.x) * (0.5 if align == HORIZONTAL_ALIGNMENT_CENTER else 1.0)
 
 	#The shape may call for some adjustments of the frame
 	shape.adjust_frame_half_size(self)
@@ -382,10 +381,10 @@ func apply_data():
 func draw_edge(draw_layer:ComicLayer):
 	edge_style.draw_edge(self, draw_layer)
 
-	for oid in data.tails:
+	for tail_oid in data.tails:
 		# Draw the tail's edge if the tail is not linked, or if the balloon it's linked to is on the same or a higher layer 
-		if not data.tails[oid].linked or Comic.book.page.os[data.tails[oid].end_oid].layer >= layer:
-			tails[oid].draw_edge(draw_layer)
+		if not data.tails[tail_oid].linked or Comic.book.page.os[data.tails[tail_oid].end_oid].layer >= layer:
+			tails[tail_oid].draw_edge(draw_layer)
 
 	for oids in tail_backlinks:
 		# If we're backlinked to a tail on a higher layer, draw it's fill on *this* layer
@@ -396,10 +395,10 @@ func draw_fill(draw_layer:ComicLayer):
 	if edge_points.size() > 0:
 		edge_style.draw_fill(self, draw_layer)
 
-	for oid in data.tails:
+	for tail_oid in data.tails:
 		# Draw the tail's fill if the tail is not linked, or if the balloon it's linked to is on the same or a lower layer
-		if not data.tails[oid].linked or Comic.book.page.os[data.tails[oid].end_oid].layer <= layer:
-			tails[oid].draw_fill(draw_layer)
+		if not data.tails[tail_oid].linked or Comic.book.page.os[data.tails[tail_oid].end_oid].layer <= layer:
+			tails[tail_oid].draw_fill(draw_layer)
 
 	for oids in tail_backlinks:
 		# If we're backlinked to a tail on a lower layer, draw it's fill on *this* layer
@@ -408,6 +407,37 @@ func draw_fill(draw_layer:ComicLayer):
 
 func _on_meta_clicked(uri:String):
 	OS.shell_open(uri)
+
+func rebuild(rebuild_subobjects:bool = false):
+	apply_data()
+	if rebuild_subobjects:
+		rebuild_tails(true)
+
+func rebuild_tails(include_backlinked:bool = false):
+	# First, clear out any tails that don't have data (they've been deleted)
+	var to_remove:Array = []
+	for tail_oid in tails:
+		if not data.tails.has(tail_oid):
+			to_remove.push_back(tail_oid)
+	for tail_oid in to_remove:
+		tails.erase(tail_oid)
+	
+	# Now rebuild the tails from the data (this will add any tails that are new)
+	for tail_oid in data.tails:
+		rebuild_tail(tail_oid)
+	if include_backlinked:
+		for oids in tail_backlinks:
+			Comic.book.page.os[oids.x].rebuild_tail(oids.y)
+
+func rebuild_tail(tail_oid:int):
+	if data.tails.has(tail_oid): # Ignore any request to rebuild a tail that isn't in the data
+		if not tails.has(tail_oid):
+			# The tail is in the data but doesn't exist (yet) - add it.
+			tails[tail_oid] = ComicTail.new(tail_oid, self)
+		tails[tail_oid].apply_data()
+		if data.tails[tail_oid].has("end_oid"):
+			if not Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.has(Vector2i(oid, tail_oid)):
+				Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.push_back(Vector2i(oid, tail_oid))
 
 # ------------------------------------------------------------------------------
 

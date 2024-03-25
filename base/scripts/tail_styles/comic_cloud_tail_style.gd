@@ -31,15 +31,15 @@ func adjust_points(tail:ComicTail):
 		points.push_back(curve.sample(0, i / float(num_points - 1)))
 	tail.edge_points = points
 	
-func draw_edge(tail:ComicTail, layer:ComicLayer):
+func draw_edge(_tail:ComicTail, _draw_layer:ComicLayer):
 	pass
 	
-func draw_fill(tail:ComicTail, layer:ComicLayer, called_by_linked_layer:bool = false):
+func draw_fill(tail:ComicTail, draw_layer:ComicLayer):
 	var color:Color
 	# In case of overlap, points nearer the start should be drawn last (on top)
 	for i in range(tail.edge_points.size() - 1, -1, -1):
 		var t = i / float(tail.edge_points.size() - 1)
 		color = tail.edge_color_start.lerp(tail.edge_color_end, t)
-		layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5) + tail.edge_thickness * EDGE_THICKNESS_CORRECTION, color)
+		draw_layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5) + tail.edge_thickness * EDGE_THICKNESS_CORRECTION, color)
 		color = tail.fill_color_start.lerp(tail.fill_color_end, t)
-		layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5), color)
+		draw_layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5), color)

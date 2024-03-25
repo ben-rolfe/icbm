@@ -23,17 +23,20 @@ var v_start:Vector2
 var inset_start:Vector2
 var inset_end:Vector2
 
+# We don't store the balloon, to avoid circular references. Instead, we store its oid.
 var balloon:ComicBalloon:
 	get:
 		return Comic.book.page.os[balloon_oid]
+	set(value):
+		balloon_oid = value.oid
 
 var data:Dictionary:
 	get:
 		return balloon.data.tails[oid]
 
-func _init(oid: int, balloon:ComicBalloon):
-	self.oid = oid
-	balloon_oid = balloon.oid
+func _init(_oid: int, _balloon:ComicBalloon):
+	oid = _oid
+	balloon = _balloon
 	if not data.has("seed"):
 		data.seed = balloon.data.seed + balloon.data.tails.size()
 	if not data.has("start_placement_angle"):
@@ -109,10 +112,10 @@ func draw_fill(draw_layer:ComicLayer):
 # Editor Methods - TODO: subclass?
 # ------------------------------------------------------------------------------
 
-func attach_end(end_balloon:ComicBalloon, end_placement_angle:float):
+func attach_end(_end_balloon:ComicBalloon, end_placement_angle:float):
 	# Note that we don't create an undo point, since this action is the result of a drag action, and an undo point was created at the start of the drag
 	data.linked = true
-	data.end_oid = end_balloon.data.oid
+	data.end_oid = _end_balloon.data.oid
 	data.end_placement_angle = end_placement_angle
 	# (balloon.center_point - end_balloon.center_point).angle()
 	balloon.rebuild_tails()

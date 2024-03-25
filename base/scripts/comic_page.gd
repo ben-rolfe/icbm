@@ -3,11 +3,9 @@ extends SubViewport
 
 var bg_path:String
 var background:ComicBackground
-var _click_lines:Array[String] = []
 var layers:Array[ComicLayer] = []
 
 var layer_depth:int
-var _default_line_layer:int
 
 var bookmark:String
 
@@ -18,8 +16,8 @@ var os = {}
 #var last_ref:int = -1
 #var refs = {}
 
-func _init(bookmark: String):
-	self.bookmark = bookmark
+func _init(_bookmark: String):
+	bookmark = _bookmark
 	name = bookmark.replace("/","__")
 
 	#var theme:Theme = preload("res://theme/root_theme.tres")
@@ -47,6 +45,7 @@ func _init(bookmark: String):
 	file.close()
 
 func add_fragment(fragment:Dictionary):
+	print("Adding fragment")
 	#TODO: Cope with logic fragments and include fragments
 	for o in fragment.os:
 		add_o(o)
@@ -60,8 +59,14 @@ func add_o(data:Dictionary):
 			o = ComicLine.new(data, self)
 		"label":
 			o = ComicLabel.new(data, self)
-		#TODO: Execute Note text here, or elsewhere?
-	get_layer(o.layer).add_child(o)
+		"note":
+			if data.has("text"):
+				if OS.is_debug_build():
+					print(Comic.execute(data.text))
+				else:
+					Comic.execute(data.text)
+	if o != null:
+		get_layer(o.layer).add_child(o)
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.
@@ -92,13 +97,13 @@ func get_layer(i:int) -> ComicLayer:
 	i = clampi(i,-layer_depth,layer_depth)
 	return layers[i + layer_depth]
 
-func add_click_line(line:String):
-	_click_lines.push_back(line)
-	background.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-func activatebackground_button():
-	if _click_lines.size() > 0:
-		Comic.book.read_lines(_click_lines, self)
+#func add_click_line(line:String):
+	#_click_lines.push_back(line)
+	#background.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+#
+#func activatebackground_button():
+	#if _click_lines.size() > 0:
+		#Comic.book.read_lines(_click_lines, self)
 
 func make_oid() -> int:
 	#We use os as unique, immutable identifiers for objects that are unique within a view
@@ -115,7 +120,6 @@ func make_oid() -> int:
 		
 func get_default_data() -> Array:
 	# Add the default frame
-	var points:PackedVector2Array = PackedVector2Array()
 	return [{ "os":[{
 		# We draw the outside frame at double width, so that one full width is shown within the page.
 		"otype": "line",

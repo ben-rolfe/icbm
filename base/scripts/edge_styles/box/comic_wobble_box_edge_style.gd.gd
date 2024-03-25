@@ -7,7 +7,7 @@ func _init():
 	super()
 	id = "wobble"
 	editor_name = "Wobble"
-	editor_icon = load(str(ComicEditor.DIR_ICONS, "edge_burst_box.svg"))
+	editor_icon = load(str(ComicEditor.DIR_ICONS, "edge_wobble_box.svg"))
 	is_randomized = true
 	tail_style_id = "wobble"
 

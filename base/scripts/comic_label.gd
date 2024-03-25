@@ -116,24 +116,24 @@ var spacing:float:
 	set(value):
 		_data_set("spacing", value)
 
-var seed:int:
+var rng_seed:int:
 	get:
-		return data.seed
+		return data.rng_seed
 	set(value):
-		data.seed = value
+		data.rng_seed = value
 
 # ------------------------------------------------------------------------------
 
-func _init(data:Dictionary, page:ComicPage):
-	self.data = data
+func _init(_data:Dictionary, page:ComicPage):
+	data = _data
 	default_data = _get_default_data()
 	if not data.has("oid"):
 		data.oid = Comic.book.page.make_oid()
 	page.os[oid] = self
 	if not data.has("anchor"):
 		data.anchor = Vector2.ZERO
-	if not data.has("seed"):
-		data.seed = Comic.get_seed_from_position(data.anchor)
+	if not data.has("rng_seed"):
+		data.rng_seed = Comic.get_seed_from_position(data.anchor)
 	if not data.has("text"):
 		data.text = DEFAULT_TEXT
 		
@@ -153,11 +153,8 @@ func apply_data():
 	clip_contents = false
 	
 	var rng = RandomNumberGenerator.new()
-	rng.seed = seed
+	rng.seed = rng_seed
 
-	var pre_text:String
-	var post_text:String
-	
 	var s = Comic.parse_rich_text_string(data.text)
 
 	for child in get_children():
@@ -181,8 +178,8 @@ func apply_data():
 		char_font_size.push_back(font_size)
 		char_str.push_back(s.substr(i,1))
 		char_int.push_back(s.unicode_at(i))
-		glyph.push_back(text_server.font_get_glyph_index(font_rid, char_font_size[i], char_int[i], 0))
-		char_size.push_back(font.get_char_size(char_int[i], char_font_size[i]))
+		glyph.push_back(text_server.font_get_glyph_index(font_rid, int(char_font_size[i]), char_int[i], 0))
+		char_size.push_back(font.get_char_size(char_int[i], int(char_font_size[i])))
 		if i == 0:
 			pos.push_back(Vector2.ZERO)
 		else:
@@ -199,10 +196,10 @@ func apply_data():
 		# Then recalculate char_size, pos, and fiunally t, based on variable font sizes.
 		for i in char_font_size.size():
 			if grow != 1:
-				char_font_size[i] *= 1 + (grow - 1) * pow(t[i], 2 if grow > 1 else 0.5)
+				char_font_size[i] *= 1 + (grow - 1) * pow(t[i], 2.0 if grow > 1 else 0.5)
 			if bulge != 1:
 				char_font_size[i] *= 1 + (bulge - 1) * sin(t[i] * PI)
-			char_size[i] = font.get_char_size(char_int[i], char_font_size[i]) if char_font_size[i] > 0 else Vector2.ZERO
+			char_size[i] = font.get_char_size(char_int[i], int(char_font_size[i])) if char_font_size[i] > 0 else Vector2.ZERO
 			if i == 0:
 				pos[i] = Vector2.ZERO
 			else:
@@ -244,7 +241,7 @@ func apply_data():
 
 	var char_obj:Array[ComicChar] = []
 	for i in char_str.size():
-		char_obj.push_back(ComicChar.new(char_str[i], font, char_font_size[i], font_color, outline_color, outline_thickness, pos[i], char_size[i], rot[i]))
+		char_obj.push_back(ComicChar.new(char_str[i], font, int(char_font_size[i]), font_color, outline_color, int(outline_thickness), pos[i], char_size[i], rot[i]))
 		add_child(char_obj[i])
 		if i > 0 and not FOREGROUND_CHARS.contains(char_str[i]):
 			# Move normal characters behind existing ones, but don't do this for punctuation.
@@ -265,7 +262,7 @@ func _data_set(key:Variant, value:Variant):
 		data[key] = value
 
 func _get_default_data() -> Dictionary:
-	var r = {
+	var ret = {
 		"align": HORIZONTAL_ALIGNMENT_CENTER,
 		"anchor": Vector2.ZERO,
 		"bulge": 1.0,
@@ -288,6 +285,6 @@ func _get_default_data() -> Dictionary:
 		if presets.has(preset_key):
 			# We have this preset - apply all its keys to the default data 
 			for key in Comic.label_presets[preset_key].keys():
-				r[key] = Comic.label_presets[preset_key][key]
+				ret[key] = Comic.label_presets[preset_key][key]
 
-	return r
+	return ret
