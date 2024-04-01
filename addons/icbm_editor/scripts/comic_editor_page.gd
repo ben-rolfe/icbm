@@ -21,17 +21,27 @@ func get_save_data() -> Array:
 
 func add_o(data:Dictionary) -> Variant:
 	var o:Variant
-	match data.otype:
-		"balloon":
-			o = ComicEditorBalloon.new(data, self)
-		"line":
-			o = ComicEditorLine.new(data, self)
-		"label":
-			o = ComicEditorLabel.new(data, self)
-		"note":
-			o = ComicEditorNote.new(data, self)
-	get_layer(o.layer).add_child(o)
-	return o
+	if data.has("otype"):
+		match data.otype:
+			"balloon":
+				o = ComicEditorBalloon.new(data, self)
+				get_layer(o.layer).add_child(o)
+			"button":
+				o = ComicEditorButton.new(data, self)
+				Comic.book.buttons_container.add_child(o)
+			"line":
+				o = ComicEditorLine.new(data, self)
+				get_layer(o.layer).add_child(o)
+			"label":
+				o = ComicEditorLabel.new(data, self)
+				get_layer(o.layer).add_child(o)
+			"note":
+				o = ComicEditorNote.new(data, self)
+				get_layer(o.layer).add_child(o)
+		return o
+	else:
+		printerr("No otype in data: ", data)
+		return null
 
 func add_balloon(data:Dictionary = {}):
 	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
@@ -45,6 +55,11 @@ func add_balloon(data:Dictionary = {}):
 
 	Comic.book.add_undo_step([ComicReversionParent.new(balloon, null)])
 	rebuild_lookups()
+
+func add_button(data:Dictionary = {}):
+	var button:ComicEditorButton = ComicEditorButton.new(data, self)
+	Comic.book.buttons_container.add_child(button)
+	Comic.book.add_undo_step([ComicReversionParent.new(button, null)])
 
 func add_line(data:Dictionary = {}):
 	data.otype = "line"

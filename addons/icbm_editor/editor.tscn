@@ -159,7 +159,41 @@ text = "Label Properties"
 [node name="LineEdit" type="LineEdit" parent="Properties/MarginContainer/LabelProperties"]
 layout_mode = 2
 
-[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer"]
+[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("8_lxpup")
+text_edit = NodePath("Text/Text LineEdit")
+action_button = NodePath("Action/Action OptionButton")
+action_target_button = NodePath("Action Target OptionButton")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Button Properties"
+
+[node name="Text" type="HBoxContainer" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+
+[node name="Text Label" type="Label" parent="Properties/MarginContainer/ButtonProperties/Text"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text:"
+
+[node name="Text LineEdit" type="LineEdit" parent="Properties/MarginContainer/ButtonProperties/Text"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Action" type="HBoxContainer" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+
+[node name="Action Label" type="Label" parent="Properties/MarginContainer/ButtonProperties/Action"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Action:"
+
+[node name="Action OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties/Action"]
+layout_mode = 2
+
+[node name="Action Target OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2

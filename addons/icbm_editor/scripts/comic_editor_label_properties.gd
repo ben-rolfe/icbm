@@ -22,16 +22,13 @@ func prepare():
 		line_edit.caret_column = line_edit.text.length()
 
 func _on_text_changed(new_text:String):
-	print("boop1")
 	label.data.text = ComicEditor.unparse_text_edit(line_edit.text)
 	label.rebuild(true)
 
 func _on_text_focused():
-	print("boop2")
 	text_before_changes = line_edit.text
 	
 func _on_text_unfocused():
-	print("boop3")
 	if line_edit.text != text_before_changes:
 		var reversion:ComicReversionData = ComicReversionData.new(label)
 		reversion.data.text = ComicEditor.unparse_text_edit(text_before_changes)

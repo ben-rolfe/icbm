@@ -276,6 +276,7 @@ func clean_up_reversion(reversion:ComicReversion, is_redo_step:bool):
 func save(quit_after_saving:bool = false):
 	#print("TODO: Save changes to ", bookmark)
 	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.WRITE)
+	print(page.get_save_data())
 	file.store_var(page.get_save_data())
 	file.close()
 	

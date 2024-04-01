@@ -16,7 +16,7 @@ func prepare():
 	balloon = Comic.book.selected_element
 	text_edit.text = ComicEditor.parse_text_edit(balloon.data.text)
 	text_edit.grab_focus()
-	if text_edit.text == ComicBalloon.DEFAULT_TEXT:
+	if text_edit.text == balloon._default_data.text:
 		text_edit.select_all()
 	else:
 		#TODO: There's gotta be a less weird way?!

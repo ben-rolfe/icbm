@@ -1,8 +1,6 @@
 class_name ComicBalloon
 extends RichTextLabel
 
-const DEFAULT_TEXT:String = "New Balloon..."
-
 var _final_box_scale:float
 var _final_font_scale:float
 var _final_edge_scale:Vector2
@@ -194,7 +192,7 @@ func _init(_data:Dictionary, page:ComicPage):
 	if not data.has("tails"):
 		data.tails = {}
 	if not data.has("text"):
-		data.text = DEFAULT_TEXT
+		data.text = _default_data.text
 	
 	if not Comic.book is ComicEditor:
 		data.text = Comic.execute_embedded_code(data.text)
@@ -202,8 +200,7 @@ func _init(_data:Dictionary, page:ComicPage):
 	name = str("Balloon (", oid, ")")
 
 func apply_data():
-	# First, combine any selected presets to create the default dictionary
-	# This dictionary will be used 
+	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
 	_default_data = _get_default_data()
 	
 	var parent_layer = Comic.book.page.get_layer(layer)
@@ -473,6 +470,7 @@ func _get_default_data() -> Dictionary:
 		"scroll": false,
 		"shape": "balloon",
 		"squirk": Comic.theme.get_constant("squirk", "Balloon") / 100.0,
+		"text": "New Balloon...",
 		"width": Comic.theme.get_constant("width", "Balloon"),
 	}
 

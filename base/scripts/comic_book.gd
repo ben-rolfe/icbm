@@ -6,7 +6,6 @@ extends Control
 #@export var debug_bookmark:String = "start"
 
 var aliases:Dictionary = {}
-var _buttons:Array[ComicButton] = []
 var change_page:bool
 var default_balloon_layer:int
 var history:Array = []
@@ -15,6 +14,8 @@ var _history_size:int
 var vars:Dictionary
 var page:ComicPage
 var has_unsaved_changes:bool
+var pages:Dictionary
+var bookmarks:PackedStringArray
 
 # ------------------------------------------------------------------------------
 
@@ -30,6 +31,19 @@ func _init():
 	Comic.book = self
 	_history_size = Comic.theme.get_constant("history_size", "Settings")
 	default_balloon_layer = Comic.theme.get_constant("default_layer", "Balloon")
+	pages = {"start":["_"]} # We begin with start in the dictionary, so that it will be at index 0.
+	for chapter in DirAccess.get_directories_at(Comic.DIR_STORY):
+		if chapter != "start":
+			pages[chapter] = ["_"] # We begin each chapter with the title page, so that it will be at index 0.
+		for page in DirAccess.get_files_at(str(Comic.DIR_STORY, chapter)):
+			if page.get_extension() == "txt" and page.get_basename().get_file() != "_":
+				pages[chapter].push_back(page.get_basename().get_file())
+	for chapter in pages:
+		for page in pages[chapter]:
+			if page == "_":
+				bookmarks.push_back(chapter) # Title page
+			else:
+				bookmarks.push_back(str(chapter, "/", page))
 
 func _ready():
 #	read_story_directory()
@@ -55,7 +69,7 @@ func _input(event):
 			#Key.KEY_SPACE, Key.KEY_RIGHT, Key.KEY_0, Key.KEY_KP_0:
 				#page.activate_bg_button()
 			Key.KEY_LEFT:
-				go_back()
+				page_back()
 
 func _process(_delta:float):
 	if change_page:
@@ -74,7 +88,7 @@ func left_clicked(control:Control, _event:InputEvent):
 
 func right_clicked(control:Control, _event:InputEvent):
 	if control is ComicBackground:
-		go_back()
+		page_back()
 
 func _show_page():
 	change_page = false
@@ -83,9 +97,9 @@ func _show_page():
 	print(history)
 	while history.size() > _history_size:
 		history.pop_front()
-#	assert( _page_data.has(bookmark), "Bookmark pointed to non-existent page '" + bookmark + "'.");
-	while _buttons.size() > 0:
-		_buttons.pop_back().queue_free()
+	# Buttons are not part of the page itself, so we need to clear them separately:
+	for button in buttons_container.get_children():
+		button.queue_free()
 	if page != null:
 		#TODO: Transitions?
 		page.queue_free()
@@ -101,13 +115,49 @@ func _show_page():
 	else:
 		page.rebuild()
 
-func go_back():
+func page_back():
 	if history.size() > 1:
 		history.pop_back() # This is the vars history for the *current* page - we discard it.
 		vars = history.pop_back()	#behind it is the vars history for the previous page. We remove it and load it into vars - changing the page will add it back to the history.
 		print("Go back!")
 		print(history)
 		change_page = true
+
+func page_go(_bookmark:String):
+	bookmark = _bookmark
+	change_page = true
+
+func page_next():
+	bookmark = get_relative_bookmark(bookmark, 1)
+	change_page = true
+
+func page_previous():
+	bookmark = get_relative_bookmark(bookmark, -1)
+	change_page = true
+
+func page_return():
+	if vars._bookmarks.size() > 1:
+		vars._bookmarks.pop_back()
+	else:
+		printerr("Return was called when bookmarks contained only one value (perhaps visit hadn't been called or return was called multiple times)")
+	change_page = true
+
+func page_visit(_bookmark:String):
+	vars._bookmarks.push_back(_bookmark)
+	change_page = true
+
+func get_relative_bookmark_index(from_key:String, offset:int) -> int:
+	print("seeking ", from_key, " in ", bookmarks) 
+	var index = bookmarks.find(from_key)
+	if index == null:
+		# We default to the title page.
+		index = 0
+	else:
+		index = posmod(index + offset, bookmarks.size())
+	return index
+
+func get_relative_bookmark(from_key:String, offset:int) -> String:
+	return bookmarks[get_relative_bookmark_index(from_key, offset)]
 
 func save(quit_after_saving:bool = false):
 	print("TODO: Save")

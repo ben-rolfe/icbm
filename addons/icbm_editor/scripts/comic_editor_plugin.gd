@@ -127,7 +127,7 @@ func item_pressed(index:int, chapter:String = ""):
 		# ADD PAGE
 		# Find an unused page name
 		var i = 1
-		while pages[chapter].has(str("page_", i, ".txt")):
+		while pages[chapter].has(str("page_", i)):
 			i += 1
 		bookmark = str(chapter, "/page_", i)
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".txt"), FileAccess.WRITE)

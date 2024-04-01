@@ -326,7 +326,6 @@ func load_texture(path:String, dir:String = DIR_STORY) -> Texture2D:
 	push_warning("Image failed to load from path: ", path)
 	return null
 
-
 func execute_embedded_code(s:String) -> String:
 	var r:String
 	var last_end:int = 0
@@ -346,6 +345,12 @@ func style_embedded_code(s:String) -> String:
 		last_end = result.get_end()
 	r = str(r, s.substr(last_end))
 	return r
+
+func parse_hidden_string(s:String):
+	if OS.is_debug_build():
+		print(execute_embedded_code(s))
+	else:
+		execute_embedded_code(s)
 
 func parse_rich_text_string(s: String) -> String:
 	# In the editor we'll have un-executed code that we want to style.
@@ -385,149 +390,149 @@ func split_tag_params(s:String) -> Dictionary:
 # ------------------------------------------------------------------------------
 # Presented in alphabetic order, but with parse and unparse in pairs
 
-func parse_anchor(s:String) -> Vector2:
-	var v = Vector2(0.5,0.5)
-	if s.contains("L"):
-		v.x = 0
-	elif s.contains("R"):
-		v.x = 1
-	if s.contains("T"):
-		v.y = 0
-	elif s.contains("B"):
-		v.y = 1
-	return v
-func unparse_anchor(v:Vector2) -> String:
-	var s:String
-	if is_zero_approx(v.y):
-		s = "T"
-	elif is_equal_approx(v.y, 1):
-		s = "B"
-	if is_zero_approx(v.x):
-		s = str(s, "L")
-	elif is_equal_approx(v.x, 1):
-		s = str(s, "R")
-	if s == "":
-		s = "C"
-	return s
-
-func parse_angle(angle_string:String) -> float:
-	#TODO: Consider returning 0 on fail
-	var angle:float
-	if angle_string.contains(":"):
-		# Angle is in clock notation.
-		var parts:PackedFloat64Array = angle_string.split_floats(":",false)
-		if parts.size() == 0:
-			return 0
-		angle = TAU * parts[0] / 12.0
-		if parts.size() > 1:
-			angle += TAU * parts[1] / 720.0
-	else:
-		# Angle is in degrees
-		angle = TAU * float(angle_string) / 360.0
-	# Before returning, we:
-	#	Subtract a quarter-turn, because we accept angles as 0=up, but in Godot they're 0=right
-	#	Make sure it's a positive value between 0 and TAU radians
-	return fposmod(angle - TAU / 4, TAU)
-func unparse_angle(n:float) -> String:
-	var s = ""
-	n += TAU / 4 # Transform from 0-right to 0-up
-	# Convert to clock format
-	n *= 12 / TAU
-	var hours:int = posmod(floori(n), 12)
-	var minutes:int = floori(fposmod(n, 1) * 60)
-	if hours == 0:
-		s = "12:"
-	else:
-		s = str(hours, ":")
-	if minutes < 10:
-		if minutes > 0: # In clock format, we can leave off the minutes if they are 0.
-			s = str(s, "0", minutes)
-	else:
-		s = str(s, minutes)
-	return s
-
-func parse_bookmark(s:String) -> String:
-	#TODO: Do we really want to execute here?
-	s = execute_embedded_code(s)
-	if s == "/":
-		# The current page's chapter.
-		return book.page.bookmark.split("/")[0]
-	if s[0] == "/":
-		# Local address = add the current page's chapter
-		return book.page.bookmark.split("/")[0] + s
-	return s
-
-func parse_boolean(s:String) -> bool:
-	match s.to_lower():
-		"1", "true", "t", "yes", "y":
-			return true
-		_:
-			return false
-func unparse_boolean(b:bool) -> String:
-	return "y" if b else "n"
-
-func parse_halign(s:String) -> int:
-	match s.left(1).to_upper():
-		"L":
-			return HORIZONTAL_ALIGNMENT_LEFT
-		"R":
-			return HORIZONTAL_ALIGNMENT_RIGHT
-		_:
-			return HORIZONTAL_ALIGNMENT_CENTER
-func unparse_halign(halign:int) -> String:
-	match halign:
-		HORIZONTAL_ALIGNMENT_LEFT:
-			return "L"
-		HORIZONTAL_ALIGNMENT_CENTER:
-			return "R"
-		_:
-			return "C"
-
-func parse_layer(s:String) -> int:
-	return clampi(int(s), -Comic.book.page.layer_depth, Comic.book.page.layer_depth)
-	
-func unparse_layer(n:int) -> String:
-	return str(n)
-
-func parse_multiplier(s:String) -> float:
-	s = s.strip_edges()
-	if s[-1] == "%":
-		return float(s.left(-1)) / 100
-	else:
-		return float(s)
-func unparse_multiplier(n:float) -> String:
-	return str(String.num(n * 100, 3), "%")
-
-func parse_overflow(s:String) -> Overflow:
-	match s:
-		"scroll":
-			return Overflow.SCROLL
-		"clip":
-			return Overflow.CLIP
-		_:
-			return Overflow.SHOW
-func unparse_overflow(overflow:Overflow) -> String:
-	match overflow:
-		Overflow.SCROLL:
-			return "scroll"
-		Overflow.CLIP:
-			return "clip"
-		_:
-			return "show"
-
-func parse_position(s:String) -> Vector2:
-	var parts = s.split(",")
-	if parts.size() != 2:
-		printerr("Position parse failed on '", s, "'")
-		return Vector2.ZERO
-	return Vector2(float(parts[0]), float(parts[1])) * px_per_unit
-func unparse_position(pos:Vector2) -> String:
-	return str(String.num(pos.x / px_per_unit, 3), ",", String.num(pos.y / px_per_unit, 3))
-
-func parse_units(s:String) -> float:
-	return float(s) * px_per_unit
-func unparse_units(n:float) -> String:
-	return String.num(n / px_per_unit, 3)
+#func parse_anchor(s:String) -> Vector2:
+	#var v = Vector2(0.5,0.5)
+	#if s.contains("L"):
+		#v.x = 0
+	#elif s.contains("R"):
+		#v.x = 1
+	#if s.contains("T"):
+		#v.y = 0
+	#elif s.contains("B"):
+		#v.y = 1
+	#return v
+#func unparse_anchor(v:Vector2) -> String:
+	#var s:String
+	#if is_zero_approx(v.y):
+		#s = "T"
+	#elif is_equal_approx(v.y, 1):
+		#s = "B"
+	#if is_zero_approx(v.x):
+		#s = str(s, "L")
+	#elif is_equal_approx(v.x, 1):
+		#s = str(s, "R")
+	#if s == "":
+		#s = "C"
+	#return s
+#
+#func parse_angle(angle_string:String) -> float:
+	##TODO: Consider returning 0 on fail
+	#var angle:float
+	#if angle_string.contains(":"):
+		## Angle is in clock notation.
+		#var parts:PackedFloat64Array = angle_string.split_floats(":",false)
+		#if parts.size() == 0:
+			#return 0
+		#angle = TAU * parts[0] / 12.0
+		#if parts.size() > 1:
+			#angle += TAU * parts[1] / 720.0
+	#else:
+		## Angle is in degrees
+		#angle = TAU * float(angle_string) / 360.0
+	## Before returning, we:
+	##	Subtract a quarter-turn, because we accept angles as 0=up, but in Godot they're 0=right
+	##	Make sure it's a positive value between 0 and TAU radians
+	#return fposmod(angle - TAU / 4, TAU)
+#func unparse_angle(n:float) -> String:
+	#var s = ""
+	#n += TAU / 4 # Transform from 0-right to 0-up
+	## Convert to clock format
+	#n *= 12 / TAU
+	#var hours:int = posmod(floori(n), 12)
+	#var minutes:int = floori(fposmod(n, 1) * 60)
+	#if hours == 0:
+		#s = "12:"
+	#else:
+		#s = str(hours, ":")
+	#if minutes < 10:
+		#if minutes > 0: # In clock format, we can leave off the minutes if they are 0.
+			#s = str(s, "0", minutes)
+	#else:
+		#s = str(s, minutes)
+	#return s
+#
+#func parse_bookmark(s:String) -> String:
+	##TODO: Do we really want to execute here?
+	#s = execute_embedded_code(s)
+	#if s == "/":
+		## The current page's chapter.
+		#return book.page.bookmark.split("/")[0]
+	#if s[0] == "/":
+		## Local address = add the current page's chapter
+		#return book.page.bookmark.split("/")[0] + s
+	#return s
+#
+#func parse_boolean(s:String) -> bool:
+	#match s.to_lower():
+		#"1", "true", "t", "yes", "y":
+			#return true
+		#_:
+			#return false
+#func unparse_boolean(b:bool) -> String:
+	#return "y" if b else "n"
+#
+#func parse_halign(s:String) -> int:
+	#match s.left(1).to_upper():
+		#"L":
+			#return HORIZONTAL_ALIGNMENT_LEFT
+		#"R":
+			#return HORIZONTAL_ALIGNMENT_RIGHT
+		#_:
+			#return HORIZONTAL_ALIGNMENT_CENTER
+#func unparse_halign(halign:int) -> String:
+	#match halign:
+		#HORIZONTAL_ALIGNMENT_LEFT:
+			#return "L"
+		#HORIZONTAL_ALIGNMENT_CENTER:
+			#return "R"
+		#_:
+			#return "C"
+#
+#func parse_layer(s:String) -> int:
+	#return clampi(int(s), -Comic.book.page.layer_depth, Comic.book.page.layer_depth)
+	#
+#func unparse_layer(n:int) -> String:
+	#return str(n)
+#
+#func parse_multiplier(s:String) -> float:
+	#s = s.strip_edges()
+	#if s[-1] == "%":
+		#return float(s.left(-1)) / 100
+	#else:
+		#return float(s)
+#func unparse_multiplier(n:float) -> String:
+	#return str(String.num(n * 100, 3), "%")
+#
+#func parse_overflow(s:String) -> Overflow:
+	#match s:
+		#"scroll":
+			#return Overflow.SCROLL
+		#"clip":
+			#return Overflow.CLIP
+		#_:
+			#return Overflow.SHOW
+#func unparse_overflow(overflow:Overflow) -> String:
+	#match overflow:
+		#Overflow.SCROLL:
+			#return "scroll"
+		#Overflow.CLIP:
+			#return "clip"
+		#_:
+			#return "show"
+#
+#func parse_position(s:String) -> Vector2:
+	#var parts = s.split(",")
+	#if parts.size() != 2:
+		#printerr("Position parse failed on '", s, "'")
+		#return Vector2.ZERO
+	#return Vector2(float(parts[0]), float(parts[1])) * px_per_unit
+#func unparse_position(pos:Vector2) -> String:
+	#return str(String.num(pos.x / px_per_unit, 3), ",", String.num(pos.y / px_per_unit, 3))
+#
+#func parse_units(s:String) -> float:
+	#return float(s) * px_per_unit
+#func unparse_units(n:float) -> String:
+	#return String.num(n / px_per_unit, 3)
 
 
 # ------------------------------------------------------------------------------

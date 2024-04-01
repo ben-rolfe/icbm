@@ -1,10 +1,18 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://7p01lqx0eat7"]
+[gd_resource type="Theme" load_steps=6 format=3 uid="uid://7p01lqx0eat7"]
 
+[ext_resource type="FontVariation" uid="uid://djt5ukb7wrtng" path="res://theme/fonts/ICBMComic-FauxBold.tres" id="2_80rcx"]
 [ext_resource type="StyleBox" uid="uid://bt2dlubrthyw8" path="res://theme/styleboxes/button_stylebox.tres" id="2_wftyd"]
+[ext_resource type="FontVariation" uid="uid://f0xti67u7ix2" path="res://theme/fonts/ICBMComic-FauxBoldItalic.tres" id="3_88t30"]
+[ext_resource type="FontVariation" uid="uid://dto1412w0nfym" path="res://theme/fonts/ICBMComic-FauxItalic.tres" id="4_oijon"]
+[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="5_4t54b"]
 
 [resource]
 PanelContainer/styles/panel = ExtResource("2_wftyd")
 RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
 RichTextLabel/constants/padding_font_size = 8
+RichTextLabel/fonts/bold_font = ExtResource("2_80rcx")
+RichTextLabel/fonts/bold_italics_font = ExtResource("3_88t30")
+RichTextLabel/fonts/italics_font = ExtResource("4_oijon")
+RichTextLabel/fonts/normal_font = ExtResource("5_4t54b")
 RichTextLabel/styles/normal = ExtResource("2_wftyd")
 VBoxContainer/constants/separation = 8

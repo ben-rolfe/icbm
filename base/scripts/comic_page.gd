@@ -55,18 +55,19 @@ func add_o(data:Dictionary):
 	match data.otype:
 		"balloon":
 			o = ComicBalloon.new(data, self)
+			get_layer(o.layer).add_child(o)
+		"button":
+			o = ComicButton.new(data, self)
+			Comic.book.buttons_container.add_child(o)
 		"line":
 			o = ComicLine.new(data, self)
+			get_layer(o.layer).add_child(o)
 		"label":
 			o = ComicLabel.new(data, self)
+			get_layer(o.layer).add_child(o)
 		"note":
 			if data.has("text"):
-				if OS.is_debug_build():
-					print(Comic.execute(data.text))
-				else:
-					Comic.execute(data.text)
-	if o != null:
-		get_layer(o.layer).add_child(o)
+				Comic.parse_hidden_string(data.text)
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.
