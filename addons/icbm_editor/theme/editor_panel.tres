@@ -1,0 +1,32 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://cfh5p5iowtmg7"]
+
+[ext_resource type="FontFile" uid="uid://wbpda6tspm4v" path="res://theme/fonts/label/Bangers-Regular.ttf" id="1_rdejs"]
+[ext_resource type="StyleBox" uid="uid://diy2wo8kbj8do" path="res://addons/icbm_editor/theme/styleboxes/editable_stylebox.tres" id="2_dytjs"]
+[ext_resource type="StyleBox" uid="uid://drb2aylo2hd5n" path="res://addons/icbm_editor/theme/styleboxes/non_editable_stylebox.tres" id="3_g11fe"]
+[ext_resource type="StyleBox" uid="uid://ejkvhwdffcg" path="res://addons/icbm_editor/theme/styleboxes/properties_stylebox.tres" id="4_6u1np"]
+[ext_resource type="FontFile" uid="uid://c3pnj1ilhlb58" path="res://addons/icbm_editor/theme/fonts/JetBrainsMono-Regular.ttf" id="5_thvgt"]
+[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="6_l0fr6"]
+
+[resource]
+default_font = ExtResource("6_l0fr6")
+default_font_size = 24
+HeaderLarge/font_sizes/font_size = 36
+HeaderLarge/fonts/font = ExtResource("1_rdejs")
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/constants/outline_size = 0
+LineEdit/colors/caret_color = Color(0, 0, 0, 1)
+LineEdit/colors/font_color = Color(0, 0, 0, 1)
+LineEdit/colors/font_uneditable_color = Color(0, 0, 0, 0.4)
+LineEdit/styles/normal = ExtResource("2_dytjs")
+LineEdit/styles/read_only = ExtResource("3_g11fe")
+MarginContainer/constants/margin_bottom = 16
+MarginContainer/constants/margin_left = 16
+MarginContainer/constants/margin_right = 16
+MarginContainer/constants/margin_top = 16
+PanelContainer/styles/panel = ExtResource("4_6u1np")
+TextEdit/colors/caret_color = Color(0, 0, 0, 1)
+TextEdit/colors/font_color = Color(0, 0, 0, 1)
+TextEdit/constants/outline_size = 5
+TextEdit/font_sizes/font_size = 18
+TextEdit/fonts/font = ExtResource("5_thvgt")
+TextEdit/styles/normal = ExtResource("2_dytjs")

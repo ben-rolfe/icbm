@@ -7,14 +7,36 @@ var layers:Array[ComicLayer] = []
 
 var layer_depth:int
 
+#NOTE: Bookmark is not stored in data
 var bookmark:String
 
 var last_oid:int = -1
 var os = {}
-#var balloons = {}
-#var labels = {}
-#var last_ref:int = -1
-#var refs = {}
+#NOTE: The data object of the page is only the data relating to the page itself, not of the contained objects
+var data:Dictionary
+var _default_data:Dictionary
+
+#-------------------------------------------------------------------------------
+
+var action:ComicButton.Action:
+	get:
+		return _data_get("action")
+	set(value):
+		_data_set("action", value)
+
+var action_bookmark:String:
+	get:
+		return _data_get("action_bookmark")
+	set(value):
+		_data_set("action_bookmark", value)
+
+var action_commands:String:
+	get:
+		return _data_get("action_commands")
+	set(value):
+		_data_set("action_commands", value)
+
+#-------------------------------------------------------------------------------
 
 func _init(_bookmark: String):
 	bookmark = _bookmark
@@ -35,14 +57,28 @@ func _init(_bookmark: String):
 		add_child(layer)
 
 	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.READ)
-	var page_data = file.get_var()
-	if page_data == []:
+	var all_data = file.get_var()
+	print(all_data)
+	if all_data == {}:
 		# A newly created page
-		page_data = get_default_data()
-#	print(page_data)
-	for fragment in page_data:
+		all_data = {
+			"page_data": {},
+			"fragments": [{ "os":[{
+				# We draw the outside frame at double width, so that one full width is shown within the page.
+				"otype": "line",
+				"oid": 0,
+				"fill_width": Comic.theme.get_constant("fill_width", "Frame") * 2,
+				"points": [Vector2.ZERO, Vector2(Comic.size.x, 0), Comic.size, Vector2(0, Comic.size.y),Vector2.ZERO],
+			}] }]
+		}
+#	print(all_data)
+	for fragment in all_data.fragments:
 		add_fragment(fragment)
 	file.close()
+
+	data = all_data.page_data
+	_default_data = _get_default_data()
+
 
 func add_fragment(fragment:Dictionary):
 	print("Adding fragment")
@@ -50,24 +86,24 @@ func add_fragment(fragment:Dictionary):
 	for o in fragment.os:
 		add_o(o)
 
-func add_o(data:Dictionary):
+func add_o(o_data:Dictionary):
 	var o:Variant
-	match data.otype:
+	match o_data.otype:
 		"balloon":
-			o = ComicBalloon.new(data, self)
+			o = ComicBalloon.new(o_data, self)
 			get_layer(o.layer).add_child(o)
 		"button":
-			o = ComicButton.new(data, self)
+			o = ComicButton.new(o_data, self)
 			Comic.book.buttons_container.add_child(o)
 		"line":
-			o = ComicLine.new(data, self)
+			o = ComicLine.new(o_data, self)
 			get_layer(o.layer).add_child(o)
 		"label":
-			o = ComicLabel.new(data, self)
+			o = ComicLabel.new(o_data, self)
 			get_layer(o.layer).add_child(o)
 		"note":
-			if data.has("text"):
-				Comic.parse_hidden_string(data.text)
+			if o_data.has("text"):
+				Comic.parse_hidden_string(o_data.text)
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.
@@ -87,12 +123,13 @@ func rebuild_lookups():
 			for tail_oid in tails_to_remove:
 				os[oid].data.tails.erase(tail_oid)
 
-func rebuild():
+func rebuild(rebuild_sub_objects:bool = true):
 	background.rebuild()
-	rebuild_lookups()
-	for oid in os:
-		if os[oid].has_method("rebuild"):
-			os[oid].rebuild(true)
+	if rebuild_sub_objects:
+		rebuild_lookups()
+		for oid in os:
+			if os[oid].has_method("rebuild"):
+				os[oid].rebuild(true)
 
 func get_layer(i:int) -> ComicLayer:
 	i = clampi(i,-layer_depth,layer_depth)
@@ -119,12 +156,40 @@ func make_oid() -> int:
 		#last_ref += 1
 	#return str("_", last_ref)
 		
-func get_default_data() -> Array:
-	# Add the default frame
-	return [{ "os":[{
-		# We draw the outside frame at double width, so that one full width is shown within the page.
-		"otype": "line",
-		"oid": 0,
-		"fill_width": Comic.theme.get_constant("fill_width", "Frame") * 2,
-		"points": [Vector2.ZERO, Vector2(Comic.size.x, 0), Comic.size, Vector2(0, Comic.size.y),Vector2.ZERO],
-	}] }]
+
+func activate():
+	match action:
+		ComicButton.Action.GO:
+			Comic.book.page_go(action_bookmark)
+		ComicButton.Action.BACK:
+			Comic.book.page_back()
+		ComicButton.Action.NEXT:
+			Comic.book.page_next()
+		ComicButton.Action.PREVIOUS:
+			Comic.book.page_previous()
+		ComicButton.Action.VISIT:
+			Comic.book.page_visit(action_bookmark)
+		ComicButton.Action.RETURN:
+			Comic.book.page_return()
+		ComicButton.Action.PARSE_COMMANDS:
+			Comic.parse_hidden_string(action_commands)
+
+# ------------------------------------------------------------------------------
+
+func _data_get(key:Variant):
+	return data.get(key, _default_data[key])
+
+func _data_set(key:Variant, value:Variant):
+	if value == _default_data[key]:
+		data.erase(key)
+	else:
+		data[key] = value
+
+#TODO: Currently this doesn't need to be a method, and _default_data could be a const. If that doesn't change, fix it.
+func _get_default_data() -> Dictionary:
+	var r:Dictionary = {
+		"action": ComicButton.Action.NEXT,
+		"action_bookmark": "",
+		"action_commands": "",
+	}
+	return r

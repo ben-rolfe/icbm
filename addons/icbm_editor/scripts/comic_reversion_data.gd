@@ -3,7 +3,7 @@ extends ComicReversion
 
 var data
 
-func _init(o:Control, focus_after:bool = true):
+func _init(o:Object, focus_after:bool = true):
 	self.o = o
 	data = o.data.duplicate(true)
 	self.focus_after = focus_after

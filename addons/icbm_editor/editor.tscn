@@ -1,12 +1,13 @@
-[gd_scene load_steps=10 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=11 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
+[ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/root_theme.tres" id="1_gldbu"]
 [ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_uwmni"]
-[ext_resource type="Theme" uid="uid://cfh5p5iowtmg7" path="res://addons/icbm_editor/theme/editor.tres" id="3_wlsv2"]
+[ext_resource type="Theme" uid="uid://cfh5p5iowtmg7" path="res://addons/icbm_editor/theme/editor_panel.tres" id="3_wlsv2"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_balloon_properties.gd" id="4_nq2jk"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_page_properties.gd" id="4_nx1jt"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/controls/bb_text_edit.gd" id="5_cheip"]
-[ext_resource type="LabelSettings" uid="uid://nsfq3aqvbrim" path="res://addons/icbm_editor/theme/label_settings/chapter_label.tres" id="5_hcsqr"]
+[ext_resource type="Texture2D" uid="uid://pr72hwmdr574" path="res://addons/icbm_editor/theme/icons/undo.svg" id="7_bibqs"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_label_properties.gd" id="7_mktfq"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_button_properties.gd" id="8_lxpup"]
 
@@ -17,6 +18,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_gldbu")
 script = ExtResource("1_3vmmw")
 properties_panel = NodePath("Properties")
 balloon_properties = NodePath("Properties/MarginContainer/BalloonProperties")
@@ -70,11 +72,17 @@ theme = ExtResource("3_wlsv2")
 [node name="MarginContainer" type="MarginContainer" parent="Properties"]
 layout_mode = 2
 
-[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit")]
+[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nq2jk")
 text_edit = NodePath("BBTextEdit")
+edge_color_button = NodePath("Edge Color/Edge ColorPickerButton")
+edge_color_revert_button = NodePath("Edge Color/Edge Color Revert Button")
+fill_color_button = NodePath("Fill Color/Fill ColorPickerButton")
+fill_color_revert_button = NodePath("Fill Color/Fill Color Revert Button")
+font_color_button = NodePath("Font Color/Font ColorPickerButton")
+font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
@@ -117,39 +125,126 @@ text = "Style:"
 custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
-[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("ref_label", "ref_field")]
+[node name="Fill Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Fill Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Fill Color:"
+
+[node name="Fill ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/BalloonProperties/Fill Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Fill Color Revert Button" type="Button" parent="Properties/MarginContainer/BalloonProperties/Fill Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="Edge Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Edge Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Edge Color:"
+
+[node name="Edge ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/BalloonProperties/Edge Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Edge Color Revert Button" type="Button" parent="Properties/MarginContainer/BalloonProperties/Edge Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text Color:"
+
+[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nx1jt")
-ref_label = NodePath("Ref/Ref Label")
-ref_field = NodePath("Ref/Ref LineEdit")
+action_button = NodePath("Action/Action OptionButton")
+action_target_button = NodePath("Action Target OptionButton")
+action_commands_textedit = NodePath("Action Commands TextEdit")
+chapter_row = NodePath("Chapter")
+chapter_button = NodePath("Chapter/Chapter OptionButton")
+new_name_label = NodePath("Page Name/New Name Label")
+new_name_lineedit = NodePath("Page Name/New Name LineEdit")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
 text = "Page Properties"
 
-[node name="Ref" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
+[node name="Chapter" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
 
-[node name="Ref Label" type="Label" parent="Properties/MarginContainer/PageProperties/Ref"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/PageProperties/Chapter"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-label_settings = ExtResource("5_hcsqr")
-horizontal_alignment = 2
-vertical_alignment = 1
-clip_text = true
+text = "Chapter:"
 
-[node name="Ref LineEdit" type="LineEdit" parent="Properties/MarginContainer/PageProperties/Ref"]
+[node name="Chapter OptionButton" type="OptionButton" parent="Properties/MarginContainer/PageProperties/Chapter"]
+layout_mode = 2
+
+[node name="Page Name" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+
+[node name="New Name Label" type="Label" parent="Properties/MarginContainer/PageProperties/Page Name"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Page Name:"
+
+[node name="New Name LineEdit" type="LineEdit" parent="Properties/MarginContainer/PageProperties/Page Name"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Allowed chars: a-z 0-9 _"
 
-[node name="LabelProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit")]
+[node name="Action" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/PageProperties/Action"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "BG Click:"
+
+[node name="Action OptionButton" type="OptionButton" parent="Properties/MarginContainer/PageProperties/Action"]
+layout_mode = 2
+
+[node name="Action Target OptionButton" type="OptionButton" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+
+[node name="Action Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/PageProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+placeholder_text = "Enter Commands..."
+
+[node name="LabelProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("7_mktfq")
 line_edit = NodePath("LineEdit")
+font_color_button = NodePath("Font Color/Font ColorPickerButton")
+font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
+outline_color_button = NodePath("Outline Color/Outline ColorPickerButton")
+outline_color_revert_button = NodePath("Outline Color/Outline Color Revert Button")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/LabelProperties"]
 layout_mode = 2
@@ -159,13 +254,48 @@ text = "Label Properties"
 [node name="LineEdit" type="LineEdit" parent="Properties/MarginContainer/LabelProperties"]
 layout_mode = 2
 
-[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button")]
+[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/LabelProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text Color:"
+
+[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="Outline Color" type="HBoxContainer" parent="Properties/MarginContainer/LabelProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Outline Color:"
+
+[node name="Outline ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Outline Color Revert Button" type="Button" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit")]
 visible = false
 layout_mode = 2
 script = ExtResource("8_lxpup")
 text_edit = NodePath("Text/Text LineEdit")
 action_button = NodePath("Action/Action OptionButton")
 action_target_button = NodePath("Action Target OptionButton")
+action_commands_textedit = NodePath("Action Commands TextEdit")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/ButtonProperties"]
 layout_mode = 2
@@ -197,3 +327,8 @@ layout_mode = 2
 
 [node name="Action Target OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties"]
 layout_mode = 2
+
+[node name="Action Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/ButtonProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+placeholder_text = "Enter Commands..."

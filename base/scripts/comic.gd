@@ -323,7 +323,7 @@ func load_texture(path:String, dir:String = DIR_STORY) -> Texture2D:
 		var full_path: String = str(dir, path, ".", ext)
 		if ResourceLoader.exists(full_path):
 			return ResourceLoader.load(full_path)
-	push_warning("Image failed to load from path: ", path)
+#	push_warning("Image failed to load from path: ", path)
 	return null
 
 func execute_embedded_code(s:String) -> String:

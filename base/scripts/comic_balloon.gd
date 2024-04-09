@@ -438,6 +438,9 @@ func rebuild_tail(tail_oid:int):
 
 # ------------------------------------------------------------------------------
 
+func is_default(key:Variant):
+	return _data_get(key) == _default_data[key]
+
 func _data_get(key:Variant):
 	return data.get(key, _default_data[key])
 
@@ -446,7 +449,7 @@ func _data_set(key:Variant, value:Variant):
 		data.erase(key)
 	else:
 		data[key] = value
-
+		
 func _get_default_data() -> Dictionary:
 	var r = {
 		"align": HORIZONTAL_ALIGNMENT_CENTER,

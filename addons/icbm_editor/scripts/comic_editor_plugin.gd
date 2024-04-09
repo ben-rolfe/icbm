@@ -55,11 +55,9 @@ func open_menu(edit_mode:bool):
 		#assert(dir.make_dir("story") == OK)
 	if not dir.dir_exists("story/start"):
 		assert(dir.make_dir_recursive("story/start") == OK)
-	if not dir.dir_exists("images/start"):
-		assert(dir.make_dir_recursive("images/start") == OK)
 	if not FileAccess.file_exists(str(Comic.DIR_STORY, "start/_.txt")):
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.txt"), FileAccess.WRITE)
-		file.store_var([])
+		file.store_var({})
 		file.close()
 
 
@@ -120,8 +118,9 @@ func item_pressed(index:int, chapter:String = ""):
 		while pages.keys().has(str("chapter_", i)):
 			i += 1
 		bookmark = str("chapter_", i)
+		DirAccess.make_dir_absolute(str(Comic.DIR_STORY, bookmark))
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, "/_.txt"), FileAccess.WRITE)
-		file.store_var([])
+		file.store_var({})
 		file.close()
 	elif index == pages[chapter].size():
 		# ADD PAGE
@@ -131,7 +130,7 @@ func item_pressed(index:int, chapter:String = ""):
 			i += 1
 		bookmark = str(chapter, "/page_", i)
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".txt"), FileAccess.WRITE)
-		file.store_var([])
+		file.store_var({})
 		file.close()
 	else:
 		# EDIT PAGE

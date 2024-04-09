@@ -8,11 +8,14 @@ func _init(bookmark:String):
 	add_child(layer)
 	background.mouse_default_cursor_shape = Control.CURSOR_ARROW
 
-func get_save_data() -> Array:
+func get_save_data() -> Dictionary:
 	#TODO: Save multiple fragments and logic
-	var save_data:Array = []
+	var save_data:Dictionary = {
+		"page_data": data,
+		"fragments":[],
+	}
 	var base_fragment:Dictionary = { "os":[] }
-	save_data.push_back(base_fragment)	
+	save_data.fragments.push_back(base_fragment)	
 	for oid in os:
 		# Check that the object still exists, and is part of the scene tree
 		if os[oid] != null and os[oid].get_parent() != null:

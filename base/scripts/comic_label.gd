@@ -125,6 +125,7 @@ var rng_seed:int:
 # ------------------------------------------------------------------------------
 
 func _init(_data:Dictionary, page:ComicPage):
+	print("INIT LABEL")
 	data = _data
 	default_data = _get_default_data()
 	if not data.has("oid"):
@@ -136,8 +137,6 @@ func _init(_data:Dictionary, page:ComicPage):
 		data.rng_seed = Comic.get_seed_from_position(data.anchor)
 	if not data.has("text"):
 		data.text = DEFAULT_TEXT
-		
-#	install_effect(ComicLabelTextEffect.new())
 
 func apply_data():
 	default_data = _get_default_data()
@@ -251,6 +250,13 @@ func apply_data():
 
 	name = str("Label (", oid, ")")
 
+func rebuild(_rebuild_sub_objects:bool = false):
+	apply_data()
+
+# ------------------------------------------------------------------------------
+
+func is_default(key:Variant):
+	return _data_get(key) == default_data[key]
 
 func _data_get(key:Variant):
 	return data.get(key, default_data[key])

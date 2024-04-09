@@ -274,38 +274,81 @@ func clean_up_reversion(reversion:ComicReversion, is_redo_step:bool):
 		reversion.o.queue_free()
 
 func save(quit_after_saving:bool = false):
-	#print("TODO: Save changes to ", bookmark)
+	var save_data:Dictionary = page.get_save_data()
+	print(save_data)
+
+	# Just store the original and new chapter and name for now - we'll compare and apply them after the save.
+	var original_chapter = ""
+	var original_name = ""
+	if page.bookmark.contains("/"):
+		original_chapter = page.bookmark.split("/")[0]
+		original_name = page.bookmark.split("/")[1]
+	else:
+		original_name = page.bookmark
+	var new_chapter = original_chapter
+	var new_name = original_name
+	if save_data.page_data.has("new_chapter"):
+		new_chapter = save_data.page_data.new_chapter
+		save_data.page_data.erase("new_chapter")
+	if save_data.page_data.has("new_name"):
+		new_name = save_data.page_data.new_name
+		save_data.page_data.erase("new_name")
+
+	var new_bookmark = ""
+	if original_chapter == "":
+		# This is a bit counterintuitive - original chapter is empty when we're saving a title page - original_name is the chapter name.
+		new_bookmark = new_name
+	else:
+		new_bookmark = str(new_chapter, "/", new_name)
+
+	# Do the save.
 	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.WRITE)
-	print(page.get_save_data())
-	file.store_var(page.get_save_data())
+	file.store_var(save_data)
 	file.close()
 	
-	#var chapter:String = bookmark.split("/")[0] if bookmark.contains("/") else bookmark
-	#var s:String
-	#for data_bookmark in _page_data:
-		#if data_bookmark.split("/")[0] == chapter:
-			## The page is in this chapter, and needs to be saved in this file.
-			#if data_bookmark == bookmark:
-				## It's the page we're editing. Ignore the stored data and get the page to give us the new data.
-				#s = str(s, page.get_save_string())
-			#else:
-				## It's not the page we're editing. Use the stored data
-				#if data_bookmark.contains("/"):
-					#s = str(s, data_bookmark.split("/")[1], "\n")
-				#for line in _page_data[data_bookmark]:
-					#s = str(s, "	", line, "\n")
-			## Add a line between pages
-			#s = str(s, "\n")
-#
-	#var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, chapter, ".txt"), FileAccess.WRITE)
-	#file.store_string(s)
-	#file.close()
+	var original_bookmark = page.bookmark
 	
+	# Now do the rename
+	if page.bookmark != new_bookmark:
+		# We've changed something, and need to rename or move files.
+		if original_chapter == "":
+			var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+			# We're renaming a chapter
+#			var dir_access = DirAccess.new()
+			dir.rename(original_name, new_name)
+			print("TODO: Update links")
+		else:
+			rename_file(str(Comic.DIR_STORY, original_chapter, "/", original_name), str(Comic.DIR_STORY, new_chapter, "/", new_name))
+
+		# We update the page bookmark so that later operations have the new one.
+		page.bookmark = new_bookmark
+
+	print("TODO: Promote page to title")
+	print("TODO: Promote chapter to start")
+
 	page.background.save()
+	
+	# Update the last_bookmark editor setting, in case we changed the bookmark
+	save_setting("last_bookmark", page.bookmark)
 	
 	has_unsaved_changes = false
 	if quit_after_saving:
 		Comic.quit()
+
+func rename_file(old_path:String, new_path:String):
+	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	dir.rename(str(old_path, ".txt"), str(new_path, ".txt"))
+	for ext in Comic.IMAGE_EXT:
+		if dir.file_exists(str(old_path, ".", ext)):
+			dir.rename(str(old_path, ".", ext), str(new_path, ".", ext))
+			# Remove Godot's import file - image will be reimported at new location. (Doing this because I'm not sure if it's safe to move a .import)
+			dir.remove(str(old_path, ".", ext, ".import"))
+			break
+	print("TODO: Upate links")
+
+
+func delete():
+	pass
 
 static func load_setting(key:String, default_value:Variant = null) -> Variant:
 	return load_settings().get(key, default_value)

@@ -35,15 +35,15 @@ func _init():
 	for chapter in DirAccess.get_directories_at(Comic.DIR_STORY):
 		if chapter != "start":
 			pages[chapter] = ["_"] # We begin each chapter with the title page, so that it will be at index 0.
-		for page in DirAccess.get_files_at(str(Comic.DIR_STORY, chapter)):
-			if page.get_extension() == "txt" and page.get_basename().get_file() != "_":
-				pages[chapter].push_back(page.get_basename().get_file())
+		for page_filename in DirAccess.get_files_at(str(Comic.DIR_STORY, chapter)):
+			if page_filename.get_extension() == "txt" and page_filename.get_basename().get_file() != "_":
+				pages[chapter].push_back(page_filename.get_basename().get_file())
 	for chapter in pages:
-		for page in pages[chapter]:
-			if page == "_":
+		for page_filename in pages[chapter]:
+			if page_filename == "_":
 				bookmarks.push_back(chapter) # Title page
 			else:
-				bookmarks.push_back(str(chapter, "/", page))
+				bookmarks.push_back(str(chapter, "/", page_filename))
 
 func _ready():
 #	read_story_directory()
@@ -84,7 +84,7 @@ func start(start_page:String):
 
 func left_clicked(control:Control, _event:InputEvent):
 	if control is ComicBackground:
-		page.activate_bg_button()
+		page.activate()
 
 func right_clicked(control:Control, _event:InputEvent):
 	if control is ComicBackground:
@@ -94,7 +94,7 @@ func _show_page():
 	change_page = false
 	print("--- NEW PAGE ---")
 	history.push_back(vars.duplicate(true))
-	print(history)
+	#print(history)
 	while history.size() > _history_size:
 		history.pop_front()
 	# Buttons are not part of the page itself, so we need to clear them separately:
