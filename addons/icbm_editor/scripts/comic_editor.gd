@@ -312,13 +312,11 @@ func save(quit_after_saving:bool = false):
 	if page.bookmark != new_bookmark:
 		# We've changed something, and need to rename or move files.
 		if original_chapter == "":
+			update_links(page.bookmark, new_bookmark)
 			var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
-			# We're renaming a chapter
-#			var dir_access = DirAccess.new()
-			dir.rename(original_name, new_name)
-			print("TODO: Update links")
+			dir.rename(page.bookmark, new_bookmark)
 		else:
-			rename_file(str(Comic.DIR_STORY, original_chapter, "/", original_name), str(Comic.DIR_STORY, new_chapter, "/", new_name))
+			rename_page(page.bookmark, new_bookmark)
 
 		# We update the page bookmark so that later operations have the new one.
 		page.bookmark = new_bookmark
@@ -335,46 +333,91 @@ func save(quit_after_saving:bool = false):
 	if quit_after_saving:
 		Comic.quit()
 
-func rename_file(old_path:String, new_path:String):
+func rename_page(old_bookmark:String, new_bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
-	dir.rename(str(old_path, ".txt"), str(new_path, ".txt"))
+	dir.rename(str(old_bookmark, ".txt"), str(new_bookmark, ".txt"))
 	for ext in Comic.IMAGE_EXT:
-		if dir.file_exists(str(old_path, ".", ext)):
-			dir.rename(str(old_path, ".", ext), str(new_path, ".", ext))
+		if dir.file_exists(str(old_bookmark, ".", ext)):
+			dir.rename(str(old_bookmark, ".", ext), str(new_bookmark, ".", ext))
 			# Remove Godot's import file - image will be reimported at new location. (Doing this because I'm not sure if it's safe to move a .import)
-			dir.remove(str(old_path, ".", ext, ".import"))
+			dir.remove(str(old_bookmark, ".", ext, ".import"))
 			break
-	print("TODO: Upate links")
+	update_links(old_bookmark, new_bookmark)
 
+func delete_page(path:String):
+	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	dir.remove(str(path, ".txt"))
+	for ext in Comic.IMAGE_EXT:
+		if dir.file_exists(str(path, ".", ext)):
+			dir.remove(str(path, ".", ext))
+			dir.remove(str(path, ".", ext, ".import"))
+			break
 
 func delete():
-	pass
+	if page.bookmark.contains("/"):
+		# Delete Page
+		delete_page(str(Comic.DIR_STORY, bookmark))
+	else:
+		# Delete Chapter
+		var path:String = str(Comic.DIR_STORY, page.bookmark)
+		for file in DirAccess.get_files_at(path):
+			DirAccess.remove_absolute(str(path, "/", file))
+		DirAccess.remove_absolute(path)
+	if page.bookmark == "start":
+		# Start chapter deleted - create a blank one
+		ComicEditor.create_start_chapter()
+	else:
+		update_links(page.bookmark, "")
+	save_setting("last_bookmark", "start")
+	Comic.quit()
 
+func update_links(from_bookmark:String, to_bookmark:String, entire_chapter:bool = true):
+	#NOTE: if deleted, to_bookmark will be ""
+	print("TODO: Update links")
+	if entire_chapter and not from_bookmark.contains("/"):
+		# We're updating links to any page in the whole chapter, not just links to the title page.
+		print("TODO: Update links to whole chapter")
+		
 static func load_setting(key:String, default_value:Variant = null) -> Variant:
-	return load_settings().get(key, default_value)
-
-static func load_settings() -> Dictionary:
-	if FileAccess.file_exists(SETTINGS_PATH):
-		var file = FileAccess.open(SETTINGS_PATH, FileAccess.READ)
-		var r:Dictionary = file.get_var()
-		file.close()
-		return r
-	return {}
+	var settings = _load_settings_file()
+	return settings.get(key, default_value)
 
 static func save_setting(key:String, value:Variant):
-	var settings = ComicEditor.load_settings()
+	var settings = _load_settings_file()
 	settings[key] = value
-	ComicEditor.save_settings(settings)
+	_save_settings_file(settings)
 
-static func save_settings(value:Dictionary):
+static func save_settings(dict:Dictionary):
+	var settings = _load_settings_file()
+	for key in dict:
+		settings[key] = dict[key]
+	_save_settings_file(settings)
+
+static func _load_settings_file() -> Dictionary:
+	if FileAccess.file_exists(SETTINGS_PATH):
+		var file = FileAccess.open(SETTINGS_PATH, FileAccess.READ)
+		var settings:Dictionary = file.get_var()
+		file.close()
+		return settings
+	return {}
+	
+static func _save_settings_file(settings:Dictionary):
 	var file = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
-	file.store_var(value)
+	file.store_var(settings)
 	file.close()
-
 
 static func parse_text_edit(s:String) -> String:
 	return s.replace("[br]", "\n").replace("[tab]","	")
 
 static func unparse_text_edit(s:String) -> String:
 	return s.replace("\n", "[br]").replace("	","[tab]")
+
+static func create_start_chapter():
+	var dir:DirAccess = DirAccess.open("res://")
+	if not dir.dir_exists("story/start"):
+		assert(dir.make_dir_recursive("story/start") == OK)
+	if not FileAccess.file_exists(str(Comic.DIR_STORY, "start/_.txt")):
+		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.txt"), FileAccess.WRITE)
+		file.store_var({})
+		file.close()
 

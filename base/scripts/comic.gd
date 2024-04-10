@@ -699,3 +699,44 @@ func quit():
 
 func get_seed_from_position(v:Vector2) -> int:
 	return int(v.x + v.y * size.x)
+
+func alert(title:String, text:String, callback:Callable = Callable()):
+	confirm(title, text, callback, "OK", "")
+
+func confirm(title:String, text:String, confirm_callback:Callable = Callable(), confirm_text:String = "Yes", cancel_text:String = "No", cancel_callback:Callable = Callable()):
+	var dialog = AcceptDialog.new()
+	dialog.title = title
+	dialog.dialog_text = text
+	dialog.ok_button_text = confirm_text
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.confirmed.connect(confirm_callback)
+	if cancel_text != "":
+		dialog.add_cancel_button(cancel_text)
+		dialog.canceled.connect(dialog.queue_free)
+		dialog.canceled.connect(cancel_callback)
+	add_child(dialog)
+	dialog.popup_centered()
+
+#
+#You can use the OS / platform's alert system:
+#
+#OS.alert('This is your message', 'Message Title')
+#
+#You can use WindowDialog or subclass on any node like this:
+#
+#func alert(text: String, title: String='Message') -> void:
+	#var dialog = AcceptDialog.new()
+	#dialog.dialog_text = text
+	#dialog.window_title = title
+	#dialog.connect('modal_closed', dialog, 'queue_free')
+	#add_child(dialog)
+	#dialog.popup_centered()
+#
+#You can do the above, but globally:
+#
+#func alert(text: String, title: String='Message') -> void:
+	## ... code from above, but instead of `add_child(dialog)` do
+	#var scene_tree = Engine.get_main_loop()
+	#scene_tree.current_scene.add_child(dialog)
+	#dialog.popup_centered()
+#

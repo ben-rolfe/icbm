@@ -19,6 +19,9 @@ var commands_before_changes:String
 var original_chapter_name:String = ""
 var original_page_name:String = ""
 
+@export var promote_button:Button
+@export var delete_button:Button
+
 func _ready():
 	chapter_button.item_selected.connect(_on_chapter_item_selected)
 
@@ -37,6 +40,8 @@ func _ready():
 	new_name_lineedit.text_submitted.connect(_on_new_name_submitted)
 	new_name_lineedit.focus_exited.connect(_on_new_name_unfocused)
 
+	promote_button.pressed.connect(_on_promote_pressed)
+	delete_button.pressed.connect(_on_delete_pressed)
 
 func prepare():
 	page = Comic.book.page
@@ -147,3 +152,16 @@ func _on_commands_textedit_unfocused():
 		var reversion:ComicReversionData = ComicReversionData.new(page)
 		reversion.data.action_commands = ComicEditor.unparse_text_edit(commands_before_changes)
 		Comic.book.add_undo_step([reversion])
+
+
+func _on_delete_pressed():
+	Comic.confirm("Delete Page?", "You are about to delete this page!\n\nYOU CANNOT UNDO THIS ACTION.\n\nAre you sure you want to delete the page?", _on_delete_confirmed)
+
+func _on_delete_confirmed():
+	Comic.book.delete()
+	
+func _on_promote_pressed():
+	Comic.confirm("Promote Page?", "You are about to promote this page to the title page of the chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old title page will be renamed old_title_page.\n\nAre you sure you want to promote the page?", _on_promote_confirmed)
+
+func _on_promote_confirmed():
+	print("PROMOTE PAGE")

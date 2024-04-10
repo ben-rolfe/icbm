@@ -176,7 +176,7 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit")]
+[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "promote_button", "delete_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nx1jt")
@@ -187,6 +187,8 @@ chapter_row = NodePath("Chapter")
 chapter_button = NodePath("Chapter/Chapter OptionButton")
 new_name_label = NodePath("Page Name/New Name Label")
 new_name_lineedit = NodePath("Page Name/New Name LineEdit")
+promote_button = NodePath("Promote Button")
+delete_button = NodePath("Delete Button")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
@@ -235,6 +237,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."
+
+[node name="Promote Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+text = "Promote to Chapter Title Page"
+
+[node name="Delete Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+text = "Delete Page"
 
 [node name="LabelProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false

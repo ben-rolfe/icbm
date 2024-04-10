@@ -48,12 +48,9 @@ func _init():
 func _ready():
 #	read_story_directory()
 	if OS.is_debug_build():
-		var editor_settings:Dictionary = ComicEditor.load_settings()
-		print("Starting '", editor_settings.bookmark, "'")
-		start(editor_settings.get("bookmark", "start"))
+		start(ComicEditor.load_setting("bookmark", "start"))
 		# We reset the bookmark to start, so that that will be open next time the game is run (unless changed by ComicEditorPlugin, in the meantime
-		editor_settings.bookmark = "start"
-		ComicEditor.save_settings(editor_settings)
+		ComicEditor.save_setting("bookmark", "start")
 	else:
 		start("start")
 

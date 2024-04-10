@@ -49,17 +49,7 @@ func open_menu(edit_mode:bool):
 	self.edit_mode = edit_mode
 
 	# Ensure that the basic content files and directories exist
-	var dir:DirAccess = DirAccess.open("res://")
-	assert(dir != null)
-	#if not dir.dir_exists("story"):
-		#assert(dir.make_dir("story") == OK)
-	if not dir.dir_exists("story/start"):
-		assert(dir.make_dir_recursive("story/start") == OK)
-	if not FileAccess.file_exists(str(Comic.DIR_STORY, "start/_.txt")):
-		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.txt"), FileAccess.WRITE)
-		file.store_var({})
-		file.close()
-
+	ComicEditor.create_start_chapter()
 
 	var editor_theme:Theme = get_editor_interface().get_editor_theme()
 #	print(editor_theme.get_icon_type_list())
@@ -95,7 +85,7 @@ func open_menu(edit_mode:bool):
 	menu.show()
 
 func run():
-	var bookmark:String = ComicEditor.load_settings().get("bookmark", "start")
+	var bookmark:String = ComicEditor.load_setting("bookmark", "start")
 	var file_path = str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt")
 	# Ensure that the file exists, and contains the page
 	if FileAccess.file_exists(file_path):
@@ -104,9 +94,7 @@ func run():
 
 func run_last(edit_mode:bool):
 	self.edit_mode = edit_mode
-	var editor_settings:Dictionary = ComicEditor.load_settings()
-	editor_settings.bookmark = editor_settings.get("last_bookmark", "start")
-	ComicEditor.save_settings(editor_settings)
+	ComicEditor.save_setting("bookmark", ComicEditor.load_setting("last_bookmark", "start"))
 	run()
 
 func item_pressed(index:int, chapter:String = ""):
@@ -136,9 +124,9 @@ func item_pressed(index:int, chapter:String = ""):
 		# EDIT PAGE
 		var page:String = pages[chapter][index]
 		bookmark = chapter if page == "_" else str(chapter, "/", page)
-	var editor_settings:Dictionary = ComicEditor.load_settings()
-	editor_settings.last_bookmark = bookmark
-	editor_settings.bookmark = bookmark
-	ComicEditor.save_settings(editor_settings)
+	ComicEditor.save_settings({
+		"bookmark": bookmark,
+		"last_bookmark": bookmark,
+	})
 	run()
 
