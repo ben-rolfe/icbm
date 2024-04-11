@@ -75,8 +75,6 @@ var _grab_offset:Vector2
 var undo_steps:Array
 var redo_steps:Array
 
-var unique_ref_id = 0
-
 @export var properties_panel:PanelContainer
 @export var balloon_properties:ComicEditorBalloonProperties
 @export var button_properties:ComicEditorButtonProperties
@@ -204,15 +202,6 @@ func _unhandled_input(event):
 				else:
 					print("Unhandled keypress: ", event.get_keycode_with_modifiers())
 
-func get_unique_ref() -> String:
-	unique_ref_id += 1
-	return str("_auto_", unique_ref_id)
-
-func safety_check_unique_ref(ref:String):
-	if ref.left(6) == "_auto_":
-		ref = ref.substr(6)
-		unique_ref_id = max(unique_ref_id, int(ref))
-
 static func snap(pos:Variant) -> Variant:
 	if Comic.book.snap_positions:
 		if pos is Vector2:
@@ -275,56 +264,36 @@ func clean_up_reversion(reversion:ComicReversion, is_redo_step:bool):
 
 func save(quit_after_saving:bool = false):
 	var save_data:Dictionary = page.get_save_data()
-	print(save_data)
+	#print(save_data)
 
-	# Just store the original and new chapter and name for now - we'll compare and apply them after the save.
-	var original_chapter = ""
-	var original_name = ""
-	if page.bookmark.contains("/"):
-		original_chapter = page.bookmark.split("/")[0]
-		original_name = page.bookmark.split("/")[1]
-	else:
-		original_name = page.bookmark
-	var new_chapter = original_chapter
-	var new_name = original_name
-	if save_data.page_data.has("new_chapter"):
-		new_chapter = save_data.page_data.new_chapter
-		save_data.page_data.erase("new_chapter")
+	# There are some properties of page.data that we don't want to save - we deal with them and erase them, first.
+	var new_bookmark = page.bookmark
 	if save_data.page_data.has("new_name"):
-		new_name = save_data.page_data.new_name
+		# This doesn't necessarily mean that there's a new name, just that the new_name property exists because page properties was opened - it might be the same as the existing name.
+		new_bookmark = save_data.page_data.new_name
 		save_data.page_data.erase("new_name")
-
-	var new_bookmark = ""
-	if original_chapter == "":
-		# This is a bit counterintuitive - original chapter is empty when we're saving a title page - original_name is the chapter name.
-		new_bookmark = new_name
-	else:
-		new_bookmark = str(new_chapter, "/", new_name)
+		if save_data.page_data.has("new_chapter"):
+			# This is a non-title page
+			new_bookmark = str(save_data.page_data.new_chapter, "/", new_bookmark)
+			save_data.page_data.erase("new_chapter")
 
 	# Do the save.
 	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.WRITE)
 	file.store_var(save_data)
 	file.close()
-	
-	var original_bookmark = page.bookmark
+	page.background.save()
 	
 	# Now do the rename
 	if page.bookmark != new_bookmark:
 		# We've changed something, and need to rename or move files.
-		if original_chapter == "":
-			update_links(page.bookmark, new_bookmark)
-			var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
-			dir.rename(page.bookmark, new_bookmark)
-		else:
+		new_bookmark = get_unique_bookmark(new_bookmark)
+		if page.bookmark.contains("/"):
 			rename_page(page.bookmark, new_bookmark)
+		else:
+			rename_chapter(page.bookmark, new_bookmark)
 
-		# We update the page bookmark so that later operations have the new one.
+		# We update the page bookmark so that later operations (like promote) have the new one.
 		page.bookmark = new_bookmark
-
-	print("TODO: Promote page to title")
-	print("TODO: Promote chapter to start")
-
-	page.background.save()
 	
 	# Update the last_bookmark editor setting, in case we changed the bookmark
 	save_setting("last_bookmark", page.bookmark)
@@ -333,8 +302,33 @@ func save(quit_after_saving:bool = false):
 	if quit_after_saving:
 		Comic.quit()
 
-func rename_page(old_bookmark:String, new_bookmark:String):
+func promote():
+	save(false)
+	if page.bookmark.contains("/"):
+		# page - promote to title
+		var chapter:String = page.bookmark.split("/")[0]
+		rename_page(chapter, get_unique_bookmark(str(chapter, "/old_title_page")))
+		rename_page(page.bookmark, chapter)
+	else:
+		# chapter - promote to start
+		rename_chapter("start", get_unique_bookmark("old_start_chapter"))
+		rename_chapter(page.bookmark, "start")
+	Comic.quit()
+
+static func rename_chapter(old_bookmark:String, new_bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	dir.rename(old_bookmark, new_bookmark)
+	update_links(old_bookmark, new_bookmark)
+
+static func rename_page(old_bookmark:String, new_bookmark:String):
+	#NOTE: This method doesn't test new_bnookmark is unique. That should be done before calling this method.
+	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	update_links(old_bookmark, new_bookmark, false)
+	# If either page is a title page, we add "/_" to it to get the file name
+	if not old_bookmark.contains("/"):
+		old_bookmark = str(old_bookmark, "/_")
+	if not new_bookmark.contains("/"):
+		new_bookmark = str(new_bookmark, "/_")
 	dir.rename(str(old_bookmark, ".txt"), str(new_bookmark, ".txt"))
 	for ext in Comic.IMAGE_EXT:
 		if dir.file_exists(str(old_bookmark, ".", ext)):
@@ -342,42 +336,45 @@ func rename_page(old_bookmark:String, new_bookmark:String):
 			# Remove Godot's import file - image will be reimported at new location. (Doing this because I'm not sure if it's safe to move a .import)
 			dir.remove(str(old_bookmark, ".", ext, ".import"))
 			break
-	update_links(old_bookmark, new_bookmark)
 
-func delete_page(path:String):
+static func delete_page(bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
-	dir.remove(str(path, ".txt"))
+	dir.remove(str(bookmark, ".txt"))
 	for ext in Comic.IMAGE_EXT:
-		if dir.file_exists(str(path, ".", ext)):
-			dir.remove(str(path, ".", ext))
-			dir.remove(str(path, ".", ext, ".import"))
+		if dir.file_exists(str(bookmark, ".", ext)):
+			dir.remove(str(bookmark, ".", ext))
+			dir.remove(str(bookmark, ".", ext, ".import"))
 			break
+	update_links(bookmark, "")
 
-func delete():
-	if page.bookmark.contains("/"):
-		# Delete Page
-		delete_page(str(Comic.DIR_STORY, bookmark))
-	else:
-		# Delete Chapter
-		var path:String = str(Comic.DIR_STORY, page.bookmark)
-		for file in DirAccess.get_files_at(path):
-			DirAccess.remove_absolute(str(path, "/", file))
-		DirAccess.remove_absolute(path)
-	if page.bookmark == "start":
+static func delete_chapter(bookmark:String):
+	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	var path:String = str(Comic.DIR_STORY, bookmark)
+	for file in DirAccess.get_files_at(path):
+		DirAccess.remove_absolute(str(path, "/", file))
+	DirAccess.remove_absolute(path)
+	if bookmark == "start":
 		# Start chapter deleted - create a blank one
 		ComicEditor.create_start_chapter()
 	else:
-		update_links(page.bookmark, "")
+		update_links(bookmark, "")
+
+func delete():
+	if page.bookmark.contains("/"):
+		delete_page(bookmark)
+	else:
+		delete_chapter(bookmark)
 	save_setting("last_bookmark", "start")
 	Comic.quit()
 
-func update_links(from_bookmark:String, to_bookmark:String, entire_chapter:bool = true):
+static func update_links(from_bookmark:String, to_bookmark:String, entire_chapter:bool = true):
 	#NOTE: if deleted, to_bookmark will be ""
-	print("TODO: Update links")
 	if entire_chapter and not from_bookmark.contains("/"):
 		# We're updating links to any page in the whole chapter, not just links to the title page.
 		print("TODO: Update links to whole chapter")
-		
+	else:
+		print("TODO: Update links")
+
 static func load_setting(key:String, default_value:Variant = null) -> Variant:
 	var settings = _load_settings_file()
 	return settings.get(key, default_value)
@@ -420,4 +417,34 @@ static func create_start_chapter():
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.txt"), FileAccess.WRITE)
 		file.store_var({})
 		file.close()
+
+static func get_unique_bookmark(bookmark:String) ->String:
+	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
+	if bookmark.contains("/"):
+		# page
+		if not dir.file_exists(str(bookmark, ".txt")):
+			return bookmark
+	else:
+		# chapter
+		if not dir.dir_exists(bookmark):
+			return bookmark
+	var elements:Array = bookmark.split("_")
+	var i:int = int(elements[-1])
+	if elements[-1] == str(i):
+		# Last element is already numeric - remember it and remove it from the bookmark
+		elements[-1] = ""
+	else:
+		# last element is not numeric - set i to 1 and add an underscore at the end of the bookmark
+		i = 1
+		elements.push_back("")
+	bookmark = "_".join(elements)
+	if bookmark.contains("/"):
+		# page
+		while dir.file_exists(str(bookmark, i, ".txt")):
+			i += 1
+	else:
+		# chapter
+		while dir.dir_exists(str(bookmark, i)):
+			i += 1
+	return str(bookmark, i)
 

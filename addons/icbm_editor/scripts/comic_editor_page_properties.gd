@@ -68,6 +68,10 @@ func prepare():
 			page.data.new_name = original_chapter_name
 			if page.bookmark == "start":
 				new_name_lineedit.editable = false
+				promote_button.hide()
+			else:
+				promote_button.text = "Promote Chapter to \"start\""
+			delete_button.text = "Delete Chapter"
 
 	new_name_lineedit.text = page.data.new_name
 
@@ -79,7 +83,6 @@ func _on_new_name_submitted(new_text:String):
 
 func _on_new_name_unfocused():
 	new_name_lineedit.text = Comic.sanitize_var_name(new_name_lineedit.text)
-	print("TODO: Ensure unique names")
 	if original_page_name == "":
 		# This is a title page - we're trying to change a CHAPTER name
 		if new_name_lineedit.text != original_chapter_name and Comic.book.pages.has(new_name_lineedit.text):
@@ -96,10 +99,7 @@ func _on_new_name_unfocused():
 					new_name_lineedit.text = original_page_name
 				else:
 					# We've changed chapters, and a page of the original name exists within the new chapter, so generate a new name
-					var i = 1
-					while Comic.book.pages[page.data.new_chapter].has(str("page_", i)):
-						i += 1
-					new_name_lineedit.text = str("page_", i)
+					new_name_lineedit.text = ComicEditor.get_unique_bookmark(str(page.data.new_chapter, "/page_1")).split("/")[1]
 	page.data.new_name = new_name_lineedit.text
 
 func after_action_changed():
@@ -155,13 +155,13 @@ func _on_commands_textedit_unfocused():
 
 
 func _on_delete_pressed():
-	Comic.confirm("Delete Page?", "You are about to delete this page!\n\nYOU CANNOT UNDO THIS ACTION.\n\nAre you sure you want to delete the page?", _on_delete_confirmed)
-
-func _on_delete_confirmed():
-	Comic.book.delete()
+	if page.bookmark.contains("/"):
+		Comic.confirm("Delete Page?", "You are about to delete this page!\n\nYOU CANNOT UNDO THIS ACTION.\n\nAre you sure you want to delete the page?", Comic.book.delete)
+	else:
+		Comic.confirm("Delete Chapter?", "You are about to delete this entire CHAPTER, including this page AND all other pages in it!\n(If you just want to delete this page, promote another page to be title page, first)\n\nYOU CANNOT UNDO THIS ACTION.\n\nAre you sure you want to delete the chapter?", Comic.book.delete)
 	
 func _on_promote_pressed():
-	Comic.confirm("Promote Page?", "You are about to promote this page to the title page of the chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old title page will be renamed old_title_page.\n\nAre you sure you want to promote the page?", _on_promote_confirmed)
-
-func _on_promote_confirmed():
-	print("PROMOTE PAGE")
+	if page.bookmark.contains("/"):
+		Comic.confirm("Promote Page?", "You are about to promote this page to the title page of the chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old title page will be renamed to \"old_title_page\".\n\nAre you sure you want to promote the page?", Comic.book.promote)
+	else:
+		Comic.confirm("Promote Chapter?", "You are about to promote this chapter to be the \"start\" chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old start chapter will be renamed to \"old_start_chapter\".\n\nAre you sure you want to promote the chapter?", Comic.book.promote)

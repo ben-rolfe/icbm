@@ -240,7 +240,7 @@ placeholder_text = "Enter Commands..."
 
 [node name="Promote Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
-text = "Promote to Chapter Title Page"
+text = "Promote to Title Page"
 
 [node name="Delete Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
