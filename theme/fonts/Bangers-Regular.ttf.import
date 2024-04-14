@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://wbpda6tspm4v"
-path="res://.godot/imported/Bangers-Regular.ttf-c1c68fff114f35dd33a53530825330e2.fontdata"
+path="res://.godot/imported/Bangers-Regular.ttf-6fdb2d53a00519ff72a56ec8dd8a13a0.fontdata"
 
 [deps]
 
-source_file="res://theme/fonts/label/Bangers-Regular.ttf"
-dest_files=["res://.godot/imported/Bangers-Regular.ttf-c1c68fff114f35dd33a53530825330e2.fontdata"]
+source_file="res://theme/fonts/Bangers-Regular.ttf"
+dest_files=["res://.godot/imported/Bangers-Regular.ttf-6fdb2d53a00519ff72a56ec8dd8a13a0.fontdata"]
 
 [params]
 

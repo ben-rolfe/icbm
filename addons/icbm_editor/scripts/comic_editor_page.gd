@@ -3,7 +3,7 @@ extends ComicPage
 
 func _init(bookmark:String):
 	super(bookmark)
-	var layer:ComicLayer = ComicWidgetLayer.new("Widgets", INF)
+	var layer:ComicLayer = ComicWidgetLayer.new(Comic.LAYERS.size())
 	layers.push_back(layer)
 	add_child(layer)
 	background.mouse_default_cursor_shape = Control.CURSOR_ARROW
@@ -28,19 +28,19 @@ func add_o(data:Dictionary) -> Variant:
 		match data.otype:
 			"balloon":
 				o = ComicEditorBalloon.new(data, self)
-				get_layer(o.layer).add_child(o)
+				layers[o.layer].add_child(o)
 			"button":
 				o = ComicEditorButton.new(data, self)
 				Comic.book.buttons_container.add_child(o)
 			"line":
 				o = ComicEditorLine.new(data, self)
-				get_layer(o.layer).add_child(o)
+				layers[o.layer].add_child(o)
 			"label":
-				o = ComicEditorLabel.new(data, self)
-				get_layer(o.layer).add_child(o)
+				o = ComicEditorKaboom.new(data, self)
+				layers[o.layer].add_child(o)
 			"note":
 				o = ComicEditorNote.new(data, self)
-				get_layer(o.layer).add_child(o)
+				layers[o.layer].add_child(o)
 		return o
 	else:
 		printerr("No otype in data: ", data)
@@ -75,7 +75,7 @@ func add_line(data:Dictionary = {}):
 func add_label(data:Dictionary = {}):
 	data.otype = "label"
 	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
-	var label:ComicLabel = Comic.book.page.add_o(data)
+	var label:ComicKaboom = Comic.book.page.add_o(data)
 	label.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(label, null)])

@@ -1,8 +1,8 @@
-class_name ComicEditorLabelProperties
+class_name ComicEditorKaboomProperties
 extends ComicEditorProperties
 
 @export var line_edit:LineEdit
-var label:ComicEditorLabel
+var label:ComicEditorKaboom
 var text_before_changes:String
 
 @export var font_color_button:ColorPickerButton
@@ -36,7 +36,7 @@ func prepare():
 	label = Comic.book.selected_element
 	line_edit.text = ComicEditor.parse_text_edit(label.data.text)
 	line_edit.grab_focus()
-	if line_edit.text == ComicLabel.DEFAULT_TEXT:
+	if line_edit.text == ComicKaboom.DEFAULT_TEXT:
 		line_edit.select_all()
 	else:
 		line_edit.caret_column = line_edit.text.length()

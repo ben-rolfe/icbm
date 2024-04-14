@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bdr7jeq3kh55o"
-path="res://.godot/imported/delete.svg-45a8f01a94b27e186c96c3322366fffc.ctex"
+uid="uid://spg1den01qqt"
+path="res://.godot/imported/close.svg-3c94b0437ef499c1412661d017b495c0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/icbm_editor/theme/icons/delete.svg"
-dest_files=["res://.godot/imported/delete.svg-45a8f01a94b27e186c96c3322366fffc.ctex"]
+source_file="res://addons/icbm_editor/theme/icons/close.svg"
+dest_files=["res://.godot/imported/close.svg-3c94b0437ef499c1412661d017b495c0.ctex"]
 
 [params]
 

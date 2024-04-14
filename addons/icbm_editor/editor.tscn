@@ -8,10 +8,10 @@
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_page_properties.gd" id="4_nx1jt"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/controls/bb_text_edit.gd" id="5_cheip"]
 [ext_resource type="Texture2D" uid="uid://pr72hwmdr574" path="res://addons/icbm_editor/theme/icons/undo.svg" id="7_bibqs"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_label_properties.gd" id="7_mktfq"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_kaboom_properties.gd" id="7_mktfq"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_button_properties.gd" id="8_lxpup"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "label_properties", "page_properties", "page_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "page_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +23,7 @@ script = ExtResource("1_3vmmw")
 properties_panel = NodePath("Properties")
 balloon_properties = NodePath("Properties/MarginContainer/BalloonProperties")
 button_properties = NodePath("Properties/MarginContainer/ButtonProperties")
-label_properties = NodePath("Properties/MarginContainer/LabelProperties")
+kaboom_properties = NodePath("Properties/MarginContainer/KaboomProperties")
 page_properties = NodePath("Properties/MarginContainer/PageProperties")
 page_container = NodePath("Page Container")
 buttons_container = NodePath("Buttons Container")
@@ -88,23 +88,6 @@ font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
 text = "Balloon Properties"
-
-[node name="Base Type" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Base Type"]
-custom_minimum_size = Vector2(140, 0)
-layout_mode = 2
-text = "Base Type:"
-
-[node name="OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Base Type"]
-custom_minimum_size = Vector2(304, 0)
-layout_mode = 2
-
-[node name="Text Label" type="Label" parent="Properties/MarginContainer/BalloonProperties"]
-layout_mode = 2
-text = "Text (BBCode)"
 
 [node name="BBTextEdit" type="TextEdit" parent="Properties/MarginContainer/BalloonProperties"]
 custom_minimum_size = Vector2(0, 128)
@@ -246,7 +229,7 @@ text = "Promote to Title Page"
 layout_mode = 2
 text = "Delete Page"
 
-[node name="LabelProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
+[node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("7_mktfq")
@@ -256,44 +239,44 @@ font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 outline_color_button = NodePath("Outline Color/Outline ColorPickerButton")
 outline_color_revert_button = NodePath("Outline Color/Outline Color Revert Button")
 
-[node name="Header" type="Label" parent="Properties/MarginContainer/LabelProperties"]
+[node name="Header" type="Label" parent="Properties/MarginContainer/KaboomProperties"]
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
-text = "Label Properties"
+text = "Kaboom Properties"
 
-[node name="LineEdit" type="LineEdit" parent="Properties/MarginContainer/LabelProperties"]
+[node name="LineEdit" type="LineEdit" parent="Properties/MarginContainer/KaboomProperties"]
 layout_mode = 2
 
-[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/LabelProperties"]
+[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/KaboomProperties/Font Color"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 text = "Text Color:"
 
-[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/KaboomProperties/Font Color"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 
-[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/LabelProperties/Font Color"]
+[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/KaboomProperties/Font Color"]
 layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="Outline Color" type="HBoxContainer" parent="Properties/MarginContainer/LabelProperties"]
+[node name="Outline Color" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/KaboomProperties/Outline Color"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 text = "Outline Color:"
 
-[node name="Outline ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+[node name="Outline ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/KaboomProperties/Outline Color"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 
-[node name="Outline Color Revert Button" type="Button" parent="Properties/MarginContainer/LabelProperties/Outline Color"]
+[node name="Outline Color Revert Button" type="Button" parent="Properties/MarginContainer/KaboomProperties/Outline Color"]
 layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true

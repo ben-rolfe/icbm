@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://bleubbm4jke43"]
+
+[ext_resource type="FontFile" uid="uid://c3pnj1ilhlb58" path="res://theme/fonts/JetBrainsMono-Regular.ttf" id="1_eftg6"]
+
+[resource]
+RichTextLabel/font_sizes/bold_font_size = 32
+RichTextLabel/font_sizes/bold_italics_font_size = 28
+RichTextLabel/font_sizes/italics_font_size = 28
+RichTextLabel/font_sizes/mono_font_size = 28
+RichTextLabel/font_sizes/normal_font_size = 28
+RichTextLabel/fonts/normal_font = ExtResource("1_eftg6")

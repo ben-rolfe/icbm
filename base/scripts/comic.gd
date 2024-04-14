@@ -19,6 +19,27 @@ const ROOT2:float = sqrt(2)
 const QUARTIC2:float = sqrt(ROOT2)
 const EDGE_SEGMENT_LENGTH:float = 4.0
 
+var LAYERS:Array[String] = [
+	"Furthest",
+	"Further",
+	"Middle",
+	"Closer",
+	"Closest",
+]
+
+const ANCHOR_POINTS = {
+	"TL":Vector2(0, 0),
+	"T":Vector2(0, 0.5),
+	"TR":Vector2(0, 1),
+	"L":Vector2(0.5, 0),
+	"C":Vector2(0.5, 0.5),
+	"R":Vector2(0.5, 1),
+	"BL":Vector2(1, 0),
+	"B":Vector2(1, 0.5),
+	"BR":Vector2(1, 1),
+}
+
+
 #Regular expressions
 var _rex_bracketed_expressions:RegEx = RegEx.new()
 var _regex_tag_params:RegEx = RegEx.new()
@@ -42,46 +63,6 @@ var edge_styles:Dictionary = {}
 var tail_tips:Dictionary = {}
 var tail_styles:Dictionary = {}
 
-#TODO: Make presets an editable part of the story data
-var balloon_presets:Dictionary = {
-	"caption": {
-		"editor_name": "Caption",
-		"shape": "box",
-		"italic": true,
-		"fill_color": Color(1,1,0.6),
-		"anchor_to": Vector2.ZERO
-	},
-	"thought": {
-		"editor_name": "Thought",
-		"edge_style": "cloud",
-		"italic": true,
-	},
-	"whisper": {
-		"editor_name": "Whisper",
-		"edge_style": "dash",
-		"italic": true,
-		"text_scale": 0.75,
-	},
-	"yell": {
-		"editor_name": "Yell",
-		"edge_style": "burst",
-		"bold": true,
-	},
-}
-
-var label_presets:Dictionary = {
-	"test": {
-		"editor_name": "Test",
-		"font_color": Color.RED,
-		"font_scale": 2,
-	},
-}
-
-# prefs are usually able to be set by the player.
-var prefs:Dictionary = {
-	"read": false,
-}
-
 # These are ComicScript language constructs, rather than callable commands - we put them in the _commands dictionary to stop people from adding a command of the same name (which would be ignored without error, otherwise)
 var commands:Dictionary = {
 	"*": null, 
@@ -96,6 +77,87 @@ var _replacers:Dictionary = {}
 var image_scale:float = 1
 
 var px_per_unit:float = 1
+
+var preset_properties:Dictionary = {
+	"balloon": {
+		"align": {
+			"Left":HORIZONTAL_ALIGNMENT_LEFT,
+			"Center":HORIZONTAL_ALIGNMENT_CENTER,
+			"Right":HORIZONTAL_ALIGNMENT_RIGHT,
+		},
+		"anchor": "hidden",
+		"anchor_to": ANCHOR_POINTS,
+		"bold": "bool",
+		"bold_is_italic": "bool",
+		"collapse": "bool",
+		"edge_color": "color",
+		"edge_style": "edge_style",
+		"edge_thickness": "int",
+		"height": "int",
+		"font": "font",
+		"font_color": "color",
+		"fill_color": "color",
+		"italic": "bool",
+		"layer": LAYERS,
+		"scale_all": "percent",
+		"scale_box": "percent",
+		"scale_edge_h": "percent",
+		"scale_edge_w": "percent",
+		"scale_font": "percent",
+		"scroll": "bool",
+		"shape": "shape",
+		"squirk": "percent",
+		"width": "int",
+	},
+	"kaboom": {
+
+		"align": {
+			"Left":HORIZONTAL_ALIGNMENT_LEFT,
+			"Center":HORIZONTAL_ALIGNMENT_CENTER,
+			"Right":HORIZONTAL_ALIGNMENT_RIGHT,
+		},
+		"anchor": "hidden",
+		"bulge": "percent",
+		"wave_period": "percent",
+		"wave_height": "percent",
+		"font": "font",
+		"font_size": "percent",
+		"font_color": "color",
+		"grow": "percent",
+		"layer": LAYERS,
+		"outline_color": "color",
+		"outline_thickness": "int",
+		"rotate": "degrees",
+		"rotate_chars": "bool",
+		"spacing": "percent",
+		
+	},
+}
+var default_presets:Dictionary = {
+	"balloon": {
+		"caption": {
+			"shape": "box",
+			"italic": true,
+			"fill_color": Color(1,1,0.6),
+			"anchor_to": Vector2.ZERO
+		},
+		"thought": {
+			"edge_style": "cloud",
+			"italic": true,
+		},
+		"whisper": {
+			"edge_style": "dash",
+			"italic": true,
+			"text_scale": 0.75,
+		},
+		"yell": {
+			"edge_style": "burst",
+			"bold": true,
+		},
+	},
+	"kaboom": {}
+}
+
 
 func _init():
 	theme = preload("res://theme/root_theme.tres")
@@ -114,7 +176,6 @@ func _init():
 	_regex_escape_chars.compile("[\\\\\\.\\^\\$\\*\\+\\?\\(\\)\\[\\]\\{\\}\\|]")
 	_regex_sanitize_varname.compile("[^a-zA-Z0-9_\\ ]")
 
-	
 	for ext in IMAGE_EXT:
 		var path: String = str("res://theme/background.", ext)
 		if ResourceLoader.exists(path):
@@ -154,18 +215,6 @@ func _ready():
 	register_tail_style(ComicZigTailStyle.new())
 	register_tail_style(ComicZagTailStyle.new())
 
-	#add_command("#", _cmd_ignore)
-	#add_command("@", _cmd_define_alias)
-	#add_command("r", _cmd_read)
-	#add_command(">", _cmd_go)
-	#add_command("<", _cmd_back)
-	#add_command("->", _cmd_visit)
-	#add_command("<-", _cmd_return)
-	#add_command("exit", _cmd_exit)
-	#add_command("\"\"", _cmd_balloon)
-	#add_command("!", _cmd_label)
-	#add_command("_", _cmd_frame)
-
 	add_tag_replacer("b", _replace_b, true)
 	if theme.get_constant("replace_capital_i", "Settings") != 0:
 		var _regex_capital_i_in_word:RegEx = RegEx.new()
@@ -188,17 +237,6 @@ func _ready():
 	var _regex_remaining_quotes:RegEx = RegEx.new()
 	_regex_remaining_quotes.compile("[\\\"\\']")
 	add_regex_replacer("remaining_quotes", _regex_remaining_quotes, _replace_remaining_quotes)
-
-
-	## And in case the smart quotes are failing
-	#r = r.replace("[dq]", "“")
-	#r = r.replace('[/dq]', "”")
-	#r = r.replace('[sq]', "‘")
-	#r = r.replace("[/sq]", "’")
-	## and if they really wanted the boring quotes
-	#r = r.replace("[q]", "'")
-	#r = r.replace("[qq]", '"')
-
 
 # Escapes a string for use within a regex
 func escape_regex(s:String) -> String:
@@ -386,233 +424,6 @@ func split_tag_params(s:String) -> Dictionary:
 	return r
 
 # ------------------------------------------------------------------------------
-# Parse/Unparse methods
-# ------------------------------------------------------------------------------
-# Presented in alphabetic order, but with parse and unparse in pairs
-
-#func parse_anchor(s:String) -> Vector2:
-	#var v = Vector2(0.5,0.5)
-	#if s.contains("L"):
-		#v.x = 0
-	#elif s.contains("R"):
-		#v.x = 1
-	#if s.contains("T"):
-		#v.y = 0
-	#elif s.contains("B"):
-		#v.y = 1
-	#return v
-#func unparse_anchor(v:Vector2) -> String:
-	#var s:String
-	#if is_zero_approx(v.y):
-		#s = "T"
-	#elif is_equal_approx(v.y, 1):
-		#s = "B"
-	#if is_zero_approx(v.x):
-		#s = str(s, "L")
-	#elif is_equal_approx(v.x, 1):
-		#s = str(s, "R")
-	#if s == "":
-		#s = "C"
-	#return s
-#
-#func parse_angle(angle_string:String) -> float:
-	##TODO: Consider returning 0 on fail
-	#var angle:float
-	#if angle_string.contains(":"):
-		## Angle is in clock notation.
-		#var parts:PackedFloat64Array = angle_string.split_floats(":",false)
-		#if parts.size() == 0:
-			#return 0
-		#angle = TAU * parts[0] / 12.0
-		#if parts.size() > 1:
-			#angle += TAU * parts[1] / 720.0
-	#else:
-		## Angle is in degrees
-		#angle = TAU * float(angle_string) / 360.0
-	## Before returning, we:
-	##	Subtract a quarter-turn, because we accept angles as 0=up, but in Godot they're 0=right
-	##	Make sure it's a positive value between 0 and TAU radians
-	#return fposmod(angle - TAU / 4, TAU)
-#func unparse_angle(n:float) -> String:
-	#var s = ""
-	#n += TAU / 4 # Transform from 0-right to 0-up
-	## Convert to clock format
-	#n *= 12 / TAU
-	#var hours:int = posmod(floori(n), 12)
-	#var minutes:int = floori(fposmod(n, 1) * 60)
-	#if hours == 0:
-		#s = "12:"
-	#else:
-		#s = str(hours, ":")
-	#if minutes < 10:
-		#if minutes > 0: # In clock format, we can leave off the minutes if they are 0.
-			#s = str(s, "0", minutes)
-	#else:
-		#s = str(s, minutes)
-	#return s
-#
-#func parse_bookmark(s:String) -> String:
-	##TODO: Do we really want to execute here?
-	#s = execute_embedded_code(s)
-	#if s == "/":
-		## The current page's chapter.
-		#return book.page.bookmark.split("/")[0]
-	#if s[0] == "/":
-		## Local address = add the current page's chapter
-		#return book.page.bookmark.split("/")[0] + s
-	#return s
-#
-#func parse_boolean(s:String) -> bool:
-	#match s.to_lower():
-		#"1", "true", "t", "yes", "y":
-			#return true
-		#_:
-			#return false
-#func unparse_boolean(b:bool) -> String:
-	#return "y" if b else "n"
-#
-#func parse_halign(s:String) -> int:
-	#match s.left(1).to_upper():
-		#"L":
-			#return HORIZONTAL_ALIGNMENT_LEFT
-		#"R":
-			#return HORIZONTAL_ALIGNMENT_RIGHT
-		#_:
-			#return HORIZONTAL_ALIGNMENT_CENTER
-#func unparse_halign(halign:int) -> String:
-	#match halign:
-		#HORIZONTAL_ALIGNMENT_LEFT:
-			#return "L"
-		#HORIZONTAL_ALIGNMENT_CENTER:
-			#return "R"
-		#_:
-			#return "C"
-#
-#func parse_layer(s:String) -> int:
-	#return clampi(int(s), -Comic.book.page.layer_depth, Comic.book.page.layer_depth)
-	#
-#func unparse_layer(n:int) -> String:
-	#return str(n)
-#
-#func parse_multiplier(s:String) -> float:
-	#s = s.strip_edges()
-	#if s[-1] == "%":
-		#return float(s.left(-1)) / 100
-	#else:
-		#return float(s)
-#func unparse_multiplier(n:float) -> String:
-	#return str(String.num(n * 100, 3), "%")
-#
-#func parse_overflow(s:String) -> Overflow:
-	#match s:
-		#"scroll":
-			#return Overflow.SCROLL
-		#"clip":
-			#return Overflow.CLIP
-		#_:
-			#return Overflow.SHOW
-#func unparse_overflow(overflow:Overflow) -> String:
-	#match overflow:
-		#Overflow.SCROLL:
-			#return "scroll"
-		#Overflow.CLIP:
-			#return "clip"
-		#_:
-			#return "show"
-#
-#func parse_position(s:String) -> Vector2:
-	#var parts = s.split(",")
-	#if parts.size() != 2:
-		#printerr("Position parse failed on '", s, "'")
-		#return Vector2.ZERO
-	#return Vector2(float(parts[0]), float(parts[1])) * px_per_unit
-#func unparse_position(pos:Vector2) -> String:
-	#return str(String.num(pos.x / px_per_unit, 3), ",", String.num(pos.y / px_per_unit, 3))
-#
-#func parse_units(s:String) -> float:
-	#return float(s) * px_per_unit
-#func unparse_units(n:float) -> String:
-	#return String.num(n / px_per_unit, 3)
-
-
-# ------------------------------------------------------------------------------
-# Command methods
-# ------------------------------------------------------------------------------
-#func add_command(key:Variant, callable:Callable):
-	#if key is Array:
-		##If we're passed an array as the key, iteratively call this function with the elements of that array
-		#for key_single in key:
-			#add_command(key_single, callable)
-	#else:
-		#assert(!commands.has(key), "The command key '" + key + "' is registered to an existing command, or is a language construct")
-		#commands[key] = callable
-#
-#func _cmd_back(params:Dictionary) -> bool:
-	#book.go_back()
-	#return false
-#
-#func _cmd_balloon(params:Dictionary) ->bool:
-	#assert(params.has(0), str("Too few positional parameters entered for ", params.command, " command. At least 1 is expected."))
-	#assert(not params.has(2), str("Too many positional parameters entered for '", params.command, "' command. At most 2 are expected. Did you forget to mark an optional parameter with @?"))
-	## Add a caption, speech, thought, whisper, or yell balloon.
-	#book.page.get_layer(int(params.layer) if params.has("layer") else book.default_balloon_layer).add_balloon_from_params(params)
-	#return true
-#
-#func _cmd_define_alias(params:Dictionary):
-	#var alias_name:String = params[0]
-	#params.erase("command")
-	#params.erase(0)
-	#book.aliases[alias_name] = params
-	#return true
-#
-#func _cmd_exit(params:Dictionary) -> bool:
-	#get_tree().quit()
-	#return false
-#
-#func _cmd_frame(params:Dictionary) -> bool:
-	#book.page.add_line_from_params(params)
-	#return true
-#
-#func _cmd_go(params:Dictionary) -> bool:
-	#book.bookmark = parse_bookmark(params[0])
-	#book.change_page = true
-	#return false
-#
-#func _cmd_ignore(params:Dictionary) -> bool:
-	#print("# ", params[0])
-	#return true
-#
-#func _cmd_label(params:Dictionary) -> bool:
-	## Add sound effect or title text
-	#_tts_queue(params[0])
-	#var layer:int
-	#if params.has("layer"):
-		#layer = int(params.layer)
-	#else:
-		#var label_theme:Theme = load(str("res://theme/label/", params.theme, ".tres")) if params.has("theme") else preload("res://theme/label/default.tres")
-		#layer = label_theme.get_constant("default_layer", "RichTextLabel")
-	#book.page.get_layer(layer).add_label_from_params(params)
-	#return true
-#
-#func _cmd_read(params:Dictionary) -> bool:
-	#_tts_queue(execute_embedded_code(params[0]))
-	#return true
-#
-#func _cmd_return(params:Dictionary) -> bool:
-	#assert(book.vars._bookmarks.size() > 1, "Cannot return without first visiting" )
-	#book.vars._bookmarks.pop_back()
-	#book.change_page = true
-	#return false
-	#
-#func _cmd_visit(params:Dictionary) -> bool:
-	#if params.has(1):
-		## A return address has been given. Replace the current bookmark with it.
-		#book.bookmark = parse_bookmark(params[1])
-	#book.vars._bookmarks.push_back(parse_bookmark(params[0]))
-	#book.change_page = true
-	#return false
-
-# ------------------------------------------------------------------------------
 # Tag methods
 # ------------------------------------------------------------------------------
 func _replace_b(match_dict:Dictionary) -> String:
@@ -679,7 +490,7 @@ func _replace_img(match_dict:Dictionary) -> String:
 
 # ------------------------------------------------------------------------------
 
-func sanitize_var_name(s:String) -> String:
+func validate_name(s:String) -> String:
 	s = s.replace("-", "_")
 	s = _regex_sanitize_varname.sub(s, "", true).to_lower().to_snake_case()
 	s = s.lstrip("_").rstrip("_")
@@ -689,8 +500,7 @@ func sanitize_var_name(s:String) -> String:
 	
 func request_quit():
 	if book.has_unsaved_changes:
-		print("TODO: Confirm quit popup")
-		quit()
+		confirm("Discard Changes?", "You have unsaved changes.\n\nIf you quit, they will be lost.\n\nAre you sure you want to quit?", quit)
 	else:
 		quit()
 

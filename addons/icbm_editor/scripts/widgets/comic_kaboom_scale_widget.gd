@@ -1,4 +1,4 @@
-class_name ComicLabelScaleWidget
+class_name ComicKaboomScaleWidget
 extends ComicWidget
 
 const DISTANCE_MULTIPLIER:float = 2
@@ -6,7 +6,7 @@ const DISTANCE_MULTIPLIER:float = 2
 var property_name = "font_size"
 var label
 
-func _init(serves:ComicEditorLabel):
+func _init(serves:ComicEditorKaboom):
 	label = serves
 	action = Action.SLIDE_V
 	color = Color.GREEN

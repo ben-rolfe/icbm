@@ -3,8 +3,7 @@ extends Control
 
 var depth:int
 
-func _init(_name:String, _depth:int):
-	name = _name
+func _init(_depth:int):
 	depth = _depth
 
 func _draw():

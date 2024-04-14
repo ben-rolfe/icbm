@@ -129,17 +129,10 @@ func add_menu_items(menu:PopupMenu):
 	# Layer Submenu
 	var menu_layer:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_layer)
-	menu_layer.id_pressed.connect(menu.id_pressed.get_connections()[0].callable)
+	menu_layer.id_pressed.connect(menu_layer_index_pressed)
 	menu_layer.name = "layer"
-	if layer != Comic.book.page.layer_depth:
-		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("pull_to_top.svg"))), "Pull to Front", ComicEditor.MenuCommand.PULL_TO_FRONT)
-		if layer < Comic.book.page.layer_depth - 1:
-			menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("pull.svg"))), "Pull", ComicEditor.MenuCommand.PULL)
-	menu_layer.add_separator(str("At Front  (+", Comic.book.page.layer_depth, ")") if layer == Comic.book.page.layer_depth else str("At Back (-", Comic.book.page.layer_depth, ")") if layer == -Comic.book.page.layer_depth else str("On layer ", "+" if layer > 0 else "", layer))
-	if layer != -Comic.book.page.layer_depth:
-		if layer > 1 - Comic.book.page.layer_depth:
-			menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("push.svg"))), "Push", ComicEditor.MenuCommand.PUSH)
-		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("push_to_bottom.svg"))), "Push to Back", ComicEditor.MenuCommand.PUSH_TO_BACK)
+	for i in range(Comic.LAYERS.size() - 1, -1, -1):
+		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, "checked.svg" if i == layer else "unchecked.svg")), Comic.LAYERS[i])
 
 	# Preset Submenu
 	var menu_preset:PopupMenu = PopupMenu.new()
@@ -147,9 +140,11 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.hide_on_checkable_item_selection = false
 	menu_preset.index_pressed.connect(menu_preset_index_pressed.bind(menu_preset))
 	menu_preset.name = "preset"
-	for key in Comic.balloon_presets:
-		menu_preset.add_check_item(Comic.balloon_presets[key].editor_name)
+	for key in Comic.book.presets.balloon:
+		menu_preset.add_check_item(key.capitalize())
 		menu_preset.set_item_checked(-1, presets.has(key))
+	menu_preset.add_separator()
+	menu_preset.add_item("Manage Presets / Defaults")
 
 	# Size Submenu
 	var menu_size:PopupMenu = PopupMenu.new()
@@ -185,15 +180,24 @@ func menu_style_index_pressed(index:int):
 	rebuild(true)
 
 func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
-	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	var key:String = Comic.balloon_presets.keys()[index]
-	if presets.has(key):
-		presets.erase(key)
-		menu_preset.set_item_checked(index, false)
+	if index == menu_preset.item_count - 1:
+		# Manage Presets was selected
+		Comic.book.open_presets_manager("balloon")
 	else:
-		presets.push_back(key)
-		menu_preset.set_item_checked(index, true)
-	scrub_redundant_data()
+		# A preset was selected
+		Comic.book.add_undo_step([ComicReversionData.new(self)])
+		var key:String = Comic.book.presets.balloon.keys()[index]
+		if presets.has(key):
+			presets.erase(key)
+			menu_preset.set_item_checked(index, false)
+		else:
+			presets.push_back(key)
+			menu_preset.set_item_checked(index, true)
+		scrub_redundant_data()
+		rebuild(true)
+
+func menu_layer_index_pressed(index:int):
+	layer = Comic.LAYERS.size() - 1 - index
 	rebuild(true)
 
 func menu_command_pressed(id:int):
@@ -253,22 +257,6 @@ func menu_command_pressed(id:int):
 			remove()
 		ComicEditor.MenuCommand.OPEN_PROPERTIES:
 			Comic.book.open_properties = Comic.book.balloon_properties
-		ComicEditor.MenuCommand.PULL:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = layer + 1
-			rebuild(true)
-		ComicEditor.MenuCommand.PULL_TO_FRONT:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = Comic.book.page.layer_depth
-			rebuild(true)
-		ComicEditor.MenuCommand.PUSH:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = layer - 1
-			rebuild(true)
-		ComicEditor.MenuCommand.PUSH_TO_BACK:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = -Comic.book.page.layer_depth
-			rebuild(true)
 		ComicEditor.MenuCommand.RANDOMIZE:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			rng_seed = randi()

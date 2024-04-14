@@ -1,11 +1,11 @@
-class_name ComicLabelCurveHeightWidget
+class_name ComicKaboomWaveHeightWidget
 extends ComicWidget
 
 var DISTANCE_MULTIPLIER:float = 5
-var label:ComicEditorLabel
-var property_name = "curve_height"
+var label:ComicEditorKaboom
+var property_name = "wave_height"
 
-func _init(serves:ComicEditorLabel):
+func _init(serves:ComicEditorKaboom):
 	super(serves)
 	action = Action.SLIDE_V
 	color = Color.ORANGE
@@ -51,9 +51,9 @@ func menu_command_pressed(id:int):
 func get_adjusted_anchor():
 	match label.align:
 		HORIZONTAL_ALIGNMENT_LEFT:
-			return serves.anchor + serves.get_transform().x * serves.width * serves.curve_period * 0.25
+			return serves.anchor + serves.get_transform().x * serves.width * serves.wave_period * 0.25
 		HORIZONTAL_ALIGNMENT_CENTER:
-			return serves.anchor + serves.get_transform().x * serves.width * (serves.curve_period * 0.25 - 0.5)
+			return serves.anchor + serves.get_transform().x * serves.width * (serves.wave_period * 0.25 - 0.5)
 		HORIZONTAL_ALIGNMENT_RIGHT:
-			return serves.anchor + serves.get_transform().x * serves.width * (serves.curve_period * 0.25 - 1)
+			return serves.anchor + serves.get_transform().x * serves.width * (serves.wave_period * 0.25 - 1)
 	

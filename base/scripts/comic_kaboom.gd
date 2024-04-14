@@ -1,4 +1,4 @@
-class_name ComicLabel
+class_name ComicKaboom
 extends Control
 
 const DEFAULT_TEXT:String = "POW!"
@@ -30,23 +30,23 @@ var bulge:float:
 	set(value):
 		_data_set("bulge", value)
 
-var curve_period:float:
+var wave_period:float:
 	get:
-		return _data_get("curve_period")
+		return _data_get("wave_period")
 	set(value):
-		_data_set("curve_period", value)
+		_data_set("wave_period", value)
 
-var curve_height:float:
+var wave_height:float:
 	get:
-		return _data_get("curve_height")
+		return _data_get("wave_height")
 	set(value):
-		_data_set("curve_height", value)
+		_data_set("wave_height", value)
 
-var font:Font:
+var font:String:
 	get:
-		return load(str(Comic.DIR_FONTS, "label/", _data_get("font_name")))
+		return _data_get("font")
 	set(value):
-		_data_set("font_name", value.get_font_name())
+		_data_set("font", value)
 
 var font_color:Color:
 	get:
@@ -98,11 +98,11 @@ var presets:Array:
 	set(value):
 		data.presets = value
 
-var r:float:
+var rotate:float:
 	get:
-		return _data_get("r")
+		return _data_get("rotate")
 	set(value):
-		_data_set("r", value)
+		_data_set("rotate", value)
 
 var rotate_chars:bool:
 	get:
@@ -140,8 +140,13 @@ func _init(_data:Dictionary, page:ComicPage):
 
 func apply_data():
 	default_data = _get_default_data()
+	
+	# Get the font and font size from the theme
+	var font_theme:Theme = ResourceLoader.load(str(Comic.DIR_FONTS, "kaboom/", font, ".tres"))
+	var font_face:Font = font_theme.get_font("font", "Label")
+	var base_font_size:float = font_theme.get_font_size("font_size", "Label") * font_size
 
-	var parent_layer = Comic.book.page.get_layer(layer)
+	var parent_layer = Comic.book.page.layers[layer]
 	if get_parent() != parent_layer:
 		if get_parent() != null:
 			get_parent().remove_child(self)
@@ -162,7 +167,7 @@ func apply_data():
 
 	var text_server:TextServer = TextServerManager.get_primary_interface()
 	# First, we calculate the t values for each char - the position of their center from the position of the first char's center to the last char's center
-	var font_rid:RID = font.get_rids()[0]
+	var font_rid:RID = font_face.get_rids()[0]
 	var char_font_size:Array[float] = []
 	var char_str:Array = []
 	var char_int:Array = []
@@ -172,13 +177,13 @@ func apply_data():
 	var t:Array = []
 	var rot = []
 
-	# Calculate everything based on the initial font size
+	# Calculate everything based on the base font size
 	for i in s.length():
-		char_font_size.push_back(font_size)
+		char_font_size.push_back(base_font_size)
 		char_str.push_back(s.substr(i,1))
 		char_int.push_back(s.unicode_at(i))
 		glyph.push_back(text_server.font_get_glyph_index(font_rid, int(char_font_size[i]), char_int[i], 0))
-		char_size.push_back(font.get_char_size(char_int[i], int(char_font_size[i])))
+		char_size.push_back(font_face.get_char_size(char_int[i], int(char_font_size[i])))
 		if i == 0:
 			pos.push_back(Vector2.ZERO)
 		else:
@@ -198,7 +203,7 @@ func apply_data():
 				char_font_size[i] *= 1 + (grow - 1) * pow(t[i], 2.0 if grow > 1 else 0.5)
 			if bulge != 1:
 				char_font_size[i] *= 1 + (bulge - 1) * sin(t[i] * PI)
-			char_size[i] = font.get_char_size(char_int[i], int(char_font_size[i])) if char_font_size[i] > 0 else Vector2.ZERO
+			char_size[i] = font_face.get_char_size(char_int[i], int(char_font_size[i])) if char_font_size[i] > 0 else Vector2.ZERO
 			if i == 0:
 				pos[i] = Vector2.ZERO
 			else:
@@ -215,18 +220,18 @@ func apply_data():
 	width = pos[-1].x
 
 	# Apply curve effects
-	if curve_height != 0:
+	if wave_height != 0:
 		for i in pos.size():
-			pos[i] += Vector2.UP * (sin(TAU * t[i] / curve_period) * curve_height * pos[-1].x)
+			pos[i] += Vector2.UP * (sin(TAU * t[i] / wave_period) * wave_height * pos[-1].x)
 			if rotate_chars:
 				# Full disclosure: There was a lot of trial and error here, but it SEEMS to be right?
-				rot[i] += Vector2(curve_period / TAU, -cos(TAU * t[i] / curve_period) * curve_height).angle()
+				rot[i] += Vector2(wave_period / TAU, -cos(TAU * t[i] / wave_period) * wave_height).angle()
 				
 	# Apply character effects
 
 
 	#Apply rotation
-	rotation = r
+	rotation = rotate
 
 	#Apply alignment
 	match align:
@@ -240,7 +245,7 @@ func apply_data():
 
 	var char_obj:Array[ComicChar] = []
 	for i in char_str.size():
-		char_obj.push_back(ComicChar.new(char_str[i], font, int(char_font_size[i]), font_color, outline_color, int(outline_thickness), pos[i], char_size[i], rot[i]))
+		char_obj.push_back(ComicChar.new(char_str[i], font_face, int(char_font_size[i]), font_color, outline_color, int(outline_thickness), pos[i], char_size[i], rot[i]))
 		add_child(char_obj[i])
 		if i > 0 and not FOREGROUND_CHARS.contains(char_str[i]):
 			# Move normal characters behind existing ones, but don't do this for punctuation.
@@ -272,25 +277,24 @@ func _get_default_data() -> Dictionary:
 		"align": HORIZONTAL_ALIGNMENT_CENTER,
 		"anchor": Vector2.ZERO,
 		"bulge": 1.0,
-		"curve_period": 2.0,
-		"curve_height": 0.0,
-		"font_name": Comic.theme.get_font("font", "Label").get_path().get_file(),
-		"font_size": Comic.theme.get_font_size("font_size", "Label"),
-		"font_color": Comic.theme.get_color("font_color", "Label"),
+		"wave_period": 2.0,
+		"wave_height": 0.0,
+		"font": "default",
+		"font_size": 1.0,
+		"font_color": Color.YELLOW,
 		"grow": 1.0,
-		"layer": Comic.theme.get_constant("layer", "Label"), # We put labels on the top layer by default
-		"outline_color": Comic.theme.get_color("font_outline_color", "Label"),
-		"outline_thickness": Comic.theme.get_constant("outline_size", "Label"),
-		"r": 0,
+		"layer": Comic.LAYERS.size() - 1, # We put labels on the top layer by default
+		"outline_color": Color.BLACK,
+		"outline_thickness": 8,
+		"rotate": 0,
 		"rotate_chars": true,
 		"spacing": 1.0,
 	}
 
 	# We iterate over the full list of presets, rather than the array, because we want to apply presets in the order they appear in that list
-	for preset_key in Comic.label_presets.keys():
+	for preset_key in Comic.book.presets.kaboom.keys():
 		if presets.has(preset_key):
 			# We have this preset - apply all its keys to the default data 
-			for key in Comic.label_presets[preset_key].keys():
-				ret[key] = Comic.label_presets[preset_key][key]
-
+			for key in Comic.book.presets.kaboom[preset_key].keys():
+				ret[key] = Comic.book.presets.kaboom[preset_key][key]
 	return ret

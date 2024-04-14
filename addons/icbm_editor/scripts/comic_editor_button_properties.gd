@@ -37,7 +37,7 @@ func prepare():
 
 	text_edit.text = ComicEditor.parse_text_edit(button.data.text)
 	text_edit.grab_focus()
-	if text_edit.text == ComicLabel.DEFAULT_TEXT:
+	if text_edit.text == ComicKaboom.DEFAULT_TEXT:
 		text_edit.select_all()
 	else:
 		text_edit.caret_column = text_edit.text.length()

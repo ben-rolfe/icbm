@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cf6jwjl2o51p1"
-path="res://.godot/imported/balloon.svg-9753eca31790035ae9ef4458d0104ef8.ctex"
+uid="uid://b5wpal7kylwpr"
+path="res://.godot/imported/arrow_u.svg-0197c864ee50a58a3452db4609d10496.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/icbm_editor/theme/icons/balloon.svg"
-dest_files=["res://.godot/imported/balloon.svg-9753eca31790035ae9ef4458d0104ef8.ctex"]
+source_file="res://addons/icbm_editor/theme/icons/arrow_u.svg"
+dest_files=["res://.godot/imported/arrow_u.svg-0197c864ee50a58a3452db4609d10496.ctex"]
 
 [params]
 

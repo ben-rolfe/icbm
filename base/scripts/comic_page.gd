@@ -5,7 +5,7 @@ var bg_path:String
 var background:ComicBackground
 var layers:Array[ComicLayer] = []
 
-var layer_depth:int
+#var layer_depth:int
 
 #NOTE: Bookmark is not stored in data
 var bookmark:String
@@ -43,7 +43,7 @@ func _init(_bookmark: String):
 	name = bookmark.replace("/","__")
 
 	#var theme:Theme = preload("res://theme/root_theme.tres")
-	layer_depth = Comic.theme.get_constant("layer_depth", "Settings")
+	#layer_depth = Comic.theme.get_constant("layer_depth", "Settings")
 	#_default_line_layer = theme.get_constant("default_layer", "Frame")
 
 	disable_3d = true
@@ -51,8 +51,8 @@ func _init(_bookmark: String):
 	render_target_update_mode = SubViewport.UPDATE_ONCE
 	background = ComicEditorBackground.new() if self is ComicEditorPage else ComicBackground.new()
 	add_child(background)
-	for i in range(-layer_depth, layer_depth + 1):
-		var layer:ComicLayer = ComicLayer.new(str(i), i)
+	for i in Comic.LAYERS.size():
+		var layer:ComicLayer = ComicLayer.new(i)
 		layers.push_back(layer)
 		add_child(layer)
 
@@ -91,16 +91,16 @@ func add_o(o_data:Dictionary):
 	match o_data.otype:
 		"balloon":
 			o = ComicBalloon.new(o_data, self)
-			get_layer(o.layer).add_child(o)
+			layers[o.layer].add_child(o)
 		"button":
 			o = ComicButton.new(o_data, self)
 			Comic.book.buttons_container.add_child(o)
 		"line":
 			o = ComicLine.new(o_data, self)
-			get_layer(o.layer).add_child(o)
+			layers[o.layer].add_child(o)
 		"label":
-			o = ComicLabel.new(o_data, self)
-			get_layer(o.layer).add_child(o)
+			o = ComicKaboom.new(o_data, self)
+			layers[o.layer].add_child(o)
 		"note":
 			if o_data.has("text"):
 				Comic.parse_hidden_string(o_data.text)
@@ -131,9 +131,9 @@ func rebuild(rebuild_sub_objects:bool = true):
 			if os[oid].has_method("rebuild"):
 				os[oid].rebuild(true)
 
-func get_layer(i:int) -> ComicLayer:
-	i = clampi(i,-layer_depth,layer_depth)
-	return layers[i + layer_depth]
+#func get_layer(i:int) -> ComicLayer:
+	#i = clampi(i,-layer_depth,layer_depth)
+	#return layers[i + layer_depth]
 
 #func add_click_line(line:String):
 	#_click_lines.push_back(line)

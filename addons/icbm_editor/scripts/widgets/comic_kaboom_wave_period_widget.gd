@@ -1,9 +1,9 @@
-class_name ComicLabelCurvePeriodWidget
-extends ComicLabelCurveHeightWidget
+class_name ComicKaboomWavePeriodWidget
+extends ComicKaboomWaveHeightWidget
 
-func _init(serves:ComicLabelCurveHeightWidget):
+func _init(serves:ComicKaboomWaveHeightWidget):
 	super(serves.label)
-	property_name = "curve_period"
+	property_name = "wave_period"
 	action = Action.SLIDE_H
 	self.serves = serves
 

@@ -1,7 +1,7 @@
-class_name ComicLabelBulgeWidget
-extends ComicLabelScaleWidget
+class_name ComicKaboomBulgeWidget
+extends ComicKaboomScaleWidget
 
-func _init(serves:ComicLabelScaleWidget):
+func _init(serves:ComicKaboomScaleWidget):
 	super(serves.serves)
 	property_name = "bulge"
 	self.serves = serves

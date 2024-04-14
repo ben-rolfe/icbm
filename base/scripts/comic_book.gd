@@ -16,7 +16,7 @@ var page:ComicPage
 var has_unsaved_changes:bool
 var pages:Dictionary
 var bookmarks:PackedStringArray
-
+var presets:Dictionary
 # ------------------------------------------------------------------------------
 
 var bookmark:String:
@@ -29,6 +29,16 @@ var bookmark:String:
 
 func _init():
 	Comic.book = self
+
+	#Load the presets
+	if FileAccess.file_exists(str(Comic.DIR_STORY, "presets.cfg")):
+		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.cfg"), FileAccess.READ)
+		presets = file.get_var()
+		file.close()
+	else:
+		# Presets file doesn't exist - use default presets:
+		presets = Comic.default_presets
+
 	_history_size = Comic.theme.get_constant("history_size", "Settings")
 	default_balloon_layer = Comic.theme.get_constant("default_layer", "Balloon")
 	pages = {"start":["_"]} # We begin with start in the dictionary, so that it will be at index 0.
@@ -161,5 +171,7 @@ func save(quit_after_saving:bool = false):
 	has_unsaved_changes = false
 	if quit_after_saving:
 		Comic.quit()
+
+
 
 

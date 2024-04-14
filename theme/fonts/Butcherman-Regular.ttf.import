@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://c3pnj1ilhlb58"
-path="res://.godot/imported/JetBrainsMono-Regular.ttf-23f62326ffe6f0ab48ea600e7bbe4bec.fontdata"
+uid="uid://2g3r1eqgx8ld"
+path="res://.godot/imported/Butcherman-Regular.ttf-7f486d6c28932da30762a2f039c456f9.fontdata"
 
 [deps]
 
-source_file="res://addons/icbm_editor/theme/fonts/JetBrainsMono-Regular.ttf"
-dest_files=["res://.godot/imported/JetBrainsMono-Regular.ttf-23f62326ffe6f0ab48ea600e7bbe4bec.fontdata"]
+source_file="res://theme/fonts/Butcherman-Regular.ttf"
+dest_files=["res://.godot/imported/Butcherman-Regular.ttf-7f486d6c28932da30762a2f039c456f9.fontdata"]
 
 [params]
 

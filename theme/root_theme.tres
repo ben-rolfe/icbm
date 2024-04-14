@@ -1,26 +1,20 @@
 [gd_resource type="Theme" load_steps=7 format=3 uid="uid://clanbtt7hrhjb"]
 
-[ext_resource type="FontFile" uid="uid://c3pnj1ilhlb58" path="res://addons/icbm_editor/theme/fonts/JetBrainsMono-Regular.ttf" id="1_4nwh5"]
-[ext_resource type="FontFile" uid="uid://wbpda6tspm4v" path="res://theme/fonts/label/Bangers-Regular.ttf" id="1_qjjdx"]
+[ext_resource type="FontFile" uid="uid://c3pnj1ilhlb58" path="res://theme/fonts/JetBrainsMono-Regular.ttf" id="1_1l7kf"]
 [ext_resource type="FontVariation" uid="uid://djt5ukb7wrtng" path="res://theme/fonts/ICBMComic-FauxBold.tres" id="1_rm8jc"]
 [ext_resource type="FontVariation" uid="uid://f0xti67u7ix2" path="res://theme/fonts/ICBMComic-FauxBoldItalic.tres" id="2_a4gec"]
+[ext_resource type="FontFile" uid="uid://wbpda6tspm4v" path="res://theme/fonts/Bangers-Regular.ttf" id="2_kqffk"]
 [ext_resource type="FontVariation" uid="uid://dto1412w0nfym" path="res://theme/fonts/ICBMComic-FauxItalic.tres" id="3_btap7"]
 [ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="4_77otb"]
 
 [resource]
 Balloon/colors/caption_fill_color = Color(1, 1, 0.6, 1)
-Balloon/colors/edge_color = Color(0, 0, 0, 1)
-Balloon/colors/fill_color = Color(1, 1, 1, 1)
 Balloon/constants/box_margin_x = 16
 Balloon/constants/box_margin_y = 4
-Balloon/constants/edge_thickness = 2
-Balloon/constants/layer = 0
 Balloon/constants/small_scale = 75
-Balloon/constants/squirk = 50
 Balloon/constants/tail_width = 8
-Balloon/constants/width = 288
 CodeEdit/font_sizes/font_size = 16
-CodeEdit/fonts/font = ExtResource("1_4nwh5")
+CodeEdit/fonts/font = ExtResource("1_1l7kf")
 Frame/colors/edge_color = Color(0, 0, 0, 1)
 Frame/colors/fill_color = Color(1, 1, 1, 1)
 Frame/constants/auto_page_border = 1
@@ -32,7 +26,7 @@ Label/colors/font_outline_color = Color(0, 0, 0, 1)
 Label/constants/layer = 2
 Label/constants/outline_size = 8
 Label/font_sizes/font_size = 64
-Label/fonts/font = ExtResource("1_qjjdx")
+Label/fonts/font = ExtResource("2_kqffk")
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
 RichTextLabel/font_sizes/bold_font_size = 32
 RichTextLabel/font_sizes/bold_italics_font_size = 32

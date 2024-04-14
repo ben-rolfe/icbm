@@ -1,0 +1,7 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://d2q4tam0rvkty"]
+
+[ext_resource type="FontFile" uid="uid://2g3r1eqgx8ld" path="res://theme/fonts/Butcherman-Regular.ttf" id="1_r0ucl"]
+
+[resource]
+Label/font_sizes/font_size = 64
+Label/fonts/font = ExtResource("1_r0ucl")

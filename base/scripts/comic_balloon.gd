@@ -1,9 +1,9 @@
 class_name ComicBalloon
 extends RichTextLabel
 
-var _final_box_scale:float
-var _final_font_scale:float
-var _final_edge_scale:Vector2
+var _final_scale_box:float
+var _final_scale_font:float
+var _final_scale_edge:Vector2
 var _final_collapse:float
 var center_point:Vector2
 var data:Dictionary
@@ -25,12 +25,6 @@ var align:int:
 		return _data_get("align")
 	set(value):
 		_data_set("align", value)
-
-var all_scale:float:
-	get:
-		return _data_get("all_scale")
-	set(value):
-		_data_set("all_scale", value)
 
 var anchor:Vector2:
 	get:
@@ -56,23 +50,11 @@ var bold_is_italic:bool:
 	set(value):
 		_data_set("bold_is_italic", value)
 
-var box_scale:float:
-	get:
-		return _data_get("box_scale")
-	set(value):
-		_data_set("box_scale", value)
-
 var collapse:bool:
 	get:
 		return _data_get("collapse")
 	set(value):
 		_data_set("collapse", value)
-
-var edge_scale:Vector2:
-	get:
-		return _data_get("edge_scale")
-	set(value):
-		_data_set("edge_scale", value)
 
 var edge_color:Color:
 	get:
@@ -99,17 +81,17 @@ var fill_color:Color:
 	set(value):
 		_data_set("fill_color", value)
 
+var font:String:
+	get:
+		return _data_get("font")
+	set(value):
+		_data_set("font", value)
+
 var font_color:Color:
 	get:
 		return _data_get("font_color")
 	set(value):
 		_data_set("font_color", value)
-
-var font_scale:float:
-	get:
-		return _data_get("font_scale")
-	set(value):
-		_data_set("font_scale", value)
 
 var height:int:
 	get:
@@ -143,6 +125,36 @@ var presets:Array:
 	set(value):
 		data.presets = value
 
+var scale_all:float:
+	get:
+		return _data_get("scale_all")
+	set(value):
+		_data_set("scale_all", value)
+
+var scale_box:float:
+	get:
+		return _data_get("scale_box")
+	set(value):
+		_data_set("scale_box", value)
+
+var scale_edge_h:float:
+	get:
+		return _data_get("scale_edge_h")
+	set(value):
+		_data_set("scale_edge_h", value)
+
+var scale_edge_w:float:
+	get:
+		return _data_get("scale_edge_w")
+	set(value):
+		_data_set("scale_edge_w", value)
+
+var scale_font:float:
+	get:
+		return _data_get("scale_font")
+	set(value):
+		_data_set("scale_font", value)
+
 var scroll:bool:
 	get:
 		return _data_get("scroll")
@@ -167,6 +179,12 @@ var squirk:float:
 	set(value):
 		_data_set("squirk", value)
 
+var _text:String:
+	get:
+		return _data_get("text")
+	set(value):
+		_data_set("text", value)
+
 var width:int:
 	get:
 		return _data_get("width")
@@ -178,7 +196,6 @@ var width:int:
 func _init(_data:Dictionary, page:ComicPage):
 	data = _data
 	_default_data = _get_default_data()
-	theme = Comic.theme # Not inherited, since we're in a subviewport.
 	bbcode_enabled = true
 	if not data.has("otype"):
 		data.otype = "balloon"
@@ -202,8 +219,9 @@ func _init(_data:Dictionary, page:ComicPage):
 func apply_data():
 	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
 	_default_data = _get_default_data()
+	theme = ResourceLoader.load(str(Comic.DIR_FONTS, "balloon/", font, ".tres"))
 	
-	var parent_layer = Comic.book.page.get_layer(layer)
+	var parent_layer = Comic.book.page.layers[layer]
 	if get_parent() != parent_layer:
 		if get_parent() != null:
 			get_parent().remove_child(self)
@@ -222,13 +240,14 @@ func apply_data():
 	# --------------------------------------------------------------------------
 	# SCALE
 	# --------------------------------------------------------------------------
-	_final_box_scale = box_scale * all_scale
+	var scale_edge:Vector2 = Vector2(scale_edge_w, scale_edge_h)
+	_final_scale_box = scale_box * scale_all
 	# We apply the INVERSE of the (non-final) box scale to the edge. The reason for this is that the edge is drawn based on the box size, but we don't want the box scale to affect the edge.
-	# For similar reasons, we DON'T apply the all_scale - it's already applied as part of _final_box_scale
-	_final_edge_scale = edge_scale / box_scale
+	# For similar reasons, we DON'T apply the scale_all - it's already applied as part of _final_scale_box
+	_final_scale_edge = scale_edge / scale_box
 	# We scale the font with the box, since we apply the box scale by changing the size, not by adjusting its scale. We do this to maintain crisp fonts, as actually scaling things buggers them up.
-	_final_font_scale = font_scale * all_scale * box_scale
-	edge_segment_length = Comic.EDGE_SEGMENT_LENGTH * all_scale
+	_final_scale_font = scale_font * scale_all * scale_box
+	edge_segment_length = Comic.EDGE_SEGMENT_LENGTH * scale_all
 
 	# @collapse
 	# Note that we may overwrite this if @height is set and @overflow is scroll.
@@ -236,17 +255,15 @@ func apply_data():
 	_final_collapse = collapse
 
 	# @font_
-	if font_color == Comic.theme.get_color("default_color", "RichTextLabel"):
-		remove_theme_color_override("default_color")
-	else:
-		add_theme_color_override("default_color", font_color)
-
-	#TODO: Font override
-	#if data.has("font_file_path"):
-		#add_theme_font_override("normal_font", load(data.font_file_path))
+	# default color was reading as black, so override was being removed, but it was displaying as white. Just applying the override no matter what, now.
+	#if font_color == theme.get_color("default_color", "RichTextLabel"):
+		#print("removing")
+		#remove_theme_color_override("default_color")
 	#else:
-		#remove_theme_font_override("normal_font")
-
+		#print("adding")
+		#add_theme_color_override("default_color", font_color)
+	add_theme_color_override("default_color", font_color)
+	
 	# --------------------------------------------------------------------------
 	# HEIGHT AND WIDTH (before text is set)
 	# --------------------------------------------------------------------------
@@ -271,20 +288,18 @@ func apply_data():
 		# The width has been explicitly set to 0, which means we want unlimited width with no wrapping
 		autowrap_mode = TextServer.AUTOWRAP_OFF
 
-
-	if not is_zero_approx(_final_font_scale):
-		#TODO: Find a better way?
+	if not is_zero_approx(_final_scale_font):
 		remove_theme_font_size_override("bold_font_size")
-		add_theme_font_size_override("bold_font_size", roundi(_final_font_scale * get_theme_font_size("bold_font_size", "RichTextLabel")))
 		remove_theme_font_size_override("bold_italics_font_size")
-		add_theme_font_size_override("bold_italics_font_size", roundi(_final_font_scale * get_theme_font_size("bold_italics_font_size", "RichTextLabel")))
 		remove_theme_font_size_override("italics_font_size")
-		add_theme_font_size_override("italics_font_size", roundi(_final_font_scale * get_theme_font_size("italics_font_size", "RichTextLabel")))
 		remove_theme_font_size_override("mono_font_size")
-		add_theme_font_size_override("mono_font_size", roundi(_final_font_scale * get_theme_font_size("mono_font_size", "RichTextLabel")))
 		remove_theme_font_size_override("normal_font_size")
-		add_theme_font_size_override("normal_font_size", roundi(_final_font_scale * get_theme_font_size("normal_font_size", "RichTextLabel")))
-
+		if not is_equal_approx(_final_scale_font, 1.0):
+			add_theme_font_size_override("bold_font_size", roundi(_final_scale_font * get_theme_font_size("bold_font_size", "RichTextLabel")))
+			add_theme_font_size_override("bold_italics_font_size", roundi(_final_scale_font * get_theme_font_size("bold_italics_font_size", "RichTextLabel")))
+			add_theme_font_size_override("italics_font_size", roundi(_final_scale_font * get_theme_font_size("italics_font_size", "RichTextLabel")))
+			add_theme_font_size_override("mono_font_size", roundi(_final_scale_font * get_theme_font_size("mono_font_size", "RichTextLabel")))
+			add_theme_font_size_override("normal_font_size", roundi(_final_scale_font * get_theme_font_size("normal_font_size", "RichTextLabel")))
 
 	if Comic.book is ComicEditor:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -321,7 +336,7 @@ func apply_data():
 		pre_text = str(pre_text, "[i]")
 		post_text = str("[/i]", post_text)
 
-	text = str(pre_text, Comic.parse_rich_text_string(data.text), post_text)
+	text = str(pre_text, Comic.parse_rich_text_string(_text), post_text)
 
 	# ----------------------------------------------------------------------------------------------
 	# BOX AND FRAME
@@ -360,8 +375,8 @@ func apply_data():
 	#The shape may call for some adjustments of the frame
 	shape.adjust_frame_half_size(self)
 
-	# We adjust the frame size according to the edge_scale
-	frame_half_size *= edge_scale
+	# We adjust the frame size according to the scale_edge
+	frame_half_size *= scale_edge
 
 	# ----------------------------------------------------------------------------------------------
 	# EDGE POINTS
@@ -453,35 +468,37 @@ func _data_set(key:Variant, value:Variant):
 func _get_default_data() -> Dictionary:
 	var r = {
 		"align": HORIZONTAL_ALIGNMENT_CENTER,
-		"all_scale": 1.0,
 		"bold": false,
 		"bold_is_italic": true,
-		"box_scale": 1.0,
 		"collapse": true,
-		"edge_color": Comic.theme.get_color("edge_color", "Balloon"),
-		"edge_scale": Vector2.ONE,
+		"edge_color": Color.BLACK,
 		"edge_style": "box",
-		"edge_thickness": Comic.theme.get_constant("edge_thickness", "Balloon"),
+		"edge_thickness": 2,
 		"height": 0,
-		"font_scale": 1.0,
-		"font_color": Comic.theme.get_color("default_color", "RichTextLabel"),
-		"fill_color": Comic.theme.get_color("fill_color", "Balloon"),
+		"font": "default",
+		"font_color": Color.BLACK,
+		"fill_color": Color.WHITE,
 		"italic": false,
-		"layer": Comic.theme.get_constant("layer", "Balloon"),
+		"layer": Comic.LAYERS.size() / 2, # Middle layer by default
 		"anchor": Vector2.ZERO,
 		"anchor_to": Vector2(0.5, 0.5),
+		"scale_all": 1.0,
+		"scale_box": 1.0,
+		"scale_edge_h": 1.0,
+		"scale_edge_w": 1.0,
+		"scale_font": 1.0,
 		"scroll": false,
 		"shape": "balloon",
-		"squirk": Comic.theme.get_constant("squirk", "Balloon") / 100.0,
+		"squirk": 0.5,
 		"text": "New Balloon...",
-		"width": Comic.theme.get_constant("width", "Balloon"),
+		"width": 288,
 	}
 
-	# We iterate over the full list of presets, rather than the array, because we want to apply presets in the order they appear in that list
-	for preset_key in Comic.balloon_presets.keys():
+	# We iterate over the full list of known presets, rather than the presets array, because we want to apply presets in the order they appear in that list
+	for preset_key in Comic.book.presets.balloon.keys():
 		if presets.has(preset_key):
 			# We have this preset - apply all its keys to the default data 
-			for key in Comic.balloon_presets[preset_key].keys():
-				r[key] = Comic.balloon_presets[preset_key][key]
+			for key in Comic.book.presets.balloon[preset_key].keys():
+				r[key] = Comic.book.presets.balloon[preset_key][key]
 
 	return r

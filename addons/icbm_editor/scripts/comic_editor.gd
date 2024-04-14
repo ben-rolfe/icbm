@@ -6,7 +6,7 @@ enum MenuCommand {
 	ADD_BALLOON,
 	ADD_CAPTION,
 	ADD_LINE,
-	ADD_LABEL,
+	ADD_KABOOM,
 
 	ADD_BUTTON,
 	ADD_HOTSPOT,
@@ -78,7 +78,7 @@ var redo_steps:Array
 @export var properties_panel:PanelContainer
 @export var balloon_properties:ComicEditorBalloonProperties
 @export var button_properties:ComicEditorButtonProperties
-@export var label_properties:ComicEditorLabelProperties
+@export var kaboom_properties:ComicEditorKaboomProperties
 @export var page_properties:ComicEditorPageProperties
 # Probably don't need a property panel for lines?
 # Maybe try to avoid property panels altogether?!
@@ -149,7 +149,7 @@ func open_menu(target:Control, pos:Vector2):
 	if pos.y + menu.size.y > get_window().size.y:
 		pos.y -= menu.size.y
 	menu.position = pos
-	menu.show()
+	menu.popup()
 	
 func _on_menu_item_pressed(id:int):
 	popup_target.menu_command_pressed(id)
@@ -403,6 +403,11 @@ static func _save_settings_file(settings:Dictionary):
 	file.store_var(settings)
 	file.close()
 
+func save_presets_file():
+	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.cfg"), FileAccess.WRITE)
+	file.store_var(presets)
+	file.close()
+
 static func parse_text_edit(s:String) -> String:
 	return s.replace("[br]", "\n").replace("[tab]","	")
 
@@ -447,4 +452,8 @@ static func get_unique_bookmark(bookmark:String) ->String:
 		while dir.dir_exists(str(bookmark, i)):
 			i += 1
 	return str(bookmark, i)
+
+func open_presets_manager(category:String):
+	var popup = ComicEditorPresetsManager.new(category)
+	Comic.add_child(popup)
 

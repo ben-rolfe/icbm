@@ -1,7 +1,7 @@
-class_name ComicLabelSpacingWidget
+class_name ComicKaboomSpacingWidget
 extends ComicWidget
 
-func _init(serves:ComicEditorLabel):
+func _init(serves:ComicEditorKaboom):
 	action = Action.SLIDE_H
 	color = Color.CYAN
 	super(serves)

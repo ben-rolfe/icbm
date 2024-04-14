@@ -1,9 +1,9 @@
-class_name ComicLabelRotateWidget
+class_name ComicKaboomRotateWidget
 extends ComicWidget
 
 const HANDLE_LENGTH:float = 100
 
-func _init(serves:ComicEditorLabel):
+func _init(serves:ComicEditorKaboom):
 	action = Action.TURN
 	color = Color.WHITE
 	super(serves)
@@ -23,19 +23,19 @@ func _get_drag_data(at_position:Vector2):
 	super(at_position)
 
 func dragged(global_position:Vector2):
-	serves.r = (serves.anchor - global_position).angle()
+	serves.rotate = (serves.anchor - global_position).angle()
 	serves.rebuild(false)
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), "Reset", ComicEditor.MenuCommand.DEFAULT)
-	if serves.r == 0:
+	if serves.rotate == 0:
 		menu.set_item_disabled(-1, true)
 
 func menu_command_pressed(id:int):
 	match id:
 		ComicEditor.MenuCommand.DEFAULT:
 			Comic.book.add_undo_step([ComicReversionData.new(serves)])
-			serves.r = 0
+			serves.rotate = 0
 			serves.rebuild(false)
 
 func draw_connector(layer):

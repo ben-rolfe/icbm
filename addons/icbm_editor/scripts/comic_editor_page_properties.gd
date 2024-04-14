@@ -82,7 +82,7 @@ func _on_new_name_submitted(new_text:String):
 	new_name_lineedit.release_focus()
 
 func _on_new_name_unfocused():
-	new_name_lineedit.text = Comic.sanitize_var_name(new_name_lineedit.text)
+	new_name_lineedit.text = Comic.validate_name(new_name_lineedit.text)
 	if original_page_name == "":
 		# This is a title page - we're trying to change a CHAPTER name
 		if new_name_lineedit.text != original_chapter_name and Comic.book.pages.has(new_name_lineedit.text):

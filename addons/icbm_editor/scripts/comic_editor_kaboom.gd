@@ -1,5 +1,5 @@
-class_name ComicEditorLabel
-extends ComicLabel
+class_name ComicEditorKaboom
+extends ComicKaboom
 
 const WIDGET_COLOR:Color = Color.WHITE
 
@@ -78,17 +78,10 @@ func add_menu_items(menu:PopupMenu):
 	# Layer Submenu
 	var menu_layer:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_layer)
-	menu_layer.id_pressed.connect(menu.id_pressed.get_connections()[0].callable)
+	menu_layer.id_pressed.connect(menu_layer_index_pressed)
 	menu_layer.name = "layer"
-	if layer != Comic.book.page.layer_depth:
-		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("pull_to_top.svg"))), "Pull to Front", ComicEditor.MenuCommand.PULL_TO_FRONT)
-		if layer < Comic.book.page.layer_depth - 1:
-			menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("pull.svg"))), "Pull", ComicEditor.MenuCommand.PULL)
-	menu_layer.add_separator(str("At Front  (+", Comic.book.page.layer_depth, ")") if layer == Comic.book.page.layer_depth else str("At Back (-", Comic.book.page.layer_depth, ")") if layer == -Comic.book.page.layer_depth else str("On layer ", "+" if layer > 0 else "", layer))
-	if layer != -Comic.book.page.layer_depth:
-		if layer > 1 - Comic.book.page.layer_depth:
-			menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("push.svg"))), "Push", ComicEditor.MenuCommand.PUSH)
-		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("push_to_bottom.svg"))), "Push to Back", ComicEditor.MenuCommand.PUSH_TO_BACK)
+	for i in range(Comic.LAYERS.size() - 1, -1, -1):
+		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, "checked.svg" if i == layer else "unchecked.svg")), Comic.LAYERS[i])
 
 	# Preset Submenu
 	var menu_preset:PopupMenu = PopupMenu.new()
@@ -96,21 +89,31 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.hide_on_checkable_item_selection = false
 	menu_preset.index_pressed.connect(menu_preset_index_pressed.bind(menu_preset))
 	menu_preset.name = "preset"
-	for key in Comic.label_presets:
-		menu_preset.add_check_item(Comic.label_presets[key].editor_name)
+	for key in Comic.book.presets.kaboom:
+		menu_preset.add_check_item(key.capitalize())
 		menu_preset.set_item_checked(-1, presets.has(key))
+	menu_preset.add_separator()
+	menu_preset.add_item("Manage Presets / Defaults")
 
 func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
-	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	var key:String = Comic.label_presets.keys()[index]
-	if presets.has(key):
-		presets.erase(key)
-		menu_preset.set_item_checked(index, false)
+	if index == menu_preset.item_count - 1:
+		# Manage Presets was selected
+		Comic.book.open_presets_manager("kaboom")
 	else:
-		presets.push_back(key)
-		menu_preset.set_item_checked(index, true)
-#	scrub_redundant_data()
-	rebuild()
+		Comic.book.add_undo_step([ComicReversionData.new(self)])
+		var key:String = Comic.book.presets.kaboom.keys()[index]
+		if presets.has(key):
+			presets.erase(key)
+			menu_preset.set_item_checked(index, false)
+		else:
+			presets.push_back(key)
+			menu_preset.set_item_checked(index, true)
+	#	scrub_redundant_data()
+		rebuild()
+
+func menu_layer_index_pressed(index:int):
+	layer = Comic.LAYERS.size() - 1 - index
+	rebuild(true)
 
 func menu_command_pressed(id:int):
 	match id:
@@ -132,23 +135,7 @@ func menu_command_pressed(id:int):
 		ComicEditor.MenuCommand.DELETE:
 			remove()
 		ComicEditor.MenuCommand.OPEN_PROPERTIES:
-			Comic.book.open_properties = Comic.book.label_properties
-		ComicEditor.MenuCommand.PULL:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = layer + 1
-			rebuild()
-		ComicEditor.MenuCommand.PULL_TO_FRONT:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = Comic.book.page.layer_depth
-			rebuild()
-		ComicEditor.MenuCommand.PUSH:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = layer - 1
-			rebuild()
-		ComicEditor.MenuCommand.PUSH_TO_BACK:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			layer = -Comic.book.page.layer_depth
-			rebuild()
+			Comic.book.open_properties = Comic.book.kaboom_properties
 		ComicEditor.MenuCommand.RANDOMIZE:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			rng_seed = randi()
@@ -157,16 +144,16 @@ func menu_command_pressed(id:int):
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()
-	draw_layer.add_child(ComicLabelRotateWidget.new(self))
-	var scale_widget:ComicLabelScaleWidget = ComicLabelScaleWidget.new(self)
+	draw_layer.add_child(ComicKaboomRotateWidget.new(self))
+	var scale_widget:ComicKaboomScaleWidget = ComicKaboomScaleWidget.new(self)
 	draw_layer.add_child(scale_widget)
-	var bulge_widget:ComicLabelBulgeWidget = ComicLabelBulgeWidget.new(scale_widget)
+	var bulge_widget:ComicKaboomBulgeWidget = ComicKaboomBulgeWidget.new(scale_widget)
 	draw_layer.add_child(bulge_widget)
-	draw_layer.add_child(ComicLabelGrowWidget.new(bulge_widget))
-	var curve_height_widget:ComicLabelCurveHeightWidget = ComicLabelCurveHeightWidget.new(self)
-	draw_layer.add_child(curve_height_widget)
-	draw_layer.add_child(ComicLabelCurvePeriodWidget.new(curve_height_widget))
-	draw_layer.add_child(ComicLabelSpacingWidget.new(self))
+	draw_layer.add_child(ComicKaboomGrowWidget.new(bulge_widget))
+	var wave_height_widget:ComicKaboomWaveHeightWidget = ComicKaboomWaveHeightWidget.new(self)
+	draw_layer.add_child(wave_height_widget)
+	draw_layer.add_child(ComicKaboomWavePeriodWidget.new(wave_height_widget))
+	draw_layer.add_child(ComicKaboomSpacingWidget.new(self))
 
 func remove():
 	Comic.book.add_undo_step([ComicReversionParent.new(self, get_parent())])

@@ -31,7 +31,7 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Balloon", ComicEditor.MenuCommand.ADD_BALLOON)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_box.svg")), "Add Caption", ComicEditor.MenuCommand.ADD_CAPTION)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "label.svg")), "Add Label", ComicEditor.MenuCommand.ADD_LABEL)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "label.svg")), "Add Kaboom", ComicEditor.MenuCommand.ADD_KABOOM)
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "button.svg")), "Add Button", ComicEditor.MenuCommand.ADD_BUTTON)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "hotspot.svg")), "Add Hotspot", ComicEditor.MenuCommand.ADD_HOTSPOT)
@@ -61,7 +61,7 @@ func menu_command_pressed(id:int):
 			Comic.book.page.add_balloon({"with_tail":true})
 		ComicEditor.MenuCommand.ADD_CAPTION:
 			Comic.book.page.add_balloon({"presets":["caption"]})
-		ComicEditor.MenuCommand.ADD_LABEL:
+		ComicEditor.MenuCommand.ADD_KABOOM:
 			Comic.book.page.add_label()
 
 		ComicEditor.MenuCommand.ADD_BUTTON:
