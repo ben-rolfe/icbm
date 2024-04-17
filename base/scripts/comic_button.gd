@@ -18,23 +18,9 @@ var key_string:String
 var data:Dictionary
 var _default_data:Dictionary
 
+var style_box:StyleBoxFlat
+
 #-------------------------------------------------------------------------------
-
-var enabled: bool = true:
-	set(value):
-		enabled = value
-		set_theme_override()
-
-var hovered: bool = false:
-	set(value):
-		hovered = value
-		set_theme_override()
-
-var oid:int:
-	get:
-		return data.oid
-	set(value):
-		data.oid = value
 
 var action:Action:
 	get:
@@ -54,40 +40,108 @@ var action_commands:String:
 	set(value):
 		_data_set("action_commands", value)
 
+var content:String:
+	get:
+		return _data_get("content")
+	set(value):
+		_data_set("content", value)
+
+var enabled:bool = true:
+	set(value):
+		enabled = value
+		set_theme_override()
+
+var fill_color:Color:
+	get:
+		return _data_get("fill_color")
+	set(value):
+		_data_set("fill_color", value)
+
+var fill_color_disabled:Color:
+	get:
+		return _data_get("fill_color_disabled")
+	set(value):
+		_data_set("fill_color_disabled", value)
+
+var fill_color_hovered:Color:
+	get:
+		return _data_get("fill_color_hovered")
+	set(value):
+		_data_set("fill_color_hovered", value)
+
+var font_color:Color:
+	get:
+		return _data_get("font_color")
+	set(value):
+		_data_set("font_color", value)
+
+var font_color_disabled:Color:
+	get:
+		return _data_get("font_color_disabled")
+	set(value):
+		_data_set("font_color_disabled", value)
+
+var font_color_hovered:Color:
+	get:
+		return _data_get("font_color_hovered")
+	set(value):
+		_data_set("font_color_hovered", value)
+
+var hovered: bool = false:
+	set(value):
+		hovered = value
+		set_theme_override()
+
+var oid:int:
+	get:
+		return data.oid
+	set(value):
+		data.oid = value
+
+var presets:Array:
+	get:
+		if not data.has("presets"):
+			data.presets = []
+		return data.presets
+	set(value):
+		data.presets = value
+
 #-------------------------------------------------------------------------------
 
 func _init(_data:Dictionary, page:ComicPage):
 	data = _data
-	_default_data = _get_default_data()
+	_default_data = Comic.get_preset_data("button", presets)
 	if not data.has("otype"):
 		data.otype = "button"
 	if not data.has("oid"):
 		oid = page.make_oid()
 	page.os[oid] = self
-	if not data.has("text"):
-		data.text = _default_data.text
 	
-	self.mouse_entered.connect(_on_mouse_entered)
-	self.mouse_exited.connect(_on_mouse_exited)
+	style_box = StyleBoxFlat.new()
+	add_theme_stylebox_override("normal", style_box)
+	
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 	bbcode_enabled = true
 	fit_content = true
 	# Buttons are in their own object so, unlike for elements in the page, there's no reason not to immediately apply the data.
 	apply_data()
 
 func apply_data():
+	_default_data = Comic.get_preset_data("button", presets)
 	var s = "[center]"
 	var padding_font_size:int = preload("res://theme/buttons_theme.tres").get_constant("padding_font_size", "RichTextLabel")
 	if padding_font_size > 0:
 		s += str("[font size=", padding_font_size, "] [/font]\n")
-	s += data.text
+	s += content
 	if padding_font_size > 0:
 		s += str("\n[font size=", padding_font_size, "] [/font]")
 	s += "[/center]"
 	text = s
-
+	set_theme_override()
 
 func _gui_input(event):
-	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and event.position.x > 0 and event.position.x < size.x and event.position.y > 0 and event.position.y < size.y:
+	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and get_global_rect().has_point(event.global_position):
 			activate()
 
 func _input(event):
@@ -122,13 +176,16 @@ func activate():
 func set_theme_override():
 	if !enabled:
 		mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
-		theme = preload("res://theme/button_disabled_theme.tres")
+		add_theme_color_override("default_color", font_color_disabled)
+		style_box.bg_color = fill_color_disabled
 	else:
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		if hovered:
-			theme = preload("res://theme/button_hover_theme.tres")
+			add_theme_color_override("default_color", font_color_hovered)
+			style_box.bg_color = fill_color_hovered
 		else:
-			theme = null
+			add_theme_color_override("default_color", font_color)
+			style_box.bg_color = fill_color
 
 # ------------------------------------------------------------------------------
 
@@ -140,13 +197,3 @@ func _data_set(key:Variant, value:Variant):
 		data.erase(key)
 	else:
 		data[key] = value
-
-#TODO: Currently this doesn't need to be a method, and _default_data could be a const. If that doesn't change, fix it.
-func _get_default_data() -> Dictionary:
-	var r:Dictionary = {
-		"text": "New Button",
-		"action": Action.NEXT,
-		"action_bookmark": "",
-		"action_commands": "",
-	}
-	return r

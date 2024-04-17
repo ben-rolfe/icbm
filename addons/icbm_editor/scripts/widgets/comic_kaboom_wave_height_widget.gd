@@ -1,7 +1,8 @@
 class_name ComicKaboomWaveHeightWidget
 extends ComicWidget
 
-var DISTANCE_MULTIPLIER:float = 5
+const DISTANCE_MULTIPLIER:float = 0.006
+
 var label:ComicEditorKaboom
 var property_name = "wave_height"
 
@@ -13,7 +14,7 @@ func _init(serves:ComicEditorKaboom):
 
 func reposition():
 	# Note that this 0.5, and the *2 in the dragged method, are arbitrary.
-	anchor = get_adjusted_anchor() - serves.get_transform().y * label[property_name] * label.font_size * DISTANCE_MULTIPLIER
+	anchor = get_adjusted_anchor() - serves.get_transform().y * label[property_name] * label.font_size / DISTANCE_MULTIPLIER
 
 func _get_drag_data(at_position:Vector2):
 	Comic.book.add_undo_step([ComicReversionData.new(label)])
@@ -31,7 +32,7 @@ func dragged(global_position:Vector2):
 	label.rebuild(false)
 	
 func set_by_distance(distance:float):
-	label[property_name] = distance / (label.font_size * DISTANCE_MULTIPLIER)
+	label[property_name] = distance / label.font_size * DISTANCE_MULTIPLIER
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), "Reset", ComicEditor.MenuCommand.DEFAULT)

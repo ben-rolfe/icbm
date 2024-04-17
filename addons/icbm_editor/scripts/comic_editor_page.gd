@@ -63,6 +63,7 @@ func add_button(data:Dictionary = {}):
 	var button:ComicEditorButton = ComicEditorButton.new(data, self)
 	Comic.book.buttons_container.add_child(button)
 	Comic.book.add_undo_step([ComicReversionParent.new(button, null)])
+	print("Button Content: ", button.content)
 
 func add_line(data:Dictionary = {}):
 	data.otype = "line"

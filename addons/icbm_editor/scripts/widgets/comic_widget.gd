@@ -20,6 +20,8 @@ var serves:Object
 var color:Color
 var action:Action = Action.MOVE
 
+
+
 var anchor:Vector2:
 	get:
 		return position + pivot_offset

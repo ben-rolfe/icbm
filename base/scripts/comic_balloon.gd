@@ -56,6 +56,12 @@ var collapse:bool:
 	set(value):
 		_data_set("collapse", value)
 
+var content:String:
+	get:
+		return _data_get("content")
+	set(value):
+		_data_set("content", value)
+
 var edge_color:Color:
 	get:
 		return _data_get("edge_color")
@@ -179,12 +185,6 @@ var squirk:float:
 	set(value):
 		_data_set("squirk", value)
 
-var _text:String:
-	get:
-		return _data_get("text")
-	set(value):
-		_data_set("text", value)
-
 var width:int:
 	get:
 		return _data_get("width")
@@ -195,21 +195,17 @@ var width:int:
 
 func _init(_data:Dictionary, page:ComicPage):
 	data = _data
-	_default_data = _get_default_data()
+	_default_data = Comic.get_preset_data("balloon", presets)
 	bbcode_enabled = true
 	if not data.has("otype"):
 		data.otype = "balloon"
 	if not data.has("oid"):
 		oid = page.make_oid()
 	page.os[oid] = self
-	if not data.has("anchor"):
-		data.anchor = Vector2.ZERO
 	if not data.has("rng_seed"):
 		data.rng_seed = Comic.get_seed_from_position(data.anchor)
 	if not data.has("tails"):
 		data.tails = {}
-	if not data.has("text"):
-		data.text = _default_data.text
 	
 	if not Comic.book is ComicEditor:
 		data.text = Comic.execute_embedded_code(data.text)
@@ -218,7 +214,7 @@ func _init(_data:Dictionary, page:ComicPage):
 
 func apply_data():
 	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
-	_default_data = _get_default_data()
+	_default_data = Comic.get_preset_data("balloon", presets)
 	theme = ResourceLoader.load(str(Comic.DIR_FONTS, "balloon/", font, ".tres"))
 	
 	var parent_layer = Comic.book.page.layers[layer]
@@ -336,7 +332,7 @@ func apply_data():
 		pre_text = str(pre_text, "[i]")
 		post_text = str("[/i]", post_text)
 
-	text = str(pre_text, Comic.parse_rich_text_string(_text), post_text)
+	text = str(pre_text, Comic.parse_rich_text_string(content), post_text)
 
 	# ----------------------------------------------------------------------------------------------
 	# BOX AND FRAME
@@ -464,41 +460,3 @@ func _data_set(key:Variant, value:Variant):
 		data.erase(key)
 	else:
 		data[key] = value
-		
-func _get_default_data() -> Dictionary:
-	var r = {
-		"align": HORIZONTAL_ALIGNMENT_CENTER,
-		"bold": false,
-		"bold_is_italic": true,
-		"collapse": true,
-		"edge_color": Color.BLACK,
-		"edge_style": "box",
-		"edge_thickness": 2,
-		"height": 0,
-		"font": "default",
-		"font_color": Color.BLACK,
-		"fill_color": Color.WHITE,
-		"italic": false,
-		"layer": Comic.LAYERS.size() / 2, # Middle layer by default
-		"anchor": Vector2.ZERO,
-		"anchor_to": Vector2(0.5, 0.5),
-		"scale_all": 1.0,
-		"scale_box": 1.0,
-		"scale_edge_h": 1.0,
-		"scale_edge_w": 1.0,
-		"scale_font": 1.0,
-		"scroll": false,
-		"shape": "balloon",
-		"squirk": 0.5,
-		"text": "New Balloon...",
-		"width": 288,
-	}
-
-	# We iterate over the full list of known presets, rather than the presets array, because we want to apply presets in the order they appear in that list
-	for preset_key in Comic.book.presets.balloon.keys():
-		if presets.has(preset_key):
-			# We have this preset - apply all its keys to the default data 
-			for key in Comic.book.presets.balloon[preset_key].keys():
-				r[key] = Comic.book.presets.balloon[preset_key][key]
-
-	return r

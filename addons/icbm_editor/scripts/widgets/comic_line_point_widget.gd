@@ -24,7 +24,8 @@ func dragged(global_position:Vector2):
 func add_menu_items(menu:PopupMenu):
 	if serves.data.points.size() > 2:
 		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "remove_line_point.svg")), "Remove Point", ComicEditor.MenuCommand.DELETE_PART)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Line", ComicEditor.MenuCommand.DELETE)
+	else:
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Line", ComicEditor.MenuCommand.DELETE)
 
 func menu_command_pressed(id:int):
 	match id:

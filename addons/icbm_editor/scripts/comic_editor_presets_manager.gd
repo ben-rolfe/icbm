@@ -4,6 +4,7 @@ extends Window
 var category:String
 var container:ScrollContainer
 var list:VBoxContainer
+var is_new:bool
 
 func _init(_category:String):
 	category = _category
@@ -25,15 +26,26 @@ func create_list():
 	for i in Comic.book.presets[category].size():
 		var row:HBoxContainer = HBoxContainer.new()
 		list.add_child(row)
-		var delete_button:Button = Button.new()
-		row.add_child(delete_button)
-		delete_button.icon = load(str(ComicEditor.DIR_ICONS, "delete.svg"))
-		delete_button.modulate = Color.RED
 		var label = Label.new()
-		row.add_child(label)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.text = Comic.book.presets[category].keys()[i].capitalize()
-		if i > 0:
+		if label.text == "":
+			var spacer:Button = Button.new()
+			row.add_child(spacer)
+			spacer.icon = load(str(ComicEditor.DIR_ICONS, "blank.svg"))
+			spacer.flat = true
+			spacer.disabled = true
+			spacer.focus_mode = Control.FOCUS_NONE
+			label.text = "Default"
+		else:
+			var delete_button:Button = Button.new()
+			row.add_child(delete_button)
+			delete_button.icon = load(str(ComicEditor.DIR_ICONS, "delete.svg"))
+			delete_button.modulate = Color.RED
+			delete_button.pressed.connect(_on_delete_pressed.bind(Comic.book.presets[category].keys()[i]))
+		row.add_child(label)
+
+		if i > 1:
 			var up_button:Button = Button.new()
 			row.add_child(up_button)
 			up_button.icon = load(str(ComicEditor.DIR_ICONS, "arrow_u.svg"))
@@ -44,17 +56,19 @@ func create_list():
 			spacer.icon = load(str(ComicEditor.DIR_ICONS, "blank.svg"))
 			spacer.flat = true
 			spacer.disabled = true
-		if i < Comic.book.presets[category].size() -1:
+			spacer.focus_mode = Control.FOCUS_NONE
+		if i > 0 and i < Comic.book.presets[category].size() - 1:
 			var down_button:Button = Button.new()
 			row.add_child(down_button)
 			down_button.icon = load(str(ComicEditor.DIR_ICONS, "arrow_d.svg"))
 			down_button.pressed.connect(_on_reorder_pressed.bind(i, i+1))
 		else:
-			var spacer = Button.new()
+			var spacer:Button = Button.new()
 			row.add_child(spacer)
 			spacer.icon = load(str(ComicEditor.DIR_ICONS, "blank.svg"))
 			spacer.flat = true
 			spacer.disabled = true
+			spacer.focus_mode = Control.FOCUS_NONE
 		var edit_button:Button = Button.new()
 		row.add_child(edit_button)
 		edit_button.icon = load(str(ComicEditor.DIR_ICONS, "properties.svg"))
@@ -70,7 +84,8 @@ func create_list():
 	add_row.add_child(label)
 	label.text = "Add New Preset"
 
-func create_properties(preset:String = ""):
+func create_properties(preset:String = "_none"):
+	is_new = preset == "_none"
 	for child in list.get_children():
 		child.queue_free()
 	var name_row:HBoxContainer = HBoxContainer.new()
@@ -81,7 +96,8 @@ func create_properties(preset:String = ""):
 	var preset_name:LineEdit = LineEdit.new()
 	name_row.add_child(preset_name)
 	preset_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	preset_name.text = preset.capitalize()
+	if not is_new:
+		preset_name.text = preset.capitalize()
 
 	var add_row:HBoxContainer = HBoxContainer.new()
 	list.add_child(add_row)
@@ -107,7 +123,7 @@ func create_properties(preset:String = ""):
 	save_button.text = "Save"
 	save_button.pressed.connect(_on_save_pressed)
 
-	if preset != "":
+	if not is_new:
 		preset_name.editable = false
 		name_row.hide()
 		title = str(preset.capitalize(), " Preset")
@@ -117,91 +133,100 @@ func create_properties(preset:String = ""):
 			else:
 				printerr("Property '", property, "' exists in preset ", category, ">", preset, " but is absent from Comic.preset_properties.", category)
 
-func _add_property_row(property:String, preset:String = ""):
-	var row:HBoxContainer = HBoxContainer.new()
-	list.get_child(-3).add_sibling(row)
-	var delete_button:Button = Button.new()
-	row.add_child(delete_button)
-	delete_button.icon = load(str(ComicEditor.DIR_ICONS, "delete.svg"))
-	delete_button.modulate = Color.RED
-	delete_button.pressed.connect(row.queue_free)
+func _add_property_row(property:String, preset:String = "_none"):
 	var label = Label.new()
-	row.add_child(label)
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.text = property.capitalize()
+	var control:Control
 	match Comic.preset_properties[category][property]:
+		"bookmark":
+			control = OptionButton.new()
+			for bookmark in Comic.book.bookmarks:
+				control.add_item(bookmark)
 		"bool":
-			var check_box:CheckBox = CheckBox.new()
-			row.add_child(check_box)
-			check_box.button_pressed = preset != "" and Comic.book.presets[category][preset][property]
+			control = CheckBox.new()
+			control.button_pressed = not is_new and Comic.book.presets[category][preset][property]
 		"color":
-			var color_button:ColorPickerButton = ColorPickerButton.new()
-			row.add_child(color_button)
-			color_button.custom_minimum_size.x = 24
-			if preset != "":
-				color_button.color = Comic.book.presets[category][preset][property]
+			control = ColorPickerButton.new()
+			control.custom_minimum_size.x = 24
+			if not is_new:
+				control.color = Comic.book.presets[category][preset][property]
 		"font":
-			var option_button:OptionButton = OptionButton.new()
-			row.add_child(option_button)
+			control = OptionButton.new()
 			for file_name in DirAccess.get_files_at(str(Comic.DIR_FONTS, category)):
-				option_button.add_item(file_name.get_basename().capitalize())
-				option_button.set_item_metadata(option_button.item_count - 1, file_name.get_basename())
-				if preset != "" and Comic.book.presets[category][preset][property] == file_name.get_basename():
-					option_button.select(option_button.item_count - 1)
+				control.add_item(file_name.get_basename().capitalize())
+				control.set_item_metadata(control.item_count - 1, file_name.get_basename())
+				if not is_new and Comic.book.presets[category][preset][property] == file_name.get_basename():
+					control.select(control.item_count - 1)
 		"int":
-			var spin_box:SpinBox = SpinBox.new()
-			spin_box.max_value = 999999
-			spin_box.min_value = -999999
-			row.add_child(spin_box)
-			if preset != "":
-				spin_box.value = Comic.book.presets[category][preset][property]
+			control = SpinBox.new()
+			control.max_value = 999999
+			control.min_value = -999999
+			if not is_new:
+				control.value = Comic.book.presets[category][preset][property]
 		"percent":
-			var spin_box:SpinBox = SpinBox.new()
-			row.add_child(spin_box)
-			spin_box.max_value = 999999
-			spin_box.min_value = -999999
+			control = SpinBox.new()
+			control.max_value = 999999
+			control.min_value = -999999
 			label.text = str(label.text, " (%)")
-			if preset != "":
-				spin_box.value = Comic.book.presets[category][preset][property] * 100
+			if not is_new:
+				control.value = Comic.book.presets[category][preset][property] * 100
 		"degrees":
-			var spin_box:SpinBox = SpinBox.new()
-			row.add_child(spin_box)
-			spin_box.max_value = 999999
-			spin_box.min_value = -999999
+			control = SpinBox.new()
+			control.max_value = 999999
+			control.min_value = -999999
 			label.text = str(label.text, " (°)")
-			if preset != "":
-				spin_box.value = Comic.book.presets[category][preset][property] * 360 / TAU
+			if not is_new:
+				control.value = Comic.book.presets[category][preset][property] * 360 / TAU
+		"string":
+			control = LineEdit.new()
+			if not is_new:
+				control.text = Comic.book.presets[category][preset][property]
 		_:
+#			print(Comic.preset_properties[category][property] is enum)
 			if Comic.preset_properties[category][property] is Dictionary:
-				var option_button:OptionButton = OptionButton.new()
-				row.add_child(option_button)
+				control = OptionButton.new()
 				for option in Comic.preset_properties[category][property]:
-					option_button.add_item(option)
-					option_button.set_item_metadata(option_button.item_count - 1, Comic.preset_properties[category][property][option])
-					if preset != "" and Comic.book.presets[category][preset][property] == Comic.preset_properties[category][property][option]:
-						option_button.select(option_button.item_count - 1)
+					control.add_item(option)
+					control.set_item_metadata(control.item_count - 1, Comic.preset_properties[category][property][option])
+					if not is_new and Comic.book.presets[category][preset][property] == Comic.preset_properties[category][property][option]:
+						control.select(control.item_count - 1)
 			elif Comic.preset_properties[category][property] is String and str(Comic.preset_properties[category][property], "s") in Comic and Comic[str(Comic.preset_properties[category][property], "s")] is Dictionary:
 				# This is pretty hacky, I admit. I'm trying to make it extensible for modules.
 				# If the property is an unrecognised string, and Comic[propertys] (i.e. the property with an s on the end) is a dictionary, then the value can be selected from a dropdown of the keys - the saved value is the key
-				var option_button:OptionButton = OptionButton.new()
-				row.add_child(option_button)
+				control = OptionButton.new()
 				for option in Comic[str(Comic.preset_properties[category][property], "s")]:
-					option_button.add_item(option.capitalize())
-					option_button.set_item_metadata(option_button.item_count - 1, option)
-					if preset != "" and Comic.book.presets[category][preset][property] == option:
-						option_button.select(option_button.item_count - 1)
+					control.add_item(option.capitalize())
+					control.set_item_metadata(control.item_count - 1, option)
+					if not is_new and Comic.book.presets[category][preset][property] == option:
+						control.select(control.item_count - 1)
+	if control != null:
+		var row:HBoxContainer = HBoxContainer.new()
+		list.get_child(-3).add_sibling(row)
+		var delete_button:Button = Button.new()
+		row.add_child(delete_button)
+		delete_button.icon = load(str(ComicEditor.DIR_ICONS, "delete.svg"))
+		delete_button.modulate = Color.RED
+		delete_button.pressed.connect(row.queue_free)
+		row.add_child(label)
+		row.add_child(control)
 
 func _on_save_pressed():
 	var preset:String = Comic.validate_name(list.get_child(0).get_child(1).text)
 	list.get_child(0).get_child(1).text = preset.capitalize()
-	if preset == "":
-		Comic.alert("Invalid Preset Name", "Preset name must begin with a letter and contain only letters, numbers, and spaces.")
+	if is_new and preset == "":
+			Comic.alert("Invalid Preset Name", "Preset name must begin with a letter and\ncontain only letters, numbers, and spaces.")
+	elif is_new and Comic.book.presets[category].has(preset):
+			Comic.alert("Invalid Preset Name", "A preset with that name already exists. Please choose another name.")
 	else:
 		var dict:Dictionary = {}
 		for i in range(1, list.get_child_count() - 2):
 			var row:HBoxContainer = list.get_child(i)
 			var property:String = Comic.validate_name(row.get_child(1).text)
 			match Comic.preset_properties[category][property]:
+				"bookmark":
+					var option_button:OptionButton = row.get_child(2)
+					dict[property] = option_button.get_item_text(option_button.get_selected_id())
 				"bool":
 					var check_box:CheckBox = row.get_child(2)
 					dict[property] = check_box.button_pressed
@@ -217,6 +242,9 @@ func _on_save_pressed():
 				"degrees":
 					var spin_box:SpinBox = row.get_child(2)
 					dict[property] = spin_box.value * TAU / 360.0
+				"string":
+					var line_edit:LineEdit = row.get_child(2)
+					dict[property] = line_edit.text
 				_:
 					var option_button:OptionButton = row.get_child(2)
 					dict[property] = option_button.get_selected_metadata()
@@ -245,6 +273,10 @@ func _on_list_resized():
 	container.size = Vector2(min(list.size.x, Comic.size.x - 80), min(list.size.y, Comic.size.y - 80))
 	size = container.size
 	popup_centered()
+	
+func _on_delete_pressed(preset:String):
+	Comic.book.presets[category].erase(preset)
+	_save_presets()
 	
 func _on_reorder_pressed(from:int, to:int):
 	# I couldn't figure out a way to reorder dictionary items apart from rebuilding.

@@ -1,7 +1,6 @@
 class_name ComicKaboom
 extends Control
 
-const DEFAULT_TEXT:String = "POW!"
 const BASE_FONT_SIZE:int = 32
 const FOREGROUND_CHARS = "~!@#$%^&*()_+`-={}|[]\\:;'\"''“”<>?,./"
 
@@ -30,17 +29,11 @@ var bulge:float:
 	set(value):
 		_data_set("bulge", value)
 
-var wave_period:float:
+var content:String:
 	get:
-		return _data_get("wave_period")
+		return _data_get("content")
 	set(value):
-		_data_set("wave_period", value)
-
-var wave_height:float:
-	get:
-		return _data_get("wave_height")
-	set(value):
-		_data_set("wave_height", value)
+		_data_set("content", value)
 
 var font:String:
 	get:
@@ -98,6 +91,12 @@ var presets:Array:
 	set(value):
 		data.presets = value
 
+var rng_seed:int:
+	get:
+		return data.rng_seed
+	set(value):
+		data.rng_seed = value
+
 var rotate:float:
 	get:
 		return _data_get("rotate")
@@ -116,30 +115,32 @@ var spacing:float:
 	set(value):
 		_data_set("spacing", value)
 
-var rng_seed:int:
+var wave_period:float:
 	get:
-		return data.rng_seed
+		return _data_get("wave_period")
 	set(value):
-		data.rng_seed = value
+		_data_set("wave_period", value)
+
+var wave_height:float:
+	get:
+		return _data_get("wave_height")
+	set(value):
+		_data_set("wave_height", value)
+
 
 # ------------------------------------------------------------------------------
 
 func _init(_data:Dictionary, page:ComicPage):
-	print("INIT LABEL")
 	data = _data
-	default_data = _get_default_data()
+	default_data = Comic.get_preset_data("kaboom", presets)
 	if not data.has("oid"):
 		data.oid = Comic.book.page.make_oid()
 	page.os[oid] = self
-	if not data.has("anchor"):
-		data.anchor = Vector2.ZERO
 	if not data.has("rng_seed"):
 		data.rng_seed = Comic.get_seed_from_position(data.anchor)
-	if not data.has("text"):
-		data.text = DEFAULT_TEXT
 
 func apply_data():
-	default_data = _get_default_data()
+	default_data = Comic.get_preset_data("kaboom", presets)
 	
 	# Get the font and font size from the theme
 	var font_theme:Theme = ResourceLoader.load(str(Comic.DIR_FONTS, "kaboom/", font, ".tres"))
@@ -159,7 +160,7 @@ func apply_data():
 	var rng = RandomNumberGenerator.new()
 	rng.seed = rng_seed
 
-	var s = Comic.parse_rich_text_string(data.text)
+	var s = Comic.parse_rich_text_string(content)
 
 	for child in get_children():
 		remove_child(child)
@@ -216,10 +217,10 @@ func apply_data():
 		for i in pos.size():
 			pos[i].x *= spacing
 
-	# We grab the size after scaling but before applying the curve or any random jitter to the position
+	# We grab the size after scaling but before applying the wave or any random jitter to the position
 	width = pos[-1].x
 
-	# Apply curve effects
+	# Apply wave effects
 	if wave_height != 0:
 		for i in pos.size():
 			pos[i] += Vector2.UP * (sin(TAU * t[i] / wave_period) * wave_height * pos[-1].x)
@@ -253,7 +254,7 @@ func apply_data():
 			move_child(char_obj[i], 0)
 		char_obj[i].name = char_str[i]
 
-	name = str("Label (", oid, ")")
+	name = str("Kaboom (", oid, ")")
 
 func rebuild(_rebuild_sub_objects:bool = false):
 	apply_data()
@@ -272,29 +273,3 @@ func _data_set(key:Variant, value:Variant):
 	else:
 		data[key] = value
 
-func _get_default_data() -> Dictionary:
-	var ret = {
-		"align": HORIZONTAL_ALIGNMENT_CENTER,
-		"anchor": Vector2.ZERO,
-		"bulge": 1.0,
-		"wave_period": 2.0,
-		"wave_height": 0.0,
-		"font": "default",
-		"font_size": 1.0,
-		"font_color": Color.YELLOW,
-		"grow": 1.0,
-		"layer": Comic.LAYERS.size() - 1, # We put labels on the top layer by default
-		"outline_color": Color.BLACK,
-		"outline_thickness": 8,
-		"rotate": 0,
-		"rotate_chars": true,
-		"spacing": 1.0,
-	}
-
-	# We iterate over the full list of presets, rather than the array, because we want to apply presets in the order they appear in that list
-	for preset_key in Comic.book.presets.kaboom.keys():
-		if presets.has(preset_key):
-			# We have this preset - apply all its keys to the default data 
-			for key in Comic.book.presets.kaboom[preset_key].keys():
-				ret[key] = Comic.book.presets.kaboom[preset_key][key]
-	return ret

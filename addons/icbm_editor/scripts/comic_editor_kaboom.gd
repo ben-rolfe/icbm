@@ -90,8 +90,9 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.index_pressed.connect(menu_preset_index_pressed.bind(menu_preset))
 	menu_preset.name = "preset"
 	for key in Comic.book.presets.kaboom:
-		menu_preset.add_check_item(key.capitalize())
-		menu_preset.set_item_checked(-1, presets.has(key))
+		if key != "":
+			menu_preset.add_check_item(key.capitalize())
+			menu_preset.set_item_checked(-1, presets.has(key))
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
 
@@ -101,7 +102,7 @@ func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 		Comic.book.open_presets_manager("kaboom")
 	else:
 		Comic.book.add_undo_step([ComicReversionData.new(self)])
-		var key:String = Comic.book.presets.kaboom.keys()[index]
+		var key:String = Comic.book.presets.kaboom.keys()[index + 1]
 		if presets.has(key):
 			presets.erase(key)
 			menu_preset.set_item_checked(index, false)

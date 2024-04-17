@@ -138,11 +138,12 @@ func add_menu_items(menu:PopupMenu):
 	var menu_preset:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_preset)
 	menu_preset.hide_on_checkable_item_selection = false
-	menu_preset.index_pressed.connect(menu_preset_index_pressed.bind(menu_preset))
+	menu_preset.index_pressed.connect(_menu_preset_index_pressed.bind(menu_preset))
 	menu_preset.name = "preset"
 	for key in Comic.book.presets.balloon:
-		menu_preset.add_check_item(key.capitalize())
-		menu_preset.set_item_checked(-1, presets.has(key))
+		if key != "":
+			menu_preset.add_check_item(key.capitalize())
+			menu_preset.set_item_checked(-1, presets.has(key))
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
 
@@ -179,21 +180,21 @@ func menu_style_index_pressed(index:int):
 		edge_style = Comic.edge_styles[shape.id].values()[index]
 	rebuild(true)
 
-func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
+func _menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 	if index == menu_preset.item_count - 1:
 		# Manage Presets was selected
 		Comic.book.open_presets_manager("balloon")
 	else:
 		# A preset was selected
 		Comic.book.add_undo_step([ComicReversionData.new(self)])
-		var key:String = Comic.book.presets.balloon.keys()[index]
+		var key:String = Comic.book.presets.balloon.keys()[index + 1]
 		if presets.has(key):
 			presets.erase(key)
 			menu_preset.set_item_checked(index, false)
 		else:
 			presets.push_back(key)
 			menu_preset.set_item_checked(index, true)
-		scrub_redundant_data()
+		_scrub_redundant_data()
 		rebuild(true)
 
 func menu_layer_index_pressed(index:int):
@@ -291,9 +292,9 @@ func remove():
 	Comic.book.page.redraw(true)
 	Comic.book.selected_element = null
 
-func scrub_redundant_data():
+func _scrub_redundant_data():
 	# This method removes any data that matches the current default data.
-	_default_data = _get_default_data()
+	_default_data = Comic.get_preset_data("balloon", presets)
 	for key in _default_data:
 		if data.has(key) and data[key] == _default_data[key]:
 			data.erase(key)

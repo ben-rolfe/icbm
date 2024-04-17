@@ -2,54 +2,69 @@ class_name ComicLine
 extends Control
 
 var data:Dictionary
+var _default_data:Dictionary
 
 # ------------------------------------------------------------------------------
 
 var edge_color:Color:
 	get:
-		return data.get("edge_color", Comic.theme.get_color("edge_color", "Frame"))
+		return _data_get("edge_color")
 	set(value):
-		data.edge_color = value
+		_data_set("edge_color", value)
 
 var edge_width:int:
 	get:
-		return data.get("edge_width", Comic.theme.get_constant("edge_width", "Frame"))
+		return _data_get("edge_width")
 	set(value):
-		data.edge_width = value
+		_data_set("edge_width", value)
 
 var fill_color:Color:
 	get:
-		return data.get("fill_color", Comic.theme.get_color("fill_color", "Frame"))
+		return _data_get("fill_color")
 	set(value):
-		data.fill_color = value
+		_data_set("fill_color", value)
 
 var fill_width:int:
 	get:
-		return data.get("fill_width", Comic.theme.get_constant("fill_width", "Frame"))
+		return _data_get("fill_width")
 	set(value):
-		data.fill_width = value
+		_data_set("fill_width", value)
 
 var layer:int:
 	get:
-		return data.get("layer", Comic.theme.get_constant("layer", "Frame"))
+		return _data_get("layer")
 	set(value):
-		data.layer = value
+		_data_set("layer", value)
 
 var oid:int:
 	get:
 		return data.oid
+	set(value):
+		data.oid = value
+
+var presets:Array:
+	get:
+		if not data.has("presets"):
+			data.presets = []
+		return data.presets
+	set(value):
+		data.presets = value
 
 # ------------------------------------------------------------------------------
 
 func _init(_data:Dictionary, page:ComicPage):
 	data = _data
+	_default_data = Comic.get_preset_data("line", presets)
 	if not data.has("otype"):
-		data.otype = "balloon"
+		data.otype = "line"
 	if not data.has("oid"):
 		data.oid = page.make_oid()
 	page.os[oid] = self
 
 	name = str("Line (", oid, ")")
+
+func apply_data():
+	_default_data = Comic.get_preset_data("line", presets)
 
 func draw_edge(draw_layer:ComicLayer):
 	if data.points.size() > 1:
@@ -58,3 +73,14 @@ func draw_edge(draw_layer:ComicLayer):
 func draw_fill(draw_layer:ComicLayer):
 	if data.points.size() > 1:
 		draw_layer.draw_polyline(data.points, fill_color, fill_width, true)
+
+# ------------------------------------------------------------------------------
+
+func _data_get(key:Variant):
+	return data.get(key, _default_data[key])
+
+func _data_set(key:Variant, value:Variant):
+	if value == _default_data[key]:
+		data.erase(key)
+	else:
+		data[key] = value

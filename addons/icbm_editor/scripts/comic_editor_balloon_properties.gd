@@ -44,9 +44,9 @@ func _ready():
 func prepare():
 	super()
 	balloon = Comic.book.selected_element
-	text_edit.text = ComicEditor.parse_text_edit(balloon.data.text)
+	text_edit.text = ComicEditor.parse_text_edit(balloon.content)
 	text_edit.grab_focus()
-	if text_edit.text == balloon._default_data.text:
+	if text_edit.text == Comic.default_presets.balloon[""].content:
 		text_edit.select_all()
 	else:
 		#TODO: There's gotta be a less weird way?!
@@ -64,7 +64,7 @@ func prepare():
 	_after_font_color_change()
 
 func _on_text_changed():
-	balloon.data.text = ComicEditor.unparse_text_edit(text_edit.text)
+	balloon.content = ComicEditor.unparse_text_edit(text_edit.text)
 	balloon.rebuild(true)
 
 func _on_text_focused():

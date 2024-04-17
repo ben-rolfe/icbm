@@ -35,9 +35,9 @@ func prepare():
 	action_button.select(button.action)
 	after_action_changed()
 
-	text_edit.text = ComicEditor.parse_text_edit(button.data.text)
+	text_edit.text = ComicEditor.parse_text_edit(button.content)
 	text_edit.grab_focus()
-	if text_edit.text == ComicKaboom.DEFAULT_TEXT:
+	if text_edit.text == Comic.default_presets.button[""].content:
 		text_edit.select_all()
 	else:
 		text_edit.caret_column = text_edit.text.length()
@@ -64,7 +64,7 @@ func after_action_changed():
 			button.action_commands = ""
 
 func _on_text_changed(new_text:String):
-	button.data.text = ComicEditor.unparse_text_edit(text_edit.text)
+	button.content = ComicEditor.unparse_text_edit(text_edit.text)
 	button.rebuild(true)
 
 func _on_text_focused():

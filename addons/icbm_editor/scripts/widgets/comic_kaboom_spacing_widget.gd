@@ -1,6 +1,8 @@
 class_name ComicKaboomSpacingWidget
 extends ComicWidget
 
+const DISTANCE_MULTIPLIER:float = 0.032
+
 func _init(serves:ComicEditorKaboom):
 	action = Action.SLIDE_H
 	color = Color.CYAN
@@ -8,9 +10,9 @@ func _init(serves:ComicEditorKaboom):
 
 func reposition():
 	if serves.align == HORIZONTAL_ALIGNMENT_RIGHT:
-		anchor = get_adjusted_anchor() - serves.get_transform().x * serves.width + serves.get_transform().y * serves.font_size * 0.5
+		anchor = get_adjusted_anchor() - serves.get_transform().x * serves.width + serves.get_transform().y * serves.font_size / DISTANCE_MULTIPLIER
 	else:
-		anchor = get_adjusted_anchor() + serves.get_transform().x * serves.width + serves.get_transform().y * serves.font_size * 0.5
+		anchor = get_adjusted_anchor() + serves.get_transform().x * serves.width + serves.get_transform().y * serves.font_size / DISTANCE_MULTIPLIER
 	#match serves.align:
 		#HORIZONTAL_ALIGNMENT_LEFT:
 			#anchor = get_adjusted_anchor() + serves.get_transform().x * serves.width + serves.get_transform().y * serves.font_size * 0.5

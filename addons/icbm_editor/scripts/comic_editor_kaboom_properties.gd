@@ -2,7 +2,7 @@ class_name ComicEditorKaboomProperties
 extends ComicEditorProperties
 
 @export var line_edit:LineEdit
-var label:ComicEditorKaboom
+var kaboom:ComicEditorKaboom
 var text_before_changes:String
 
 @export var font_color_button:ColorPickerButton
@@ -33,84 +33,84 @@ func _ready():
 
 func prepare():
 	super()
-	label = Comic.book.selected_element
-	line_edit.text = ComicEditor.parse_text_edit(label.data.text)
+	kaboom = Comic.book.selected_element
+	line_edit.text = ComicEditor.parse_text_edit(kaboom.content)
 	line_edit.grab_focus()
-	if line_edit.text == ComicKaboom.DEFAULT_TEXT:
+	if line_edit.text == Comic.default_presets.kaboom[""].content:
 		line_edit.select_all()
 	else:
 		line_edit.caret_column = line_edit.text.length()
 
-	font_color_button.color = label.font_color
+	font_color_button.color = kaboom.font_color
 	_after_font_color_change()
 
-	outline_color_button.color = label.outline_color
+	outline_color_button.color = kaboom.outline_color
 	_after_outline_color_change()
 
 
 func _on_text_changed(new_text:String):
-	label.data.text = ComicEditor.unparse_text_edit(line_edit.text)
-	label.rebuild(true)
+	kaboom.content = ComicEditor.unparse_text_edit(line_edit.text)
+	kaboom.rebuild(true)
 
 func _on_text_focused():
 	text_before_changes = line_edit.text
 	
 func _on_text_unfocused():
 	if line_edit.text != text_before_changes:
-		var reversion:ComicReversionData = ComicReversionData.new(label)
+		var reversion:ComicReversionData = ComicReversionData.new(kaboom)
 		reversion.data.text = ComicEditor.unparse_text_edit(text_before_changes)
 		Comic.book.add_undo_step([reversion])
 
 func _on_font_color_opened():
-	font_color_before_changes = label.font_color
+	font_color_before_changes = kaboom.font_color
 
 func _on_font_color_changed(color:Color):
-	label.font_color = color
+	kaboom.font_color = color
 	_after_font_color_change()
 
 func _on_font_color_closed():
-	if label.font_color != font_color_before_changes:
-		var reversion:ComicReversionData = ComicReversionData.new(label)
+	if kaboom.font_color != font_color_before_changes:
+		var reversion:ComicReversionData = ComicReversionData.new(kaboom)
 		reversion.data.font_color = font_color_before_changes
 		Comic.book.add_undo_step([reversion])
 
 func _on_font_color_revert():
-	if label.data.has("font_color"):
-		Comic.book.add_undo_step([ComicReversionData.new(label)])
-		label.data.erase("font_color")
+	if kaboom.data.has("font_color"):
+		Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
+		kaboom.data.erase("font_color")
 		_after_font_color_change()
-		font_color_button.color = label.font_color
+		font_color_button.color = kaboom.font_color
 
 func _after_font_color_change():
-	label.rebuild(true)
-	if label.is_default("font_color"):
+	kaboom.rebuild(true)
+	if kaboom.is_default("font_color"):
 		font_color_revert_button.hide()
 	else:
 		font_color_revert_button.show()
 
 func _on_outline_color_opened():
-	outline_color_before_changes = label.outline_color
+	outline_color_before_changes = kaboom.outline_color
 
 func _on_outline_color_changed(color:Color):
-	label.outline_color = color
+	kaboom.outline_color = color
 	_after_outline_color_change()
 
 func _on_outline_color_closed():
-	if label.outline_color != outline_color_before_changes:
-		var reversion:ComicReversionData = ComicReversionData.new(label)
+	if kaboom.outline_color != outline_color_before_changes:
+		var reversion:ComicReversionData = ComicReversionData.new(kaboom)
 		reversion.data.outline_color = outline_color_before_changes
 		Comic.book.add_undo_step([reversion])
 
 func _on_outline_color_revert():
-	if label.data.has("outline_color"):
-		Comic.book.add_undo_step([ComicReversionData.new(label)])
-		label.data.erase("outline_color")
+	if kaboom.data.has("outline_color"):
+		Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
+		kaboom.data.erase("outline_color")
 		_after_outline_color_change()
-		outline_color_button.color = label.outline_color
+		outline_color_button.color = kaboom.outline_color
 
 func _after_outline_color_change():
-	label.rebuild(true)
-	if label.is_default("outline_color"):
+	kaboom.rebuild(true)
+	if kaboom.is_default("outline_color"):
 		outline_color_revert_button.hide()
 	else:
 		outline_color_revert_button.show()

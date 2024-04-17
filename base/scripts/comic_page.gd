@@ -58,17 +58,16 @@ func _init(_bookmark: String):
 
 	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.READ)
 	var all_data = file.get_var()
-	print(all_data)
+	#print(all_data)
 	if all_data == {}:
 		# A newly created page
 		all_data = {
 			"page_data": {},
 			"fragments": [{ "os":[{
-				# We draw the outside frame at double width, so that one full width is shown within the page.
 				"otype": "line",
 				"oid": 0,
-				"fill_width": Comic.theme.get_constant("fill_width", "Frame") * 2,
 				"points": [Vector2.ZERO, Vector2(Comic.size.x, 0), Comic.size, Vector2(0, Comic.size.y),Vector2.ZERO],
+				"presets": ["page_border"],
 			}] }]
 		}
 #	print(all_data)

@@ -39,6 +39,11 @@ const ANCHOR_POINTS = {
 	"BR":Vector2(1, 1),
 }
 
+const HORIZONTAL_ALIGNMENTS:Dictionary = {
+	"Left":HORIZONTAL_ALIGNMENT_LEFT,
+	"Center":HORIZONTAL_ALIGNMENT_CENTER,
+	"Right":HORIZONTAL_ALIGNMENT_RIGHT,
+}
 
 #Regular expressions
 var _rex_bracketed_expressions:RegEx = RegEx.new()
@@ -80,12 +85,8 @@ var px_per_unit:float = 1
 
 var preset_properties:Dictionary = {
 	"balloon": {
-		"align": {
-			"Left":HORIZONTAL_ALIGNMENT_LEFT,
-			"Center":HORIZONTAL_ALIGNMENT_CENTER,
-			"Right":HORIZONTAL_ALIGNMENT_RIGHT,
-		},
-		"anchor": "hidden",
+		"align": HORIZONTAL_ALIGNMENTS,
+		"anchor": "vector2",
 		"anchor_to": ANCHOR_POINTS,
 		"bold": "bool",
 		"bold_is_italic": "bool",
@@ -107,16 +108,28 @@ var preset_properties:Dictionary = {
 		"scroll": "bool",
 		"shape": "shape",
 		"squirk": "percent",
+		"text": "string",
 		"width": "int",
 	},
+	"button": {
+		"action": ComicButton.Action,
+		"action_bookmark": "bookmark",
+		"action_commands": "string",
+		"fill_color": "color",
+		"fill_color_disabled": "color",
+		"fill_color_hovered": "color",
+		"font_color": "color",
+		"font_color_disabled": "color",
+		"font_color_hovered": "color",
+		"content": "string",
+	},
 	"kaboom": {
-
 		"align": {
 			"Left":HORIZONTAL_ALIGNMENT_LEFT,
 			"Center":HORIZONTAL_ALIGNMENT_CENTER,
 			"Right":HORIZONTAL_ALIGNMENT_RIGHT,
 		},
-		"anchor": "hidden",
+		"anchor": "vector2",
 		"bulge": "percent",
 		"wave_period": "percent",
 		"wave_height": "percent",
@@ -130,11 +143,36 @@ var preset_properties:Dictionary = {
 		"rotate": "degrees",
 		"rotate_chars": "bool",
 		"spacing": "percent",
-		
+		"text": "string",
+	},
+	"line": {
+		"edge_color": "color",
+		"edge_width": "int",
+		"fill_color": "color",
+		"fill_width": "int",
+		"layer": "int",
+	},
+}
+var preset_property_misc_defaults = {
+	"balloon": {
+		"shape": "balloon",
+		"edge_style": "smooth",		
 	},
 }
 var default_presets:Dictionary = {
 	"balloon": {
+		"" : {
+			"align": HORIZONTAL_ALIGNMENT_CENTER,
+			"bold_is_italic": true,
+			"collapse": true,
+			"content": "New Balloon...",
+			"edge_thickness": 2,
+			"fill_color": Color.WHITE,
+			"layer": 2,
+			"anchor_to": Vector2(0.5, 0.5),
+			"squirk": 0.5,
+			"width": 288,
+		},
 		"caption": {
 			"shape": "box",
 			"italic": true,
@@ -155,7 +193,45 @@ var default_presets:Dictionary = {
 			"bold": true,
 		},
 	},
-	"kaboom": {}
+	"button": {
+		"": {
+			"action": ComicButton.Action.NEXT,
+			"action_bookmark": "",
+			"action_commands": "",
+			"content": "New Button",
+			"fill_color": Color.BLACK,
+			"fill_color_disabled": Color(0.2, 0.2, 0.2),
+			"fill_color_hovered": Color.BLACK,
+			"font_color": Color.WHITE,
+			"font_color_disabled": Color(0.6, 0.6, 0.6),
+			"font_color_hovered": Color.YELLOW,
+		},
+	},
+	"kaboom": {
+		"": {
+			"align": HORIZONTAL_ALIGNMENT_CENTER,
+			"content": "Kaboom!",
+			"font_color": Color.YELLOW,
+			"layer": 4,
+			"outline_color": Color.BLACK,
+			"outline_thickness": 8,
+			"rotate_chars": true,
+			"wave_period": 2.0,
+			"wave_height": 0.0,
+		},
+	},
+	"line": {
+		"": {
+			"edge_color": Color.BLACK,
+			"edge_width": 2,
+			"fill_color": Color.WHITE,
+			"fill_width": 8,
+			"layer": 2,
+		},
+		"page_border": {
+			"fill_width": 16,
+		},
+	},
 }
 
 
@@ -494,8 +570,6 @@ func validate_name(s:String) -> String:
 	s = s.replace("-", "_")
 	s = _regex_sanitize_varname.sub(s, "", true).to_lower().to_snake_case()
 	s = s.lstrip("_").rstrip("_")
-	if s == "":
-		s = "a"
 	return s
 	
 func request_quit():
@@ -550,3 +624,47 @@ func confirm(title:String, text:String, confirm_callback:Callable = Callable(), 
 	#scene_tree.current_scene.add_child(dialog)
 	#dialog.popup_centered()
 #
+
+func get_preset_data(category:String, chosen_presets:Array = []) -> Dictionary:
+	var r = {}
+	for key in preset_properties[category]:
+		var value:Variant = _get_preset_default(category, key)
+		if value != null:
+			r[key] = value
+
+	# We iterate over the full list of known presets, rather than the presets array, because we want to apply presets in the order they appear in that list.
+	# Also, we want to add the "" default preset.
+	for preset_key in Comic.book.presets[category].keys():
+		if preset_key == "" or chosen_presets.has(preset_key):
+			# We have this preset - apply all its keys to the default data 
+			for key in Comic.book.presets[category][preset_key].keys():
+				r[key] = Comic.book.presets[category][preset_key][key]
+	return r
+
+func _get_preset_default(category:String, key:Variant) -> Variant:
+	if preset_property_misc_defaults.has(category) and preset_property_misc_defaults[category].has(key):
+		return Comic.preset_property_misc_defaults[category][key]
+	elif preset_properties[category][key] is Dictionary and preset_properties[category][key].size() > 0:
+		return Comic.preset_properties[category][key].values()[0]
+	elif Comic.preset_properties[category][key] is Array and preset_properties[category][key].size() > 0:
+		return 0
+	else:
+		match(Comic.preset_properties[category][key]):
+			"bookmark":
+				return "start"
+			"bool":
+				return false
+			"color":
+				return Color.BLACK
+			"degrees", "int":
+				return 0
+			"font":
+				return "default"
+			"percent":
+				return 1.0
+			"string":
+				return ""
+			"vector2":
+				return Vector2.ZERO
+	return null
+	
