@@ -208,7 +208,7 @@ func _init(_data:Dictionary, page:ComicPage):
 		data.tails = {}
 	
 	if not Comic.book is ComicEditor:
-		data.text = Comic.execute_embedded_code(data.text)
+		content = Comic.execute_embedded_code(content)
 
 	name = str("Balloon (", oid, ")")
 
@@ -345,7 +345,7 @@ func apply_data():
 	var content_size = Vector2(float(get_content_width()) if _final_collapse else size.x, get_content_height())
 	frame_half_size = content_size / 2.0
 
-	center_point = anchor + shape.center_adjustment - (anchor_to - Vector2.ONE * 0.5) * frame_half_size * 2
+	center_point = anchor - (anchor_to - Vector2.ONE * 0.5) * frame_half_size * 2
 	
 	# Safety check
 	var viewport_rect:Rect2i = get_viewport_rect()
@@ -359,7 +359,7 @@ func apply_data():
 			anchor.y += viewport_rect.position.y - center_point.y
 		elif center_point.y > viewport_rect.position.y + viewport_rect.size.y:
 			anchor.y += viewport_rect.position.y + viewport_rect.size.y - center_point.y
-		center_point = anchor + shape.center_adjustment - (anchor_to - Vector2.ONE * 0.5) * frame_half_size * 2
+		center_point = anchor - (anchor_to - Vector2.ONE * 0.5) * frame_half_size * 2
 
 	# With those calculated, we can place the box.
 	position = center_point - frame_half_size

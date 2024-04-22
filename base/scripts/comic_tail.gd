@@ -37,7 +37,7 @@ var data:Dictionary:
 func _init(_oid: int, _balloon:ComicBalloon):
 	oid = _oid
 	balloon = _balloon
-	if not data.has("seed"):
+	if not data.has("rng_seed"):
 		data.rng_seed = balloon.data.rng_seed + balloon.data.tails.size()
 	if not data.has("start_placement_angle"):
 		data.start_placement_angle = TAU / 4
@@ -52,7 +52,7 @@ func apply_data():
 
 	if style.is_randomized or tip.is_randomized:
 		rng = RandomNumberGenerator.new()
-		rng.seed = data.seed
+		rng.seed = data.rng_seed
 
 	#TODO: Think about getting fancy and blending to the end balloon values.
 	edge_color_start = balloon.edge_color

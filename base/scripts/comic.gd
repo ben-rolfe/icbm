@@ -91,6 +91,7 @@ var preset_properties:Dictionary = {
 		"bold": "bool",
 		"bold_is_italic": "bool",
 		"collapse": "bool",
+		"content": "string",
 		"edge_color": "color",
 		"edge_style": "edge_style",
 		"edge_thickness": "int",
@@ -108,20 +109,19 @@ var preset_properties:Dictionary = {
 		"scroll": "bool",
 		"shape": "shape",
 		"squirk": "percent",
-		"text": "string",
 		"width": "int",
 	},
 	"button": {
 		"action": ComicButton.Action,
 		"action_bookmark": "bookmark",
 		"action_commands": "string",
+		"content": "string",
 		"fill_color": "color",
 		"fill_color_disabled": "color",
 		"fill_color_hovered": "color",
 		"font_color": "color",
 		"font_color_disabled": "color",
 		"font_color_hovered": "color",
-		"content": "string",
 	},
 	"kaboom": {
 		"align": {
@@ -131,6 +131,7 @@ var preset_properties:Dictionary = {
 		},
 		"anchor": "vector2",
 		"bulge": "percent",
+		"content": "string",
 		"wave_period": "percent",
 		"wave_height": "percent",
 		"font": "font",
@@ -143,7 +144,6 @@ var preset_properties:Dictionary = {
 		"rotate": "degrees",
 		"rotate_chars": "bool",
 		"spacing": "percent",
-		"text": "string",
 	},
 	"line": {
 		"edge_color": "color",
@@ -156,7 +156,7 @@ var preset_properties:Dictionary = {
 var preset_property_misc_defaults = {
 	"balloon": {
 		"shape": "balloon",
-		"edge_style": "smooth",		
+		"edge_style": "smooth",
 	},
 }
 var default_presets:Dictionary = {
@@ -214,7 +214,7 @@ var default_presets:Dictionary = {
 			"font_color": Color.YELLOW,
 			"layer": 4,
 			"outline_color": Color.BLACK,
-			"outline_thickness": 8,
+			"outline_thickness": 16,
 			"rotate_chars": true,
 			"wave_period": 2.0,
 			"wave_height": 0.0,
@@ -232,6 +232,10 @@ var default_presets:Dictionary = {
 			"fill_width": 16,
 		},
 	},
+}
+var get_preset_options:Dictionary = {
+	"shape": get_preset_options_shape,
+	"edge_style": get_preset_options_edge_style,
 }
 
 
@@ -668,3 +672,13 @@ func _get_preset_default(category:String, key:Variant) -> Variant:
 				return Vector2.ZERO
 	return null
 	
+func get_preset_options_shape() -> Array:
+	return shapes.keys()
+
+func get_preset_options_edge_style() -> Array:
+	var r:Array = []
+	for shape in shapes:
+		for edge_style in edge_styles[shape]:
+			if not r.has(edge_style):
+				r.push_back(edge_style)
+	return r

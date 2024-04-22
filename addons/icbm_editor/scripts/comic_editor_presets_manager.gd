@@ -4,7 +4,7 @@ extends Window
 var category:String
 var container:ScrollContainer
 var list:VBoxContainer
-var is_new:bool
+var new_preset:bool
 
 func _init(_category:String):
 	category = _category
@@ -85,7 +85,7 @@ func create_list():
 	label.text = "Add New Preset"
 
 func create_properties(preset:String = "_none"):
-	is_new = preset == "_none"
+	new_preset = preset == "_none"
 	for child in list.get_children():
 		child.queue_free()
 	var name_row:HBoxContainer = HBoxContainer.new()
@@ -96,7 +96,7 @@ func create_properties(preset:String = "_none"):
 	var preset_name:LineEdit = LineEdit.new()
 	name_row.add_child(preset_name)
 	preset_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if not is_new:
+	if not new_preset:
 		preset_name.text = preset.capitalize()
 
 	var add_row:HBoxContainer = HBoxContainer.new()
@@ -123,7 +123,7 @@ func create_properties(preset:String = "_none"):
 	save_button.text = "Save"
 	save_button.pressed.connect(_on_save_pressed)
 
-	if not is_new:
+	if not new_preset:
 		preset_name.editable = false
 		name_row.hide()
 		title = str(preset.capitalize(), " Preset")
@@ -134,7 +134,8 @@ func create_properties(preset:String = "_none"):
 				printerr("Property '", property, "' exists in preset ", category, ">", preset, " but is absent from Comic.preset_properties.", category)
 
 func _add_property_row(property:String, preset:String = "_none"):
-	var label = Label.new()
+	var new_property:bool = preset == "_none"
+	var label:Label = Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.text = property.capitalize()
 	var control:Control
@@ -145,42 +146,42 @@ func _add_property_row(property:String, preset:String = "_none"):
 				control.add_item(bookmark)
 		"bool":
 			control = CheckBox.new()
-			control.button_pressed = not is_new and Comic.book.presets[category][preset][property]
+			control.button_pressed = not new_property and Comic.book.presets[category][preset][property]
 		"color":
 			control = ColorPickerButton.new()
 			control.custom_minimum_size.x = 24
-			if not is_new:
+			if not new_property:
 				control.color = Comic.book.presets[category][preset][property]
 		"font":
 			control = OptionButton.new()
 			for file_name in DirAccess.get_files_at(str(Comic.DIR_FONTS, category)):
 				control.add_item(file_name.get_basename().capitalize())
 				control.set_item_metadata(control.item_count - 1, file_name.get_basename())
-				if not is_new and Comic.book.presets[category][preset][property] == file_name.get_basename():
+				if not new_property and Comic.book.presets[category][preset][property] == file_name.get_basename():
 					control.select(control.item_count - 1)
 		"int":
 			control = SpinBox.new()
 			control.max_value = 999999
 			control.min_value = -999999
-			if not is_new:
+			if not new_property:
 				control.value = Comic.book.presets[category][preset][property]
 		"percent":
 			control = SpinBox.new()
 			control.max_value = 999999
 			control.min_value = -999999
 			label.text = str(label.text, " (%)")
-			if not is_new:
+			if not new_property:
 				control.value = Comic.book.presets[category][preset][property] * 100
 		"degrees":
 			control = SpinBox.new()
 			control.max_value = 999999
 			control.min_value = -999999
 			label.text = str(label.text, " (°)")
-			if not is_new:
+			if not new_property:
 				control.value = Comic.book.presets[category][preset][property] * 360 / TAU
 		"string":
 			control = LineEdit.new()
-			if not is_new:
+			if not new_property:
 				control.text = Comic.book.presets[category][preset][property]
 		_:
 #			print(Comic.preset_properties[category][property] is enum)
@@ -189,16 +190,15 @@ func _add_property_row(property:String, preset:String = "_none"):
 				for option in Comic.preset_properties[category][property]:
 					control.add_item(option)
 					control.set_item_metadata(control.item_count - 1, Comic.preset_properties[category][property][option])
-					if not is_new and Comic.book.presets[category][preset][property] == Comic.preset_properties[category][property][option]:
+					if not new_property and Comic.book.presets[category][preset][property] == Comic.preset_properties[category][property][option]:
 						control.select(control.item_count - 1)
-			elif Comic.preset_properties[category][property] is String and str(Comic.preset_properties[category][property], "s") in Comic and Comic[str(Comic.preset_properties[category][property], "s")] is Dictionary:
-				# This is pretty hacky, I admit. I'm trying to make it extensible for modules.
-				# If the property is an unrecognised string, and Comic[propertys] (i.e. the property with an s on the end) is a dictionary, then the value can be selected from a dropdown of the keys - the saved value is the key
+			elif Comic.get_preset_options.has(Comic.preset_properties[category][property]):
+				# Comic.get_preset_options is a dictionary of callables that return arrays of all the valid options.
 				control = OptionButton.new()
-				for option in Comic[str(Comic.preset_properties[category][property], "s")]:
+				for option in Comic.get_preset_options[Comic.preset_properties[category][property]].call():
 					control.add_item(option.capitalize())
 					control.set_item_metadata(control.item_count - 1, option)
-					if not is_new and Comic.book.presets[category][preset][property] == option:
+					if not new_property and Comic.book.presets[category][preset][property] == option:
 						control.select(control.item_count - 1)
 	if control != null:
 		var row:HBoxContainer = HBoxContainer.new()
@@ -214,9 +214,9 @@ func _add_property_row(property:String, preset:String = "_none"):
 func _on_save_pressed():
 	var preset:String = Comic.validate_name(list.get_child(0).get_child(1).text)
 	list.get_child(0).get_child(1).text = preset.capitalize()
-	if is_new and preset == "":
+	if new_preset and preset == "":
 			Comic.alert("Invalid Preset Name", "Preset name must begin with a letter and\ncontain only letters, numbers, and spaces.")
-	elif is_new and Comic.book.presets[category].has(preset):
+	elif new_preset and Comic.book.presets[category].has(preset):
 			Comic.alert("Invalid Preset Name", "A preset with that name already exists. Please choose another name.")
 	else:
 		var dict:Dictionary = {}

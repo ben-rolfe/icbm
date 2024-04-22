@@ -9,11 +9,11 @@ func _gui_input(event:InputEvent):
 	#TODO: Fix
 	if event is InputEventMouseButton and event.pressed and get_rect().has_point(event.global_position):
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.is_double_click():
+			if event.is_double_click() and Comic.book.has_method("double_clicked"):
 				Comic.book.double_clicked(self, event)
-			else:
+			elif Comic.book.has_method("left_clicked"): #NOTE: if the above has_method("double_clicked") returns false, we fall through to this elif, so a double-click will be treated as a click
 				Comic.book.left_clicked(self, event)
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
+		elif event.button_index == MOUSE_BUTTON_RIGHT and Comic.book.has_method("right_clicked"):
 			Comic.book.right_clicked(self, event)
 
 func rebuild():
