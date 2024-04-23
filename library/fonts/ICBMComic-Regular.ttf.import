@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://c3pnj1ilhlb58"
-path="res://.godot/imported/JetBrainsMono-Regular.ttf-f20e679b680402500f29dd13fe3bdda0.fontdata"
+uid="uid://bxubneop2tyks"
+path="res://.godot/imported/ICBMComic-Regular.ttf-e69a9b4748acb99c03d6f1bc240f838e.fontdata"
 
 [deps]
 
-source_file="res://theme/fonts/JetBrainsMono-Regular.ttf"
-dest_files=["res://.godot/imported/JetBrainsMono-Regular.ttf-f20e679b680402500f29dd13fe3bdda0.fontdata"]
+source_file="res://library/fonts/ICBMComic-Regular.ttf"
+dest_files=["res://.godot/imported/ICBMComic-Regular.ttf-e69a9b4748acb99c03d6f1bc240f838e.fontdata"]
 
 [params]
 
@@ -27,7 +27,12 @@ Fallbacks=null
 fallbacks=[]
 Compress=null
 compress=true
-preload=[]
+preload=[{
+"chars": [],
+"glyphs": [],
+"name": "New Configuration",
+"size": Vector2i(16, 0)
+}]
 language_support={}
 script_support={}
 opentype_features={}

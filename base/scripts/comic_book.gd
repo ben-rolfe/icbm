@@ -10,8 +10,6 @@ var change_page:bool
 var default_balloon_layer:int
 var history:Array = []
 var _history_size:int
-#var _page_data:Dictionary = {}
-var vars:Dictionary
 var page:ComicPage
 var has_unsaved_changes:bool
 var pages:Dictionary
@@ -21,9 +19,9 @@ var presets:Dictionary
 
 var bookmark:String:
 	get:
-		return vars._bookmarks[-1]
+		return Comic.vars._bookmarks[-1]
 	set(value):
-		vars._bookmarks[-1] = value
+		Comic.vars._bookmarks[-1] = value
 
 # ------------------------------------------------------------------------------
 
@@ -66,8 +64,9 @@ func _ready():
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
-		print("TODO: Open menu instead")
-		get_tree().quit()
+		ComicMenu.open()
+		#print("TODO: Open menu instead")
+		#get_tree().quit()
 	elif event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_PRINT:
@@ -83,7 +82,7 @@ func _process(_delta:float):
 		_show_page()
 
 func start(start_page:String):
-	vars = { "_bookmarks": [start_page] }
+	Comic.vars = { "_bookmarks": [start_page] }
 	#TODO: Reinstate setup?
 	#if _page_data.has("_setup"):
 		#read_lines(_page_data._setup, self)
@@ -100,7 +99,7 @@ func right_clicked(control:Control, _event:InputEvent):
 func _show_page():
 	change_page = false
 	print("--- NEW PAGE ---")
-	history.push_back(vars.duplicate(true))
+	history.push_back(Comic.vars.duplicate(true))
 	#print(history)
 	while history.size() > _history_size:
 		history.pop_front()
@@ -125,7 +124,7 @@ func _show_page():
 func page_back():
 	if history.size() > 1:
 		history.pop_back() # This is the vars history for the *current* page - we discard it.
-		vars = history.pop_back()	#behind it is the vars history for the previous page. We remove it and load it into vars - changing the page will add it back to the history.
+		Comic.vars = history.pop_back()	#behind it is the vars history for the previous page. We remove it and load it into vars - changing the page will add it back to the history.
 		print("Go back!")
 		print(history)
 		change_page = true
@@ -143,14 +142,14 @@ func page_previous():
 	change_page = true
 
 func page_return():
-	if vars._bookmarks.size() > 1:
-		vars._bookmarks.pop_back()
+	if Comic.vars._bookmarks.size() > 1:
+		Comic.vars._bookmarks.pop_back()
 	else:
 		printerr("Return was called when bookmarks contained only one value (perhaps visit hadn't been called or return was called multiple times)")
 	change_page = true
 
 func page_visit(_bookmark:String):
-	vars._bookmarks.push_back(_bookmark)
+	Comic.vars._bookmarks.push_back(_bookmark)
 	change_page = true
 
 func get_relative_bookmark_index(from_key:String, offset:int) -> int:

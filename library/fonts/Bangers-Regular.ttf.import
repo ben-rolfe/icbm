@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://2g3r1eqgx8ld"
-path="res://.godot/imported/Butcherman-Regular.ttf-7f486d6c28932da30762a2f039c456f9.fontdata"
+uid="uid://wbpda6tspm4v"
+path="res://.godot/imported/Bangers-Regular.ttf-2dd0617f5484933269ed2c3885cbc3e1.fontdata"
 
 [deps]
 
-source_file="res://theme/fonts/Butcherman-Regular.ttf"
-dest_files=["res://.godot/imported/Butcherman-Regular.ttf-7f486d6c28932da30762a2f039c456f9.fontdata"]
+source_file="res://library/fonts/Bangers-Regular.ttf"
+dest_files=["res://.godot/imported/Bangers-Regular.ttf-2dd0617f5484933269ed2c3885cbc3e1.fontdata"]
 
 [params]
 
@@ -27,7 +27,13 @@ Fallbacks=null
 fallbacks=[]
 Compress=null
 compress=true
-preload=[]
+preload=[{
+"chars": [],
+"glyphs": [],
+"name": "New Configuration",
+"size": Vector2i(16, 0),
+"variation_embolden": 0.0
+}]
 language_support={}
 script_support={}
 opentype_features={}

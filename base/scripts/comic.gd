@@ -9,7 +9,8 @@ enum Overflow {
 
 
 const DIR_STORY:String = "res://story/"
-const DIR_FONTS:String = "res://theme/fonts/"
+const DIR_FONTS:String = "res://library/fonts/"
+const DIR_ICONS:String = "res://library/icons/"
 const DEFAULT_BG:String = "res://theme/background.webp"
 
 const IMAGE_EXT:PackedStringArray = ["webp", "png", "jpg", "jpeg", "svg"]
@@ -59,9 +60,13 @@ var tail_width:float
 var default_bg_path:String = ""
 
 var book:ComicBook
+var vars:Dictionary
 
 var theme:Theme
+
 var size:Vector2
+var image_scale:float = 1
+var px_per_unit:float = 1
 
 var shapes:Dictionary = {}
 var edge_styles:Dictionary = {}
@@ -78,10 +83,6 @@ var commands:Dictionary = {
 }
 var _replacer_keys_ordered:Array[String] = []
 var _replacers:Dictionary = {}
-
-var image_scale:float = 1
-
-var px_per_unit:float = 1
 
 var preset_properties:Dictionary = {
 	"balloon": {

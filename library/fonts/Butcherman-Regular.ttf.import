@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://cmweu6xrxqum2"
-path="res://.godot/imported/Creepster-Regular.ttf-330519d0ecc97a602a5714df807c8c08.fontdata"
+uid="uid://2g3r1eqgx8ld"
+path="res://.godot/imported/Butcherman-Regular.ttf-61ce6b4e6f9145b43e91e6e87cf7a2fe.fontdata"
 
 [deps]
 
-source_file="res://theme/fonts/Creepster-Regular.ttf"
-dest_files=["res://.godot/imported/Creepster-Regular.ttf-330519d0ecc97a602a5714df807c8c08.fontdata"]
+source_file="res://library/fonts/Butcherman-Regular.ttf"
+dest_files=["res://.godot/imported/Butcherman-Regular.ttf-61ce6b4e6f9145b43e91e6e87cf7a2fe.fontdata"]
 
 [params]
 

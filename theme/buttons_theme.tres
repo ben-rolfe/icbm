@@ -1,10 +1,10 @@
 [gd_resource type="Theme" load_steps=6 format=3 uid="uid://7p01lqx0eat7"]
 
-[ext_resource type="FontVariation" uid="uid://djt5ukb7wrtng" path="res://theme/fonts/ICBMComic-FauxBold.tres" id="2_80rcx"]
+[ext_resource type="FontVariation" uid="uid://djt5ukb7wrtng" path="res://library/fonts/ICBMComic-FauxBold.tres" id="2_80rcx"]
 [ext_resource type="StyleBox" uid="uid://bt2dlubrthyw8" path="res://theme/styleboxes/button_stylebox.tres" id="2_wftyd"]
-[ext_resource type="FontVariation" uid="uid://f0xti67u7ix2" path="res://theme/fonts/ICBMComic-FauxBoldItalic.tres" id="3_88t30"]
-[ext_resource type="FontVariation" uid="uid://dto1412w0nfym" path="res://theme/fonts/ICBMComic-FauxItalic.tres" id="4_oijon"]
-[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="5_4t54b"]
+[ext_resource type="FontVariation" uid="uid://f0xti67u7ix2" path="res://library/fonts/ICBMComic-FauxBoldItalic.tres" id="3_88t30"]
+[ext_resource type="FontVariation" uid="uid://dto1412w0nfym" path="res://library/fonts/ICBMComic-FauxItalic.tres" id="4_oijon"]
+[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://library/fonts/ICBMComic-Regular.ttf" id="5_4t54b"]
 
 [resource]
 PanelContainer/styles/panel = ExtResource("2_wftyd")

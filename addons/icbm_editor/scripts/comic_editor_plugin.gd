@@ -14,7 +14,7 @@ func _enter_tree():
 	menu.index_pressed.connect(item_pressed.bind(""))
 
 	edit_button = ButtonAdvanced.new()
-	edit_button.icon = preload("res://addons/icbm_editor/theme/icons/toolbar_button_edit.svg")
+	edit_button.icon = load(str(ComicEditor.DIR_ICONS, "toolbar_button_edit.svg"))
 	edit_button.tooltip_text = "Open ICBM Editor\nOpen the ICBM Visual Editor."
 	edit_button.focus_mode = Control.FOCUS_NONE
 	edit_button.toggle_mode = false
@@ -26,7 +26,7 @@ func _enter_tree():
 	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, edit_button)
 
 	play_button = ButtonAdvanced.new()
-	play_button.icon = preload("res://addons/icbm_editor/theme/icons/toolbar_button_play.svg")
+	play_button.icon = load(str(ComicEditor.DIR_ICONS, "toolbar_button_play.svg"))
 	play_button.tooltip_text = "Play from Page\nStart ICBM at the chosen page."
 	play_button.focus_mode = Control.FOCUS_NONE
 	play_button.toggle_mode = false

@@ -61,8 +61,8 @@ enum MenuCommand {
 	QUIT_WITHOUT_SAVING = 268435537, # Ctrl + Q
 }
 
-const SETTINGS_PATH:String = "user://editor_settings.cfg"
 const DIR_ICONS:String = "res://addons/icbm_editor/theme/icons/"
+const SETTINGS_PATH:String = "user://editor_settings.cfg"
 const MAX_UNDO_STEPS:int = 50
 
 var menu:PopupMenu
@@ -129,7 +129,7 @@ func _init():
 
 func _ready():
 	super()
-	get_window().title = str("ICBM Visual Editor: ", vars._bookmarks[-1])
+	get_window().title = str("ICBM Visual Editor: ", bookmark)
 
 func open_menu(target:Control, pos:Vector2):
 	open_properties = null
