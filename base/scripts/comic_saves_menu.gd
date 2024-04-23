@@ -1,6 +1,7 @@
 class_name ComicSavesMenu
 extends Window
 
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const DIR_SAVES:String = "user://saves/"
 var panels:GridContainer
 var save_mode:bool
@@ -39,7 +40,11 @@ func _init(_save_mode:bool):
 			button.pressed.connect(_on_button_pressed.bind(i))
 		var label:Label = Label.new()
 		panel.add_child(label)
-		label.text = str(i, ": Empty Slot")
+		if save_exists:
+			var dict:Dictionary = Time.get_datetime_dict_from_unix_time(FileAccess.get_modified_time(str(DIR_SAVES, "data_", i, ".sav")) + Time.get_time_zone_from_system().bias * 60)
+			label.text = str(dict.day, " ", MONTH_NAMES[dict.month - 1], " ", dict.year, ", ", dict.hour, ":", dict.minute)
+		else:
+			label.text = str("Empty Slot")
 
 static func open(_save_mode:bool = false):
 	var menu:ComicSavesMenu = ComicSavesMenu.new(_save_mode)
