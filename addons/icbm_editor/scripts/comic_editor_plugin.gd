@@ -102,7 +102,7 @@ func item_pressed(index:int, chapter:String = ""):
 	if chapter == "":
 		# ADD CHAPTER
 		# Find an unused chapter name
-		bookmark = ComicEditor.get_unique_bookmark("chapter_1")
+		bookmark = ComicEditor.get_unique_bookmark("chapter_001")
 		DirAccess.make_dir_absolute(str(Comic.DIR_STORY, bookmark))
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, "/_.txt"), FileAccess.WRITE)
 		file.store_var({})
@@ -110,7 +110,7 @@ func item_pressed(index:int, chapter:String = ""):
 	elif index == pages[chapter].size():
 		# ADD PAGE
 		# Find an unused page name
-		bookmark = ComicEditor.get_unique_bookmark(str(chapter, "/page_1"))
+		bookmark = ComicEditor.get_unique_bookmark(str(chapter, "/page_001"))
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".txt"), FileAccess.WRITE)
 		file.store_var({})
 		file.close()

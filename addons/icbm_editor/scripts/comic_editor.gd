@@ -435,8 +435,8 @@ static func get_unique_bookmark(bookmark:String) ->String:
 			return bookmark
 	var elements:Array = bookmark.split("_")
 	var i:int = int(elements[-1])
-	if elements[-1] == str(i):
-		# Last element is already numeric - remember it and remove it from the bookmark
+	if elements[-1] == "%03d" % i:
+		# Last element is already 3-digit numeric - remember it and remove it from the bookmark
 		elements[-1] = ""
 	else:
 		# last element is not numeric - set i to 1 and add an underscore at the end of the bookmark
@@ -445,13 +445,13 @@ static func get_unique_bookmark(bookmark:String) ->String:
 	bookmark = "_".join(elements)
 	if bookmark.contains("/"):
 		# page
-		while dir.file_exists(str(bookmark, i, ".txt")):
+		while dir.file_exists(str(bookmark, "%03d.txt") % i):
 			i += 1
 	else:
 		# chapter
-		while dir.dir_exists(str(bookmark, i)):
+		while dir.dir_exists(str(bookmark, "%03d") % i):
 			i += 1
-	return str(bookmark, i)
+	return str(bookmark, "%03d") % i
 
 func open_presets_manager(category:String):
 	var popup = ComicEditorPresetsManager.new(category)
