@@ -20,6 +20,9 @@ const ROOT2:float = sqrt(2)
 const QUARTIC2:float = sqrt(ROOT2)
 const EDGE_SEGMENT_LENGTH:float = 4.0
 
+# Story file version is used for conversion when the format is changed. 
+const STORY_FILE_VERSION:int = 1
+
 var LAYERS:Array[String] = [
 	"Furthest",
 	"Further",

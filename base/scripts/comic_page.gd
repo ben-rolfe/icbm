@@ -62,17 +62,30 @@ func _init(_bookmark: String):
 	if all_data == {}:
 		# A newly created page
 		all_data = {
-			"page_data": {},
-			"fragments": [{ "os":[{
+			"page_data": {
+				"file_version": Comic.STORY_FILE_VERSION,
+			},
+			"fragments": {
+				"" : { "os":[{
 				"otype": "line",
 				"oid": 0,
 				"points": [Vector2.ZERO, Vector2(Comic.size.x, 0), Comic.size, Vector2(0, Comic.size.y),Vector2.ZERO],
 				"presets": ["page_border"],
-			}] }]
+				}] }
+			}
 		}
 #	print(all_data)
-	for fragment in all_data.fragments:
-		add_fragment(fragment)
+	# CONVERSION ---------------------------------------------------------------
+	# This section is for converting older story file formats to the current one, on load.
+	# --------------------------------------------------------------------------
+
+	#TODO: Update
+	if not all_data.page_data.has("file_version"):
+		for fragment in all_data.fragments:
+			add_fragment(fragment)
+	else:
+		for fragment in all_data.fragments:
+			add_fragment(all_data.fragments[fragment])
 	file.close()
 
 	data = all_data.page_data
