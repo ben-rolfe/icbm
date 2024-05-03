@@ -59,10 +59,10 @@ func open_menu(edit_mode:bool):
 	var button:Button = edit_button if edit_mode else play_button
 	menu.clear(true)
 	pages = {"start":["_"]} # We begin with start in the dictionary, so that it will be at index 0.
-	for chapter in DirAccess.get_directories_at(Comic.DIR_STORY):
+	for chapter in natural_sort(DirAccess.get_directories_at(Comic.DIR_STORY)):
 		if chapter != "start":
 			pages[chapter] = ["_"]
-		for page in DirAccess.get_files_at(str(Comic.DIR_STORY, chapter)):
+		for page in natural_sort(DirAccess.get_files_at(str(Comic.DIR_STORY, chapter))):
 			if page.get_extension() == "txt" and page.get_basename().get_file() != "_":
 				pages[chapter].push_back(page.get_basename().get_file())
 	for chapter in pages.keys():
@@ -102,7 +102,7 @@ func item_pressed(index:int, chapter:String = ""):
 	if chapter == "":
 		# ADD CHAPTER
 		# Find an unused chapter name
-		bookmark = ComicEditor.get_unique_bookmark("chapter_001")
+		bookmark = ComicEditor.get_unique_bookmark("chapter_1")
 		DirAccess.make_dir_absolute(str(Comic.DIR_STORY, bookmark))
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, "/_.txt"), FileAccess.WRITE)
 		file.store_var({})
@@ -110,7 +110,7 @@ func item_pressed(index:int, chapter:String = ""):
 	elif index == pages[chapter].size():
 		# ADD PAGE
 		# Find an unused page name
-		bookmark = ComicEditor.get_unique_bookmark(str(chapter, "/page_001"))
+		bookmark = ComicEditor.get_unique_bookmark(str(chapter, "/page_1"))
 		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".txt"), FileAccess.WRITE)
 		file.store_var({})
 		file.close()
@@ -124,3 +124,7 @@ func item_pressed(index:int, chapter:String = ""):
 	})
 	run()
 
+# This is a duplicate of the natural_sort function in Comic - but we can't call that from this @tool class
+func natural_sort(array:Array) -> Array:
+	array.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	return array

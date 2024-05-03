@@ -20,8 +20,9 @@ const ROOT2:float = sqrt(2)
 const QUARTIC2:float = sqrt(ROOT2)
 const EDGE_SEGMENT_LENGTH:float = 4.0
 
-# Story file version is used for conversion when the format is changed. 
+# File versions are changed when the format is changed to something that isn't backwards compatible, and conversion is required.
 const STORY_FILE_VERSION:int = 1
+const SAVE_FILE_VERSION:int = 1
 
 var LAYERS:Array[String] = [
 	"Furthest",
@@ -99,10 +100,11 @@ var preset_properties:Dictionary = {
 		"edge_color": "color",
 		"edge_style": "edge_style",
 		"edge_thickness": "int",
-		"height": "int",
 		"font": "font",
 		"font_color": "color",
 		"fill_color": "color",
+		"fragment": "string",
+		"height": "int",
 		"italic": "bool",
 		"layer": LAYERS,
 		"scale_all": "percent",
@@ -126,6 +128,7 @@ var preset_properties:Dictionary = {
 		"font_color": "color",
 		"font_color_disabled": "color",
 		"font_color_hovered": "color",
+		"fragment": "string",
 	},
 	"kaboom": {
 		"align": {
@@ -141,6 +144,7 @@ var preset_properties:Dictionary = {
 		"font": "font",
 		"font_size": "percent",
 		"font_color": "color",
+		"fragment": "string",
 		"grow": "percent",
 		"layer": LAYERS,
 		"outline_color": "color",
@@ -154,6 +158,7 @@ var preset_properties:Dictionary = {
 		"edge_width": "int",
 		"fill_color": "color",
 		"fill_width": "int",
+		"fragment": "string",
 		"layer": "int",
 	},
 }
@@ -483,6 +488,10 @@ func parse_rich_text_string(s: String) -> String:
 		r = " "
 	return r
 
+func parse_bool_string(s: String) -> bool:
+	s = s.strip_edges().to_lower()
+	return s == "true" or s == "yes" or s == "1"
+
 func replacer_execute(s:String, replacer:Dictionary) -> String:
 	var matches:Array[RegExMatch] = replacer.regex.search_all(s)
 	var pos:int = 0
@@ -686,3 +695,17 @@ func get_preset_options_edge_style() -> Array:
 			if not r.has(edge_style):
 				r.push_back(edge_style)
 	return r
+
+#NOTE: This function modifies the passed array! The array is then also returned so that it can be conveniently used in-line.
+func natural_sort(array:Array) -> Array:
+	array.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	return array
+
+#NOTE: This function DOESN'T modify the passed dictionary, like natural_sort does with arrays.
+func sort_dictionary(unsorted:Dictionary) -> Dictionary:
+	var sorted:Dictionary = {}
+	var keys:Array = unsorted.keys()
+	natural_sort(keys)
+	for key in keys:
+		sorted[key] = unsorted[key]
+	return sorted

@@ -87,6 +87,12 @@ var font_color_hovered:Color:
 	set(value):
 		_data_set("font_color_hovered", value)
 
+var fragment:String:
+	get:
+		return _data_get("fragment")
+	set(value):
+		_data_set("fragment", value)
+
 var hovered: bool = false:
 	set(value):
 		hovered = value

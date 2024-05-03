@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=12 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
 [ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/root_theme.tres" id="1_gldbu"]
@@ -10,8 +10,9 @@
 [ext_resource type="Texture2D" uid="uid://pr72hwmdr574" path="res://addons/icbm_editor/theme/icons/undo.svg" id="7_bibqs"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_kaboom_properties.gd" id="7_mktfq"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_button_properties.gd" id="8_lxpup"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_fragment_properties.gd" id="9_t8wiw"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "page_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "page_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,6 +26,7 @@ balloon_properties = NodePath("Properties/MarginContainer/BalloonProperties")
 button_properties = NodePath("Properties/MarginContainer/ButtonProperties")
 kaboom_properties = NodePath("Properties/MarginContainer/KaboomProperties")
 page_properties = NodePath("Properties/MarginContainer/PageProperties")
+fragment_properties = NodePath("Properties/MarginContainer/FragmentProperties")
 page_container = NodePath("Page Container")
 buttons_container = NodePath("Buttons Container")
 
@@ -228,6 +230,43 @@ text = "Promote to Title Page"
 [node name="Delete Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
 text = "Delete Page"
+
+[node name="FragmentProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("key_lineedit", "show_textedit", "show_in_editor_checkbox", "delete_button")]
+visible = false
+layout_mode = 2
+script = ExtResource("9_t8wiw")
+key_lineedit = NodePath("New Key LineEdit")
+show_textedit = NodePath("Show TextEdit")
+show_in_editor_checkbox = NodePath("Show in Editor CheckBox")
+delete_button = NodePath("Delete Button")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/FragmentProperties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Fragment Properties"
+
+[node name="New Key LineEdit" type="LineEdit" parent="Properties/MarginContainer/FragmentProperties"]
+layout_mode = 2
+placeholder_text = "Fragment Name"
+
+[node name="Show label" type="Label" parent="Properties/MarginContainer/FragmentProperties"]
+layout_mode = 2
+text = "Show? (true/yes/1)"
+
+[node name="Show TextEdit" type="TextEdit" parent="Properties/MarginContainer/FragmentProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "true"
+placeholder_text = "Enter Commands..."
+
+[node name="Show in Editor CheckBox" type="CheckBox" parent="Properties/MarginContainer/FragmentProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Show in editor"
+
+[node name="Delete Button" type="Button" parent="Properties/MarginContainer/FragmentProperties"]
+layout_mode = 2
+text = "Remove fragment (keep contents)"
 
 [node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false

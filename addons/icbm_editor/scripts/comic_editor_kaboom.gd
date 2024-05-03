@@ -53,7 +53,7 @@ func after_reversion():
 	rebuild()
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Label Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Kaboom Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
 	menu.add_separator()
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_submenu_item("Align", "align")
@@ -64,7 +64,7 @@ func add_menu_items(menu:PopupMenu):
 	#if not edge_style.is_randomized:
 		#menu.set_item_disabled(-1, true)
 	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Label", ComicEditor.MenuCommand.DELETE)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Kaboom", ComicEditor.MenuCommand.DELETE)
 
 	# Align Submenu
 	var menu_anchor:PopupMenu = PopupMenu.new()

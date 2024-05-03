@@ -4,7 +4,7 @@ extends VBoxContainer
 const MARGIN:int = 21
 
 func prepare():
-	if Comic.book.selected_element != null and Comic.book.selected_element.position.x > Comic.size.x / 2:
+	if Comic.book.selected_element != null and (Comic.book.selected_element is ComicButton or Comic.book.selected_element.position.x > Comic.size.x / 2):
 		# Box to left
 		get_parent().get_parent().position.x = MARGIN
 	else:

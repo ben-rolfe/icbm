@@ -14,7 +14,12 @@ var last_oid:int = -1
 var os = {}
 #NOTE: The data object of the page is only the data relating to the page itself, not of the contained objects
 var data:Dictionary
-var _default_data:Dictionary
+const _default_data:Dictionary = {
+	"action": ComicButton.Action.NEXT,
+	"action_bookmark": "",
+	"action_commands": "",
+}
+
 
 #-------------------------------------------------------------------------------
 
@@ -79,24 +84,20 @@ func _init(_bookmark: String):
 	# This section is for converting older story file formats to the current one, on load.
 	# --------------------------------------------------------------------------
 
-	#TODO: Update
-	if not all_data.page_data.has("file_version"):
-		for fragment in all_data.fragments:
-			add_fragment(fragment)
-	else:
-		for fragment in all_data.fragments:
-			add_fragment(all_data.fragments[fragment])
+	data = all_data.page_data
+
+	for key in all_data.fragments:
+		add_fragment(key, all_data.fragments[key])
 	file.close()
 
-	data = all_data.page_data
-	_default_data = _get_default_data()
 
-
-func add_fragment(fragment:Dictionary):
-	print("Adding fragment")
-	#TODO: Cope with logic fragments and include fragments
-	for o in fragment.os:
-		add_o(o)
+func add_fragment(key:String, fragment:Dictionary):
+#	print("Adding fragment: ", key)
+	# Only include the fragment if show returns true (or if it's the base fragment with key == "")
+	if key == "" or Comic.parse_bool_string(Comic.execute_embedded_code(fragment.show)):
+		for o_data in fragment.os:
+			o_data.fragment = key
+			add_o(o_data)
 
 func add_o(o_data:Dictionary):
 	var o:Variant
@@ -143,18 +144,6 @@ func rebuild(rebuild_sub_objects:bool = true):
 			if os[oid].has_method("rebuild"):
 				os[oid].rebuild(true)
 
-#func get_layer(i:int) -> ComicLayer:
-	#i = clampi(i,-layer_depth,layer_depth)
-	#return layers[i + layer_depth]
-
-#func add_click_line(line:String):
-	#_click_lines.push_back(line)
-	#background.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-#
-#func activatebackground_button():
-	#if _click_lines.size() > 0:
-		#Comic.book.read_lines(_click_lines, self)
-
 func make_oid() -> int:
 	#We use os as unique, immutable identifiers for objects that are unique within a view
 	last_oid += 1
@@ -162,13 +151,6 @@ func make_oid() -> int:
 		last_oid += 1
 	return last_oid
 	
-#func make_ref() -> String:
-	#last_ref += 1
-	#while refs.has(str("_", last_ref)):
-		#last_ref += 1
-	#return str("_", last_ref)
-		
-
 func activate():
 	match action:
 		ComicButton.Action.GO:
@@ -197,11 +179,3 @@ func _data_set(key:Variant, value:Variant):
 	else:
 		data[key] = value
 
-#TODO: Currently this doesn't need to be a method, and _default_data could be a const. If that doesn't change, fix it.
-func _get_default_data() -> Dictionary:
-	var r:Dictionary = {
-		"action": ComicButton.Action.NEXT,
-		"action_bookmark": "",
-		"action_commands": "",
-	}
-	return r

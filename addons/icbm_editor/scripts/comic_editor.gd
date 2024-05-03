@@ -48,6 +48,8 @@ enum MenuCommand {
 	TOGGLE,
 	ADD_PART,
 	DELETE_PART,
+	FRAGMENT_PROPERTIES,
+	CLEAR_FRAGMENT,
 	
 	# Tail Start and Tail End Widgets
 
@@ -80,6 +82,7 @@ var redo_steps:Array
 @export var button_properties:ComicEditorButtonProperties
 @export var kaboom_properties:ComicEditorKaboomProperties
 @export var page_properties:ComicEditorPageProperties
+@export var fragment_properties:ComicEditorFragmentProperties
 # Probably don't need a property panel for lines?
 # Maybe try to avoid property panels altogether?!
 
@@ -435,8 +438,8 @@ static func get_unique_bookmark(bookmark:String) ->String:
 			return bookmark
 	var elements:Array = bookmark.split("_")
 	var i:int = int(elements[-1])
-	if elements[-1] == "%03d" % i:
-		# Last element is already 3-digit numeric - remember it and remove it from the bookmark
+	if elements[-1] == str(i):
+		# Last element is already numeric - remember it and remove it from the bookmark
 		elements[-1] = ""
 	else:
 		# last element is not numeric - set i to 1 and add an underscore at the end of the bookmark
@@ -445,13 +448,30 @@ static func get_unique_bookmark(bookmark:String) ->String:
 	bookmark = "_".join(elements)
 	if bookmark.contains("/"):
 		# page
-		while dir.file_exists(str(bookmark, "%03d.txt") % i):
+		while dir.file_exists(str(bookmark, i, ".txt")):
 			i += 1
 	else:
 		# chapter
-		while dir.dir_exists(str(bookmark, "%03d") % i):
+		while dir.dir_exists(str(bookmark, i)):
 			i += 1
-	return str(bookmark, "%03d") % i
+	return str(bookmark, i)
+
+static func get_unique_array_item(array:Array, item:String):
+	if not array.has(item):
+		return item
+	var elements:Array = item.split("_")
+	var i:int = int(elements[-1])
+	if elements[-1] == str(i):
+		# Last element is already 3-digit numeric - remember it and remove it from the item
+		elements[-1] = ""
+	else:
+		# last element is not numeric - set i to 1 and add an underscore at the end of the item
+		i = 1
+		elements.push_back("")
+	item = "_".join(elements)
+	while array.has(str(item, i)):
+		i += 1
+	return str(item, i)
 
 func open_presets_manager(category:String):
 	var popup = ComicEditorPresetsManager.new(category)

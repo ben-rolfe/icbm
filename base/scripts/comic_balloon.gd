@@ -99,6 +99,12 @@ var font_color:Color:
 	set(value):
 		_data_set("font_color", value)
 
+var fragment:String:
+	get:
+		return _data_get("fragment")
+	set(value):
+		_data_set("fragment", value)
+
 var height:int:
 	get:
 		return _data_get("height")

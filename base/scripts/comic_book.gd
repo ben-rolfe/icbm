@@ -3,7 +3,6 @@ extends Control
 
 @export var page_container:SubViewportContainer
 @export var buttons_container:BoxContainer
-#@export var debug_bookmark:String = "start"
 
 var aliases:Dictionary = {}
 var change_page:bool
@@ -40,10 +39,10 @@ func _init():
 	_history_size = Comic.theme.get_constant("history_size", "Settings")
 	default_balloon_layer = Comic.theme.get_constant("default_layer", "Balloon")
 	pages = {"start":["_"]} # We begin with start in the dictionary, so that it will be at index 0.
-	for chapter in DirAccess.get_directories_at(Comic.DIR_STORY):
+	for chapter in Comic.natural_sort(DirAccess.get_directories_at(Comic.DIR_STORY)):
 		if chapter != "start":
 			pages[chapter] = ["_"] # We begin each chapter with the title page, so that it will be at index 0.
-		for page_filename in DirAccess.get_files_at(str(Comic.DIR_STORY, chapter)):
+		for page_filename in Comic.natural_sort(DirAccess.get_files_at(str(Comic.DIR_STORY, chapter))):
 			if page_filename.get_extension() == "txt" and page_filename.get_basename().get_file() != "_":
 				pages[chapter].push_back(page_filename.get_basename().get_file())
 	for chapter in pages:

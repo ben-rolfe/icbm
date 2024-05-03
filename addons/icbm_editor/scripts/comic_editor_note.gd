@@ -14,6 +14,12 @@ var anchor:Vector2:
 	set(value):
 		_data_set("anchor", value)
 
+var fragment:String:
+	get:
+		return _data_get("fragment")
+	set(value):
+		_data_set("fragment", value)
+
 var layer:int:
 	get:
 		return _data_get("layer")

@@ -97,39 +97,37 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_submenu_item("Style", "style")
 	menu.add_submenu_item("Size", "size")
-	menu.add_submenu_item("Anchor", "anchor")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Tail", ComicEditor.MenuCommand.ADD_TAIL)
-	menu.add_separator()
-	menu.add_submenu_item("Layer", "layer")
-	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Edge", ComicEditor.MenuCommand.RANDOMIZE)
 	if not edge_style.is_randomized:
 		menu.set_item_disabled(-1, true)
 	menu.add_separator()
+	menu.add_submenu_item("Layer", "layer")
+	menu.add_separator()
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Tail", ComicEditor.MenuCommand.ADD_TAIL)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Balloon", ComicEditor.MenuCommand.DELETE)
 
-	# Anchor Submenu
-	var menu_anchor:PopupMenu = PopupMenu.new()
-	menu.add_child(menu_anchor)
-	menu_anchor.id_pressed.connect(menu.id_pressed.get_connections()[0].callable)
-	menu_anchor.name = "anchor"
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_tl.svg"))), "Top Left", ComicEditor.MenuCommand.ANCHOR_TL)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_t.svg"))), "Top", ComicEditor.MenuCommand.ANCHOR_T)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_tr.svg"))), "Top Right", ComicEditor.MenuCommand.ANCHOR_TR)
-	menu_anchor.add_separator()
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_l.svg"))), "Left", ComicEditor.MenuCommand.ANCHOR_L)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_c.svg"))), "Center", ComicEditor.MenuCommand.ANCHOR_C)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_r.svg"))), "Right", ComicEditor.MenuCommand.ANCHOR_R)
-	menu_anchor.add_separator()
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_bl.svg"))), "Bottom Left", ComicEditor.MenuCommand.ANCHOR_BL)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_b.svg"))), "Bottom", ComicEditor.MenuCommand.ANCHOR_B)
-	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_br.svg"))), "Bottom Right", ComicEditor.MenuCommand.ANCHOR_BR)
+	# Fragment Submenu
+	var menu_fragment:PopupMenu = PopupMenu.new()
+	menu.add_child(menu_fragment)
+	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
+	menu_fragment.name = "fragment"
+	print(Comic.book.page.data)
+	for key in Comic.book.page.data.fragments:
+		if key != "":
+			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
+	menu_fragment.add_separator()
+	menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("add.svg"))), "New Fragment")
 
 	# Layer Submenu
 	var menu_layer:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_layer)
-	menu_layer.id_pressed.connect(menu_layer_index_pressed)
+	menu_layer.index_pressed.connect(menu_layer_index_pressed)
 	menu_layer.name = "layer"
 	for i in range(Comic.LAYERS.size() - 1, -1, -1):
 		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, "checked.svg" if i == layer else "unchecked.svg")), Comic.LAYERS[i])
@@ -171,6 +169,14 @@ func add_menu_items(menu:PopupMenu):
 		if key == shape.id:
 			menu_style.set_item_disabled(-1, true)
 
+func menu_fragment_index_pressed(index:int):
+	if index < Comic.book.page.data.fragments.keys().size():
+		fragment = Comic.book.page.data.fragments.keys()[index]
+	else:
+		# Add new fragment pressed
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+	Comic.book.open_properties = Comic.book.fragment_properties
+		
 func menu_style_index_pressed(index:int):
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
 	if index > Comic.edge_styles[shape.id].size():
@@ -209,53 +215,12 @@ func menu_command_pressed(id:int):
 			data.tails[tail_data.oid] = tail_data
 			rebuild(true)
 			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_TL:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0,0)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_T:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0.5,0)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_TR:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(1,0)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_L:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0, 0.5)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_C:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0.5,0.5)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_R:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(1,0.5)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_BL:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0,1)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_B:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(0.5,1)
-			rebuild(true)
-			rebuild_widgets()
-		ComicEditor.MenuCommand.ANCHOR_BR:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			anchor_to = Vector2(1,1)
-			rebuild(true)
-			rebuild_widgets()
 		ComicEditor.MenuCommand.DELETE:
 			remove()
+		ComicEditor.MenuCommand.CLEAR_FRAGMENT:
+			Comic.book.page.remove_o_from_fragment(self)
+		ComicEditor.MenuCommand.FRAGMENT_PROPERTIES:
+			Comic.book.open_properties = Comic.book.fragment_properties
 		ComicEditor.MenuCommand.OPEN_PROPERTIES:
 			Comic.book.open_properties = Comic.book.balloon_properties
 		ComicEditor.MenuCommand.RANDOMIZE:

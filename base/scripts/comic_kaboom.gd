@@ -53,6 +53,12 @@ var font_size:float:
 	set(value):
 		_data_set("font_size", value)
 
+var fragment:String:
+	get:
+		return _data_get("fragment")
+	set(value):
+		_data_set("fragment", value)
+
 var grow:float:
 	get:
 		return _data_get("grow")
