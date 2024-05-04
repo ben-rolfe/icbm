@@ -43,7 +43,7 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "hotspot.svg")), "Add Hotspot", ComicEditor.MenuCommand.ADD_HOTSPOT)
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), "Change Background", ComicEditor.MenuCommand.CHANGE_BACKGROUND)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "frame_border.svg")), "Add Frame Border", ComicEditor.MenuCommand.ADD_LINE)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "frame_border.svg")), "Add Border Line", ComicEditor.MenuCommand.ADD_LINE)
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "note.svg")), "Add Note", ComicEditor.MenuCommand.ADD_NOTE)
 	menu.add_separator()

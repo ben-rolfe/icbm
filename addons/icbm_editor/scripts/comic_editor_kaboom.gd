@@ -57,12 +57,17 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_submenu_item("Align", "align")
+	#menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Effects", ComicEditor.MenuCommand.RANDOMIZE)
+	#if not edge_style.is_randomized:
+		#menu.set_item_disabled(-1, true)
 	menu.add_separator()
 	menu.add_submenu_item("Layer", "layer")
 	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Effects", ComicEditor.MenuCommand.RANDOMIZE)
-	#if not edge_style.is_randomized:
-		#menu.set_item_disabled(-1, true)
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Kaboom", ComicEditor.MenuCommand.DELETE)
 
@@ -74,6 +79,18 @@ func add_menu_items(menu:PopupMenu):
 	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_l.svg"))), "Left", ComicEditor.MenuCommand.ANCHOR_L)
 	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_c.svg"))), "Center", ComicEditor.MenuCommand.ANCHOR_C)
 	menu_anchor.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("anchor_r.svg"))), "Right", ComicEditor.MenuCommand.ANCHOR_R)
+
+	# Fragment Submenu
+	var menu_fragment:PopupMenu = PopupMenu.new()
+	menu.add_child(menu_fragment)
+	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
+	menu_fragment.name = "fragment"
+	print(Comic.book.page.data)
+	for key in Comic.book.page.data.fragments:
+		if key != "":
+			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
+	menu_fragment.add_separator()
+	menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("add.svg"))), "New Fragment")
 
 	# Layer Submenu
 	var menu_layer:PopupMenu = PopupMenu.new()
@@ -112,6 +129,14 @@ func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 	#	scrub_redundant_data()
 		rebuild()
 
+func menu_fragment_index_pressed(index:int):
+	if index < Comic.book.page.data.fragments.keys().size():
+		fragment = Comic.book.page.data.fragments.keys()[index]
+	else:
+		# Add new fragment pressed
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+	Comic.book.open_properties = Comic.book.fragment_properties
+
 func menu_layer_index_pressed(index:int):
 	layer = Comic.LAYERS.size() - 1 - index
 	rebuild(true)
@@ -133,6 +158,10 @@ func menu_command_pressed(id:int):
 			align = HORIZONTAL_ALIGNMENT_RIGHT
 			rebuild()
 			rebuild_widgets()
+		ComicEditor.MenuCommand.CLEAR_FRAGMENT:
+			Comic.book.page.remove_o_from_fragment(self)
+		ComicEditor.MenuCommand.FRAGMENT_PROPERTIES:
+			Comic.book.open_properties = Comic.book.fragment_properties
 		ComicEditor.MenuCommand.DELETE:
 			remove()
 		ComicEditor.MenuCommand.OPEN_PROPERTIES:

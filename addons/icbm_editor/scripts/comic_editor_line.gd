@@ -42,8 +42,26 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_separator()
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add_line_point.svg")), "Add Point", ComicEditor.MenuCommand.ADD_PART)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Line", ComicEditor.MenuCommand.DELETE)
+
+	# Fragment Submenu
+	var menu_fragment:PopupMenu = PopupMenu.new()
+	menu.add_child(menu_fragment)
+	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
+	menu_fragment.name = "fragment"
+	print(Comic.book.page.data)
+	for key in Comic.book.page.data.fragments:
+		if key != "":
+			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
+	menu_fragment.add_separator()
+	menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("add.svg"))), "New Fragment")
 
 	# Preset Submenu
 	var menu_preset:PopupMenu = PopupMenu.new()
@@ -58,8 +76,20 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
 
+func menu_fragment_index_pressed(index:int):
+	if index < Comic.book.page.data.fragments.keys().size():
+		fragment = Comic.book.page.data.fragments.keys()[index]
+	else:
+		# Add new fragment pressed
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+	Comic.book.open_properties = Comic.book.fragment_properties
+	
 func menu_command_pressed(id:int):
 	match id:
+		ComicEditor.MenuCommand.CLEAR_FRAGMENT:
+			Comic.book.page.remove_o_from_fragment(self)
+		ComicEditor.MenuCommand.FRAGMENT_PROPERTIES:
+			Comic.book.open_properties = Comic.book.fragment_properties
 		ComicEditor.MenuCommand.DELETE:
 			remove()
 			Comic.book.selected_element = null

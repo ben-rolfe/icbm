@@ -27,13 +27,12 @@ func get_save_data() -> Dictionary:
 		if os[oid] != null and os[oid].get_parent() != null:
 			var o_data:Dictionary = os[oid].data.duplicate()
 			o_data.erase("fragment")
-			save_data.fragments[os[oid].data.fragment].os.push_back(o_data)
+			save_data.fragments[os[oid].fragment].os.push_back(o_data)
 	
 	return save_data
 
 func add_fragment(key:String, fragment:Dictionary):
 	if not data.has("fragments"):
-		print("ADDING FRAGS")
 		# In the editor, we store the fragments in the page data, which allows for easy integration with the undo/redo system.
 		# We don't store objects IN the fragments, like we do in the save file - rather, the objects have a fragment property
 		# On save, we remove the fragments dictionary from the page data, and create a different fragments dictionary, which actually contains the save data for its objects

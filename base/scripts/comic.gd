@@ -1,4 +1,4 @@
-# Class name is Comic, granted by AutoLoad rather than class_name
+# Singleton name is Comic
 extends Node
 
 enum Overflow {
@@ -161,6 +161,13 @@ var preset_properties:Dictionary = {
 		"fragment": "string",
 		"layer": "int",
 	},
+	"note": {
+		"anchor": "vector2",
+		"content": "string",
+		"fragment": "string",
+		"layer": "int",
+		"width": "int",
+	},
 }
 var preset_property_misc_defaults = {
 	"balloon": {
@@ -241,6 +248,12 @@ var default_presets:Dictionary = {
 			"fill_width": 16,
 		},
 	},
+	"note": {
+		"": {
+			"layer": 4,
+			"width": 288,
+		},
+	},
 }
 var get_preset_options:Dictionary = {
 	"shape": get_preset_options_shape,
@@ -249,7 +262,7 @@ var get_preset_options:Dictionary = {
 
 
 func _init():
-	theme = preload("res://theme/root_theme.tres")
+	theme = preload("res://theme/default.tres")
 	size = Vector2(float(ProjectSettings["display/window/size/viewport_width"]), float(ProjectSettings["display/window/size/viewport_height"]))
 	_units_in_width = theme.get_constant("units_in_width", "Settings")
 	px_per_unit = float(size.x) / _units_in_width
@@ -372,8 +385,6 @@ func register_tail_style(tail_style:ComicTailStyle):
 func get_tail_style(id:String) -> ComicTailStyle:
 	return tail_styles.get(id, tail_styles.values()[0])
 
-
-
 func add_tag_replacer(key:String, callable:Callable, has_closing_tag:bool = false, separator_tags:Array[String] = [], register_before:String = ""):
 	assert(has_closing_tag or separator_tags == [], "A tag with separator tags must have a closing tag")
 	assert(not (key.contains("[") or key.contains("]")), "A tag replacer key may not contain \"[\" or \"]\" characters")
@@ -444,7 +455,6 @@ func execute(command: String) -> Variant:
 	#print("Returning ", result)
 	return result
 
-
 func load_texture(path:String, dir:String = DIR_STORY) -> Texture2D:
 	for ext in IMAGE_EXT:
 		var full_path: String = str(dir, path, ".", ext)
@@ -475,9 +485,9 @@ func style_embedded_code(s:String) -> String:
 
 func parse_hidden_string(s:String):
 	if OS.is_debug_build():
-		print(execute_embedded_code(s))
+		print(parse_rich_text_string(execute_embedded_code(s)))
 	else:
-		execute_embedded_code(s)
+		parse_rich_text_string(execute_embedded_code(s))
 
 func parse_rich_text_string(s: String) -> String:
 	# In the editor we'll have un-executed code that we want to style.

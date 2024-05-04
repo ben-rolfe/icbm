@@ -90,7 +90,6 @@ func _init(_bookmark: String):
 		add_fragment(key, all_data.fragments[key])
 	file.close()
 
-
 func add_fragment(key:String, fragment:Dictionary):
 #	print("Adding fragment: ", key)
 	# Only include the fragment if show returns true (or if it's the base fragment with key == "")
@@ -115,8 +114,8 @@ func add_o(o_data:Dictionary):
 			o = ComicKaboom.new(o_data, self)
 			layers[o.layer].add_child(o)
 		"note":
-			if o_data.has("text"):
-				Comic.parse_hidden_string(o_data.text)
+			if o_data.has("content"):
+				Comic.parse_hidden_string(o_data.content)
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.

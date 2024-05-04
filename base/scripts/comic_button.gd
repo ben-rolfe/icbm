@@ -1,5 +1,5 @@
 class_name ComicButton
-extends RichTextLabel
+extends ComicTextBlock
 
 enum Action {
 	DO_NOTHING,
@@ -115,6 +115,7 @@ var presets:Array:
 #-------------------------------------------------------------------------------
 
 func _init(_data:Dictionary, page:ComicPage):
+	super()
 	data = _data
 	_default_data = Comic.get_preset_data("button", presets)
 	if not data.has("otype"):
@@ -122,8 +123,9 @@ func _init(_data:Dictionary, page:ComicPage):
 	if not data.has("oid"):
 		oid = page.make_oid()
 	page.os[oid] = self
-	
-	style_box = StyleBoxFlat.new()
+
+	# Each button has its own stylebox
+	style_box = theme.get_stylebox("normal", "ComicTextBlock").duplicate()
 	add_theme_stylebox_override("normal", style_box)
 	
 	mouse_entered.connect(_on_mouse_entered)
@@ -135,15 +137,7 @@ func _init(_data:Dictionary, page:ComicPage):
 
 func apply_data():
 	_default_data = Comic.get_preset_data("button", presets)
-	var s = "[center]"
-	var padding_font_size:int = preload("res://theme/buttons_theme.tres").get_constant("padding_font_size", "RichTextLabel")
-	if padding_font_size > 0:
-		s += str("[font size=", padding_font_size, "] [/font]\n")
-	s += content
-	if padding_font_size > 0:
-		s += str("\n[font size=", padding_font_size, "] [/font]")
-	s += "[/center]"
-	text = s
+	text = str("[center]", content, "[/center]")
 	set_theme_override()
 
 func _gui_input(event):

@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
-[ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/root_theme.tres" id="1_gldbu"]
+[ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_gldbu"]
 [ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_uwmni"]
 [ext_resource type="Theme" uid="uid://cfh5p5iowtmg7" path="res://addons/icbm_editor/theme/editor_panel.tres" id="3_wlsv2"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_balloon_properties.gd" id="4_nq2jk"]

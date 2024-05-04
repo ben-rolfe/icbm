@@ -104,8 +104,8 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_submenu_item("Layer", "layer")
 	menu.add_separator()
 	if fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
 		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
 	else:
 		menu.add_submenu_item("Add to Fragment", "fragment")
 	menu.add_separator()

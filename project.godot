@@ -22,6 +22,7 @@ general/text_to_speech=true
 [autoload]
 
 Comic="*res://base/scripts/comic.gd"
+Messages="*res://modules/messages/scripts/messages.gd"
 
 [debug]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bxdd1p0bytaef"]
 
-[ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/root_theme.tres" id="1_t7ed8"]
+[ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_t7ed8"]
 [ext_resource type="Script" path="res://base/scripts/comic_book.gd" id="2_rftg7"]
 [ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_yifq1"]
 

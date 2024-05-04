@@ -3,7 +3,7 @@ extends CodeEdit
 #NOTE: Unlike most editor controls, this doesn't extend a viewer control, because notes don't appear in the viewer.
 
 var data:Dictionary
-var default_data:Dictionary
+var _default_data:Dictionary
 var anchor_to = Vector2.ZERO
 
 #-------------------------------------------------------------------------------
@@ -13,6 +13,12 @@ var anchor:Vector2:
 		return _data_get("anchor")
 	set(value):
 		_data_set("anchor", value)
+
+var content:String:
+	get:
+		return _data_get("content")
+	set(value):
+		_data_set("content", value)
 
 var fragment:String:
 	get:
@@ -32,6 +38,14 @@ var oid:int:
 	set(value):
 		data.oid = value
 
+var presets:Array:
+	get:
+		if not data.has("presets"):
+			data.presets = []
+		return data.presets
+	set(value):
+		data.presets = value
+
 var width:float:
 	get:
 		return _data_get("width")
@@ -40,10 +54,10 @@ var width:float:
 
 #-------------------------------------------------------------------------------
 
-func _init(data:Dictionary, page:ComicPage):
+func _init(_data:Dictionary, page:ComicPage):
 	theme = Comic.theme
-	self.data = data
-	default_data = _get_default_data()
+	data = _data
+	_default_data = Comic.get_preset_data("note", presets)
 	if not data.has("oid"):
 		data.oid = Comic.book.page.make_oid()
 	page.os[oid] = self
@@ -59,18 +73,19 @@ func _init(data:Dictionary, page:ComicPage):
 	focus_exited.connect(_on_changed)
 
 func _data_get(key:Variant):
-	return data.get(key, default_data[key])
+	return data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
-	if value == default_data[key]:
+	if value == _default_data[key]:
 		data.erase(key)
 	else:
 		data[key] = value
 
 func apply_data():
+	_default_data = Comic.get_preset_data("note", presets)
 	position = anchor
 	size = Vector2(width, 0)
-	text = _data_get("text")
+	text = content
 
 func rebuild(_rebuild_subobjects:bool = false):
 	apply_data()
@@ -82,19 +97,14 @@ func after_reversion():
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()
-	draw_layer.add_child(ComicMoveWidget.new(self))
+	draw_layer.add_child(ComicNoteMoveWidget.new(self))
 	draw_layer.add_child(ComicWidthWidget.new(self))
 
-func add_menu_items(menu:PopupMenu):
-	menu.add_submenu_item("Layer", "layer")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Note", ComicEditor.MenuCommand.DELETE)
-
 func _on_text_changed():
-	if text != _data_get("text"):
-		if not Comic.book.last_undo_matched(self, "text"):
+	if text != content:
+		if not Comic.book.last_undo_matched(self, "content"):
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
-		_data_set("text", text)
+		content = text
 	_on_changed()
 		
 func _on_changed():
@@ -104,10 +114,3 @@ func _on_entered():
 	Comic.book.selected_element = self
 	_on_changed()
 
-static func _get_default_data() -> Dictionary:
-	return {
-		"anchor": Vector2.ZERO,
-		"layer": 0,
-		"text": "",
-		"width": Comic.theme.get_constant("width", "Balloon"),
-	}
