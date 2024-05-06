@@ -11,8 +11,7 @@ var messages:Array = []
 
 func _init():
 	assert(Comic, "Comic must be autoloaded before Messages")
-	Comic.add_tag_replacer("message", _replace_message, true)
-
+	Comic.add_code_tag("message", _message_tag, true)
 
 func add(text:String, duration:float = DURATION):
 	var message:ComicTextBlock = ComicTextBlock.new()
@@ -47,9 +46,9 @@ func _process(delta):
 		messages[0].o.queue_free()
 		messages.pop_front()
 
-func _replace_message(match_dict:Dictionary) ->String:
-	if match_dict.params.has("t"):
-		add(match_dict.content, float(match_dict.params.t))
+func _message_tag(params:Dictionary, contents:Array) ->String:
+	if params.has("t"):
+		add(contents[0], float(params.t))
 	else:
-		add(match_dict.content)
+		add(contents[0])
 	return ""
