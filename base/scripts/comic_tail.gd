@@ -38,7 +38,7 @@ func _init(_oid: int, _balloon:ComicBalloon):
 	oid = _oid
 	balloon = _balloon
 	if not data.has("rng_seed"):
-		data.rng_seed = balloon.data.rng_seed + balloon.data.tails.size()
+		data.rng_seed = balloon.rng_seed + balloon.tails.size()
 	if not data.has("start_placement_angle"):
 		data.start_placement_angle = TAU / 4
 	if not data.has("linked"):
