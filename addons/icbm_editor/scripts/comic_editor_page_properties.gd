@@ -53,9 +53,9 @@ func prepare():
 		# First time opening the page settings.
 		if page.bookmark.contains("/"):
 			original_chapter_name = page.bookmark.split("/")[0]
-			page.data.new_chapter = original_chapter_name
+			page.new_chapter = original_chapter_name
 			original_page_name = page.bookmark.split("/")[1]
-			page.data.new_name = original_page_name
+			page.new_name = original_page_name
 			for key in Comic.book.pages:
 				chapter_button.add_item(key)
 				if key == original_chapter_name:
@@ -65,7 +65,7 @@ func prepare():
 			get_child(0).text = "Chapter Properties"
 			new_name_label.text = "Name:"
 			original_chapter_name = page.bookmark
-			page.data.new_name = original_chapter_name
+			page.new_name = original_chapter_name
 			if page.bookmark == "start":
 				new_name_lineedit.editable = false
 				promote_button.hide()
@@ -73,7 +73,7 @@ func prepare():
 				promote_button.text = "Promote Chapter to \"start\""
 			delete_button.text = "Delete Chapter"
 
-	new_name_lineedit.text = page.data.new_name
+	new_name_lineedit.text = page.new_name
 
 	action_button.select(page.action)
 	after_action_changed()
@@ -90,17 +90,17 @@ func _on_new_name_unfocused():
 			new_name_lineedit.text = original_chapter_name
 	else:
 		# This is a non-title page - we're trying to change a page name
-		if page.data.new_chapter != original_chapter_name or new_name_lineedit.text != original_page_name:
+		if page.new_chapter != original_chapter_name or new_name_lineedit.text != original_page_name:
 			# Page name or chapter has changed, so ensure unique page name within chapter
-			if Comic.book.pages[page.data.new_chapter].has(new_name_lineedit.text):
+			if Comic.book.pages[page.new_chapter].has(new_name_lineedit.text):
 				# Page name already exists - do something about it
-				if page.data.new_chapter == original_chapter_name or not Comic.book.pages[page.data.new_chapter].has(original_page_name):
+				if page.new_chapter == original_chapter_name or not Comic.book.pages[page.new_chapter].has(original_page_name):
 					# We haven't changed chapters, or the new chapter doesn't have a page matching the original name, so just revert to the original name
 					new_name_lineedit.text = original_page_name
 				else:
 					# We've changed chapters, and a page of the original name exists within the new chapter, so generate a new name
-					new_name_lineedit.text = ComicEditor.get_unique_bookmark(str(page.data.new_chapter, "/page_1")).split("/")[1]
-	page.data.new_name = new_name_lineedit.text
+					new_name_lineedit.text = ComicEditor.get_unique_bookmark(str(page.new_chapter, "/page_1")).split("/")[1]
+	page.new_name = new_name_lineedit.text
 
 func after_action_changed():
 	match page.action:
@@ -136,7 +136,7 @@ func _on_action_target_item_selected(index:int):
 	page.rebuild(true)
 
 func _on_chapter_item_selected(index:int):
-	page.data.new_chapter = chapter_button.get_item_text(index)
+	page.new_chapter = chapter_button.get_item_text(index)
 	# We make sure that the page name is appropriate for the new chapter:
 	_on_new_name_unfocused()
 

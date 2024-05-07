@@ -46,7 +46,7 @@ var fragments:Dictionary:
 		return _data.fragments
 	set(value):
 		_data.fragments = value
-
+		
 #-------------------------------------------------------------------------------
 
 func _init(_bookmark: String):

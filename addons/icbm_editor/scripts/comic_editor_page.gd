@@ -1,6 +1,18 @@
 class_name ComicEditorPage
 extends ComicPage
 
+var new_name:String:
+	get:
+		return _data.get("new_name", bookmark.split("/")[1] if bookmark.contains("/") else bookmark)
+	set(value):
+		_data.new_name = value
+
+var new_chapter:String:
+	get:
+		return _data.get("new_chapter", bookmark.split("/")[0])
+	set(value):
+		_data.new_chapter = value
+
 func _init(bookmark:String):
 	super(bookmark)
 	var layer:ComicLayer = ComicWidgetLayer.new(Comic.LAYERS.size())

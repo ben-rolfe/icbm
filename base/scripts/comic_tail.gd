@@ -115,7 +115,7 @@ func draw_fill(draw_layer:ComicLayer):
 func attach_end(_end_balloon:ComicBalloon, end_placement_angle:float):
 	# Note that we don't create an undo point, since this action is the result of a drag action, and an undo point was created at the start of the drag
 	data.linked = true
-	data.end_oid = _end_balloon.data.oid
+	data.end_oid = _end_balloon.oid
 	data.end_placement_angle = end_placement_angle
 	# (balloon.center_point - end_balloon.center_point).angle()
 	balloon.rebuild_tails()
