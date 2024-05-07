@@ -86,7 +86,7 @@ func add_menu_items(menu:PopupMenu):
 	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
 	menu_fragment.name = "fragment"
 	print(Comic.book.page.data)
-	for key in Comic.book.page.data.fragments:
+	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
 	menu_fragment.add_separator()
@@ -130,11 +130,11 @@ func menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 		rebuild()
 
 func menu_fragment_index_pressed(index:int):
-	if index < Comic.book.page.data.fragments.keys().size():
-		fragment = Comic.book.page.data.fragments.keys()[index]
+	if index < Comic.book.page.fragments.keys().size():
+		fragment = Comic.book.page.fragments.keys()[index]
 	else:
 		# Add new fragment pressed
-		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.fragments.keys(), "fragment_1"), self)
 	Comic.book.open_properties = Comic.book.fragment_properties
 
 func menu_layer_index_pressed(index:int):
@@ -190,3 +190,6 @@ func remove():
 	get_parent().remove_child(self)
 	Comic.book.page.redraw(true)
 	Comic.book.selected_element = null
+
+func get_save_data() -> Dictionary:
+	return _data.duplicate()

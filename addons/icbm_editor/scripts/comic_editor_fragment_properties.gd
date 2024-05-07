@@ -33,8 +33,8 @@ func prepare():
 		# If we opened this panel from the background, then we already set the key directly.
 		key = Comic.book.selected_element.fragment
 	key_lineedit.text = key.capitalize()
-	show_textedit.text = ComicEditor.parse_text_edit(page.data.fragments[key].show)
-	show_in_editor_checkbox.button_pressed = page.data.fragments[key].show_in_editor
+	show_textedit.text = ComicEditor.parse_text_edit(page.fragments[key].show)
+	show_in_editor_checkbox.button_pressed = page.fragments[key].show_in_editor
 
 func _on_key_lineedit_submitted(new_text:String):
 	key_lineedit.release_focus()
@@ -44,13 +44,13 @@ func _on_key_lineedit_unfocused():
 	if new_key == "":
 		new_key = "fragment_1"
 	if new_key != key:
-		new_key = ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), new_key)
+		new_key = ComicEditor.get_unique_array_item(Comic.book.page.fragments.keys(), new_key)
 		page.rename_fragment(key, new_key)
 		key = new_key
 	key_lineedit.text = key.capitalize()
 
 func _on_show_textedit_changed():
-	page.data.fragments[key].show = ComicEditor.unparse_text_edit(show_textedit.text)
+	page.fragments[key].show = ComicEditor.unparse_text_edit(show_textedit.text)
 	page.rebuild(true)
 
 func _on_show_textedit_focused():
@@ -59,12 +59,12 @@ func _on_show_textedit_focused():
 func _on_show_textedit_unfocused():
 	if show_textedit.text != show_before_changes:
 		var reversion:ComicReversionData = ComicReversionData.new(page)
-		reversion.data.fragments[key].show = ComicEditor.unparse_text_edit(show_before_changes)
+		reversion.fragments[key].show = ComicEditor.unparse_text_edit(show_before_changes)
 		Comic.book.add_undo_step([reversion])
 
 func _on_show_in_editor_checkbox_toggled(toggled_on:bool):
 	Comic.book.add_undo_step([ComicReversionData.new(page)])
-	page.data.fragments[key].show_in_editor = toggled_on
+	page.fragments[key].show_in_editor = toggled_on
 	page.redraw()
 
 func _on_delete_pressed():

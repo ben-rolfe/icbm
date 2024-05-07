@@ -358,7 +358,7 @@ func _ready():
 	replacers["[br]"] = "\n"
 	replacers["[tab]"] = "	"
 	replacers["[tilde]"] = "~"
-	replacers["at"] = "@"
+	replacers["[at]"] = "@"
 	replacers["[-]"] = "‑" # Non-breaking hyphen (U+2011)
 	replacers["-)"] = "⚞" # Left breath mark
 	replacers["(-"] = "⚟" # Right breath mark

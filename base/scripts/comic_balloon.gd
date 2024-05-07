@@ -6,7 +6,7 @@ var _final_scale_font:float
 var _final_scale_edge:Vector2
 var _final_collapse:float
 var center_point:Vector2
-var data:Dictionary
+var _data:Dictionary
 var _default_data:Dictionary
 var edge_offsets:PackedVector2Array
 var edge_offset_angles:PackedFloat32Array
@@ -125,17 +125,17 @@ var layer:int:
 
 var oid:int:
 	get:
-		return data.oid
+		return _data.oid
 	set(value):
-		data.oid = value
+		_data.oid = value
 
 var presets:Array:
 	get:
-		if not data.has("presets"):
-			data.presets = []
-		return data.presets
+		if not _data.has("presets"):
+			_data.presets = []
+		return _data.presets
 	set(value):
-		data.presets = value
+		_data.presets = value
 
 var scale_all:float:
 	get:
@@ -181,15 +181,23 @@ var shape:ComicShape:
 
 var rng_seed:int:
 	get:
-		return data.rng_seed
+		return _data.rng_seed
 	set(value):
-		data.rng_seed = value
+		_data.rng_seed = value
 
 var squirk:float:
 	get:
 		return _data_get("squirk")
 	set(value):
 		_data_set("squirk", value)
+
+var tail_data:Dictionary:
+	get:
+		if not _data.has("tails"):
+			_data.tails = {}
+		return _data.tails
+	set(value):
+		_data.tails = value
 
 var width:int:
 	get:
@@ -199,19 +207,18 @@ var width:int:
 
 # ------------------------------------------------------------------------------
 
-func _init(_data:Dictionary, page:ComicPage):
-	data = _data
+func _init(data:Dictionary, page:ComicPage):
+	_data = data
 	_default_data = Comic.get_preset_data("balloon", presets)
 	bbcode_enabled = true
-	if not data.has("otype"):
-		data.otype = "balloon"
-	if not data.has("oid"):
+	if not _data.has("otype"):
+		_data.otype = "balloon"
+	if not _data.has("oid"):
 		oid = page.make_oid()
 	page.os[oid] = self
-	if not data.has("rng_seed"):
-		data.rng_seed = Comic.get_seed_from_position(data.anchor)
-	if not data.has("tails"):
-		data.tails = {}
+	if not _data.has("rng_seed"):
+		_data.rng_seed = Comic.get_seed_from_position(_data.anchor)
+
 	
 	if not Comic.book is ComicEditor:
 		content = Comic.execute_embedded_code(content)
@@ -395,9 +402,9 @@ func apply_data():
 func draw_edge(draw_layer:ComicLayer):
 	edge_style.draw_edge(self, draw_layer)
 
-	for tail_oid in data.tails:
+	for tail_oid in tail_data:
 		# Draw the tail's edge if the tail is not linked, or if the balloon it's linked to is on the same or a higher layer 
-		if not data.tails[tail_oid].linked or Comic.book.page.os[data.tails[tail_oid].end_oid].layer >= layer:
+		if not tail_data[tail_oid].linked or Comic.book.page.os[tail_data[tail_oid].end_oid].layer >= layer:
 			tails[tail_oid].draw_edge(draw_layer)
 
 	for oids in tail_backlinks:
@@ -409,9 +416,9 @@ func draw_fill(draw_layer:ComicLayer):
 	if edge_points.size() > 0:
 		edge_style.draw_fill(self, draw_layer)
 
-	for tail_oid in data.tails:
+	for tail_oid in tail_data:
 		# Draw the tail's fill if the tail is not linked, or if the balloon it's linked to is on the same or a lower layer
-		if not data.tails[tail_oid].linked or Comic.book.page.os[data.tails[tail_oid].end_oid].layer <= layer:
+		if not tail_data[tail_oid].linked or Comic.book.page.os[tail_data[tail_oid].end_oid].layer <= layer:
 			tails[tail_oid].draw_fill(draw_layer)
 
 	for oids in tail_backlinks:
@@ -431,27 +438,27 @@ func rebuild_tails(include_backlinked:bool = false):
 	# First, clear out any tails that don't have data (they've been deleted)
 	var to_remove:Array = []
 	for tail_oid in tails:
-		if not data.tails.has(tail_oid):
+		if not tail_data.has(tail_oid):
 			to_remove.push_back(tail_oid)
 	for tail_oid in to_remove:
 		tails.erase(tail_oid)
 	
 	# Now rebuild the tails from the data (this will add any tails that are new)
-	for tail_oid in data.tails:
+	for tail_oid in tail_data:
 		rebuild_tail(tail_oid)
 	if include_backlinked:
 		for oids in tail_backlinks:
 			Comic.book.page.os[oids.x].rebuild_tail(oids.y)
 
 func rebuild_tail(tail_oid:int):
-	if data.tails.has(tail_oid): # Ignore any request to rebuild a tail that isn't in the data
+	if tail_data.has(tail_oid): # Ignore any request to rebuild a tail that isn't in the data
 		if not tails.has(tail_oid):
 			# The tail is in the data but doesn't exist (yet) - add it.
 			tails[tail_oid] = ComicTail.new(tail_oid, self)
 		tails[tail_oid].apply_data()
-		if data.tails[tail_oid].has("end_oid"):
-			if not Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.has(Vector2i(oid, tail_oid)):
-				Comic.book.page.os[data.tails[tail_oid].end_oid].tail_backlinks.push_back(Vector2i(oid, tail_oid))
+		if tail_data[tail_oid].has("end_oid"):
+			if not Comic.book.page.os[tail_data[tail_oid].end_oid].tail_backlinks.has(Vector2i(oid, tail_oid)):
+				Comic.book.page.os[tail_data[tail_oid].end_oid].tail_backlinks.push_back(Vector2i(oid, tail_oid))
 
 # ------------------------------------------------------------------------------
 
@@ -459,10 +466,10 @@ func is_default(key:Variant):
 	return _data_get(key) == _default_data[key]
 
 func _data_get(key:Variant):
-	return data.get(key, _default_data[key])
+	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
 	if value == _default_data[key]:
-		data.erase(key)
+		_data.erase(key)
 	else:
-		data[key] = value
+		_data[key] = value

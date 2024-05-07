@@ -13,7 +13,7 @@ var bookmark:String
 var last_oid:int = -1
 var os = {}
 #NOTE: The data object of the page is only the data relating to the page itself, not of the contained objects
-var data:Dictionary
+var _data:Dictionary
 const _default_data:Dictionary = {
 	"action": ComicButton.Action.NEXT,
 	"action_bookmark": "",
@@ -40,6 +40,12 @@ var action_commands:String:
 		return _data_get("action_commands")
 	set(value):
 		_data_set("action_commands", value)
+
+var fragments:Dictionary:
+	get:
+		return _data.fragments
+	set(value):
+		_data.fragments = value
 
 #-------------------------------------------------------------------------------
 
@@ -84,7 +90,7 @@ func _init(_bookmark: String):
 	# This section is for converting older story file formats to the current one, on load.
 	# --------------------------------------------------------------------------
 
-	data = all_data.page_data
+	_data = all_data.page_data
 
 	for key in all_data.fragments:
 		add_fragment(key, all_data.fragments[key])
@@ -107,6 +113,9 @@ func add_o(o_data:Dictionary):
 		"button":
 			o = ComicButton.new(o_data, self)
 			Comic.book.buttons_container.add_child(o)
+			for child in Comic.book.buttons_container.get_children():
+				if child != o and child.order > o.order:
+					Comic.book.buttons_container.move_child(o, child.get_index())
 		"line":
 			o = ComicLine.new(o_data, self)
 			layers[o.layer].add_child(o)
@@ -127,13 +136,13 @@ func rebuild_lookups():
 	for oid in os:
 		if os[oid] is ComicBalloon:
 			var tails_to_remove:Array = []
-			for tail_oid in os[oid].data.tails:
-				var tail_data:Dictionary = os[oid].data.tails[tail_oid]
+			for tail_oid in os[oid].tail_data:
+				var tail_data:Dictionary = os[oid].tail_data[tail_oid]
 				if tail_data.linked:
 					# Add the backlink
 					os[tail_data.end_oid].tail_backlinks.push_back(Vector2i(oid, tail_data.oid))
 			for tail_oid in tails_to_remove:
-				os[oid].data.tails.erase(tail_oid)
+				os[oid].tail_data.erase(tail_oid)
 
 func rebuild(rebuild_sub_objects:bool = true):
 	background.rebuild()
@@ -170,11 +179,11 @@ func activate():
 # ------------------------------------------------------------------------------
 
 func _data_get(key:Variant):
-	return data.get(key, _default_data[key])
+	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
 	if value == _default_data[key]:
-		data.erase(key)
+		_data.erase(key)
 	else:
-		data[key] = value
+		_data[key] = value
 

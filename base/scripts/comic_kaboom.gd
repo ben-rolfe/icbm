@@ -4,8 +4,8 @@ extends Control
 const BASE_FONT_SIZE:int = 32
 const FOREGROUND_CHARS = "~!@#$%^&*()_+`-={}|[]\\:;'\"''“”<>?,./"
 
-var data:Dictionary
-var default_data:Dictionary
+var _data:Dictionary
+var _default_data:Dictionary
 
 var width:float
 
@@ -73,9 +73,9 @@ var layer:int:
 
 var oid:int:
 	get:
-		return data.oid
+		return _data.oid
 	set(value):
-		data.oid = value
+		_data.oid = value
 
 var outline_color:Color:
 	get:
@@ -91,17 +91,17 @@ var outline_thickness:float:
 
 var presets:Array:
 	get:
-		if not data.has("presets"):
-			data.presets = []
-		return data.presets
+		if not _data.has("presets"):
+			_data.presets = []
+		return _data.presets
 	set(value):
-		data.presets = value
+		_data.presets = value
 
 var rng_seed:int:
 	get:
-		return data.rng_seed
+		return _data.rng_seed
 	set(value):
-		data.rng_seed = value
+		_data.rng_seed = value
 
 var rotate:float:
 	get:
@@ -136,17 +136,17 @@ var wave_height:float:
 
 # ------------------------------------------------------------------------------
 
-func _init(_data:Dictionary, page:ComicPage):
-	data = _data
-	default_data = Comic.get_preset_data("kaboom", presets)
-	if not data.has("oid"):
-		data.oid = Comic.book.page.make_oid()
+func _init(data:Dictionary, page:ComicPage):
+	_data = data
+	_default_data = Comic.get_preset_data("kaboom", presets)
+	if not _data.has("oid"):
+		_data.oid = Comic.book.page.make_oid()
 	page.os[oid] = self
-	if not data.has("rng_seed"):
-		data.rng_seed = Comic.get_seed_from_position(data.anchor)
+	if not _data.has("rng_seed"):
+		_data.rng_seed = Comic.get_seed_from_position(_data.anchor)
 
 func apply_data():
-	default_data = Comic.get_preset_data("kaboom", presets)
+	_default_data = Comic.get_preset_data("kaboom", presets)
 	
 	# Get the font and font size from the theme
 	var font_theme:Theme = ResourceLoader.load(str(Comic.DIR_FONTS, "kaboom/", font, ".tres"))
@@ -268,14 +268,14 @@ func rebuild(_rebuild_sub_objects:bool = false):
 # ------------------------------------------------------------------------------
 
 func is_default(key:Variant):
-	return _data_get(key) == default_data[key]
+	return _data_get(key) == _default_data[key]
 
 func _data_get(key:Variant):
-	return data.get(key, default_data[key])
+	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
-	if value == default_data[key]:
-		data.erase(key)
+	if value == _default_data[key]:
+		_data.erase(key)
 	else:
-		data[key] = value
+		_data[key] = value
 

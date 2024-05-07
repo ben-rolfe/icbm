@@ -32,7 +32,7 @@ var balloon:ComicBalloon:
 
 var data:Dictionary:
 	get:
-		return balloon.data.tails[oid]
+		return balloon.tail_data[oid]
 
 func _init(_oid: int, _balloon:ComicBalloon):
 	oid = _oid

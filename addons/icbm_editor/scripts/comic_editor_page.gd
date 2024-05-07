@@ -11,34 +11,34 @@ func _init(bookmark:String):
 func get_save_data() -> Dictionary:
 	#TODO: Save multiple fragments and logic
 	var save_data:Dictionary = {
-		"page_data": data.duplicate(),
+		"page_data": _data.duplicate(),
 		"fragments":{},
 	}
 	# We remove the fragments dictionary from the page data, since we're creating a new dictionary of fragments and the data of the objects they contain
 	save_data.page_data.erase("fragments")
 	
 	save_data.fragments[""] = { "os":[] } # We add the base fragment first
-	for key in data.fragments:
-		save_data.fragments[key] = data.fragments[key].duplicate()
+	for key in _data.fragments:
+		save_data.fragments[key] = _data.fragments[key].duplicate()
 		save_data.fragments[key].os = []
 	
 	for oid in os:
 		# Check that the object still exists, and is part of the scene tree (i.e. hasn't been deleted)
 		if os[oid] != null and os[oid].get_parent() != null:
-			var o_data:Dictionary = os[oid].data.duplicate()
+			var o_data:Dictionary = os[oid].get_save_data()
 			o_data.erase("fragment")
 			save_data.fragments[os[oid].fragment].os.push_back(o_data)
 	
 	return save_data
 
 func add_fragment(key:String, fragment:Dictionary):
-	if not data.has("fragments"):
+	if not _data.has("fragments"):
 		# In the editor, we store the fragments in the page data, which allows for easy integration with the undo/redo system.
 		# We don't store objects IN the fragments, like we do in the save file - rather, the objects have a fragment property
 		# On save, we remove the fragments dictionary from the page data, and create a different fragments dictionary, which actually contains the save data for its objects
-		data.fragments = {}
+		_data.fragments = {}
 	if key != "":
-		data.fragments[key] = fragment
+		_data.fragments[key] = fragment
 	for o_data in fragment.os:
 		o_data.fragment = key
 		add_o(o_data)
@@ -55,6 +55,9 @@ func add_o(data:Dictionary) -> Variant:
 			"button":
 				o = ComicEditorButton.new(data, self)
 				Comic.book.buttons_container.add_child(o)
+				for child in Comic.book.buttons_container.get_children():
+					if child != o and child.order > o.order:
+						Comic.book.buttons_container.move_child(o, child.get_index())
 			"line":
 				o = ComicEditorLine.new(data, self)
 				layers[o.layer].add_child(o)
@@ -118,7 +121,7 @@ func redraw(rebuild_lookups_first:bool = false):
 	if rebuild_lookups_first:
 		rebuild_lookups()
 	for oid in os:
-		if os[oid].fragment == "" or data.fragments[os[oid].fragment].show_in_editor:
+		if os[oid].fragment == "" or _data.fragments[os[oid].fragment].show_in_editor:
 			os[oid].show()
 		else:
 			os[oid].hide()
@@ -151,22 +154,22 @@ func remove_o_from_fragment(o:Variant):
 			empty = false
 			break
 	if empty:
-		data.fragments.erase(fragment)
+		_data.fragments.erase(fragment)
 
 func rename_fragment(from:String, to:String):
 	#TODO: Create undo reversion
-	if data.fragments.has(from) and not data.fragments.has(to):
+	if _data.fragments.has(from) and not _data.fragments.has(to):
 		for oid in os:
 			if os[oid].fragment == from:
 				os[oid].fragment = to
-		data.fragments[to] = data.fragments[from]
-		data.fragments.erase(from)
-		data.fragments = Comic.sort_dictionary(data.fragments)
+		_data.fragments[to] = _data.fragments[from]
+		_data.fragments.erase(from)
+		_data.fragments = Comic.sort_dictionary(_data.fragments)
 
 func new_fragment(key:String, initial_o:Variant):
 	#TODO: Create undo reversion
-	if not data.fragments.has(key):
-		data.fragments[key] = {
+	if not _data.fragments.has(key):
+		_data.fragments[key] = {
 			"show": "true", # This value is intentionally a string
 			"show_in_editor": true,
 		}
@@ -174,7 +177,7 @@ func new_fragment(key:String, initial_o:Variant):
 
 func delete_fragment(key:String):
 	#TODO: create undo reversion
-	data.fragments.erase(key)
+	_data.fragments.erase(key)
 	for oid in os:
 		if os[oid].fragment == key:
 			os[oid].fragment = ""

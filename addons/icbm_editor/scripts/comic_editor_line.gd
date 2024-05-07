@@ -9,14 +9,14 @@ func _get_drag_data(_at_position):
 	return false
 
 func get_point_segment(point:Vector2, check_widgets:bool = false) -> int:
-	for i in data.points.size():
-		var d0:float = point.distance_to(data.points[i])
+	for i in _data.points.size():
+		var d0:float = point.distance_to(_data.points[i])
 		if check_widgets and d0 < ComicWidget.RADIUS:
 			return i
 		if i > 0:
-			var l:float = data.points[i].distance_to(data.points[i - 1])
-			var d1:float = point.distance_to(data.points[i - 1])
-			if d0 < l and d1 < l and d0 * abs(sin((data.points[i] - data.points[i - 1]).angle_to(data.points[i] - point))) < fill_width / 2.0:
+			var l:float = _data.points[i].distance_to(_data.points[i - 1])
+			var d1:float = point.distance_to(_data.points[i - 1])
+			if d0 < l and d1 < l and d0 * abs(sin((_data.points[i] - _data.points[i - 1]).angle_to(_data.points[i] - point))) < fill_width / 2.0:
 				return i - 1
 	return -1
 	
@@ -31,7 +31,7 @@ func rebuild(_rebuild_sub_objects:bool = false):
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()
-	for i in data.points.size():
+	for i in _data.points.size():
 		draw_layer.add_child(ComicLinePointWidget.new(self, i))
 
 func after_reversion():
@@ -57,7 +57,7 @@ func add_menu_items(menu:PopupMenu):
 	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
 	menu_fragment.name = "fragment"
 	print(Comic.book.page.data)
-	for key in Comic.book.page.data.fragments:
+	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
 	menu_fragment.add_separator()
@@ -77,11 +77,11 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.add_item("Manage Presets / Defaults")
 
 func menu_fragment_index_pressed(index:int):
-	if index < Comic.book.page.data.fragments.keys().size():
-		fragment = Comic.book.page.data.fragments.keys()[index]
+	if index < Comic.book.page.fragments.keys().size():
+		fragment = Comic.book.page.fragments.keys()[index]
 	else:
 		# Add new fragment pressed
-		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.fragments.keys(), "fragment_1"), self)
 	Comic.book.open_properties = Comic.book.fragment_properties
 	
 func menu_command_pressed(id:int):
@@ -99,7 +99,7 @@ func menu_command_pressed(id:int):
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			var index = get_point_segment(Comic.book.menu.position)
 			if index > -1:
-				data.points.insert(index + 1, Comic.book.snap_and_contain(Comic.book.menu.position))
+				_data.points.insert(index + 1, Comic.book.snap_and_contain(Comic.book.menu.position))
 			Comic.book.page.redraw(true)
 			Comic.book.page.rebuild_widgets()
 
@@ -123,3 +123,6 @@ func _menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 		
 func _scrub_redundant_data():
 	print("TODO: Scrub redundant data")
+
+func get_save_data() -> Dictionary:
+	return _data.duplicate()

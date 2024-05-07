@@ -81,7 +81,7 @@ func delete():
 
 func delete_tail(oid:int):
 	tails.erase(oid)
-	data.tails.erase(oid)
+	tail_data.erase(oid)
 
 func draw_widgets(layer:ComicWidgetLayer):
 	# Draw a box around the textbox
@@ -117,8 +117,8 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_child(menu_fragment)
 	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
 	menu_fragment.name = "fragment"
-	print(Comic.book.page.data)
-	for key in Comic.book.page.data.fragments:
+	#print(Comic.book.page.data)
+	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())
 	menu_fragment.add_separator()
@@ -170,11 +170,11 @@ func add_menu_items(menu:PopupMenu):
 			menu_style.set_item_disabled(-1, true)
 
 func menu_fragment_index_pressed(index:int):
-	if index < Comic.book.page.data.fragments.keys().size():
-		fragment = Comic.book.page.data.fragments.keys()[index]
+	if index < Comic.book.page.fragments.keys().size():
+		fragment = Comic.book.page.fragments.keys()[index]
 	else:
 		# Add new fragment pressed
-		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.data.fragments.keys(), "fragment_1"), self)
+		Comic.book.page.new_fragment(ComicEditor.get_unique_array_item(Comic.book.page.fragments.keys(), "fragment_1"), self)
 	Comic.book.open_properties = Comic.book.fragment_properties
 		
 func menu_style_index_pressed(index:int):
@@ -211,8 +211,8 @@ func menu_command_pressed(id:int):
 	match id:
 		ComicEditor.MenuCommand.ADD_TAIL:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			var tail_data:Dictionary = { "oid": Comic.book.page.make_oid() }
-			data.tails[tail_data.oid] = tail_data
+			var new_tail:Dictionary = { "oid": Comic.book.page.make_oid() }
+			tail_data[new_tail.oid] = new_tail
 			rebuild(true)
 			rebuild_widgets()
 		ComicEditor.MenuCommand.DELETE:
@@ -236,7 +236,7 @@ func menu_command_pressed(id:int):
 			if width > 0:
 				width = 0
 			else:
-				data.erase("width") # Reset to the default width
+				_data.erase("width") # Reset to the default width
 			Comic.book.page.redraw()
 			rebuild_widgets()
 
@@ -261,8 +261,8 @@ func _scrub_redundant_data():
 	# This method removes any data that matches the current default data.
 	_default_data = Comic.get_preset_data("balloon", presets)
 	for key in _default_data:
-		if data.has(key) and data[key] == _default_data[key]:
-			data.erase(key)
+		if _data.has(key) and _data[key] == _default_data[key]:
+			_data.erase(key)
 
 func bump(direction:Vector2):
 	#TODO: Figure out a way to not save on multiple bumps
@@ -285,3 +285,5 @@ func _on_key_pressed(event:InputEventKey):
 		KEY_DELETE:
 			remove()
 
+func get_save_data() -> Dictionary:
+	return _data.duplicate()

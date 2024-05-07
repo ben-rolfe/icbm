@@ -13,11 +13,11 @@ enum MenuCommand {
 
 	ADD_NOTE,
 
-	# Layers
-	PUSH_TO_BACK,
-	PUSH,
-	PULL,
-	PULL_TO_FRONT,
+	# Order
+	MOVE_TO_TOP,
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_TO_BOTTOM,
 
 	#Size
 	TOGGLE_COLLAPSE,

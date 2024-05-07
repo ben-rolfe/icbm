@@ -15,7 +15,7 @@ enum Action {
 var click_lines:Array[String] = []
 var key_string:String
 
-var data:Dictionary
+var _data:Dictionary
 var _default_data:Dictionary
 
 var style_box:StyleBoxFlat
@@ -100,27 +100,33 @@ var hovered: bool = false:
 
 var oid:int:
 	get:
-		return data.oid
+		return _data.oid
 	set(value):
-		data.oid = value
+		_data.oid = value
+
+var order:int:
+	get:
+		return _data.get("order", 0)
+	set(value):
+		_data.order = value
 
 var presets:Array:
 	get:
-		if not data.has("presets"):
-			data.presets = []
-		return data.presets
+		if not _data.has("presets"):
+			_data.presets = []
+		return _data.presets
 	set(value):
-		data.presets = value
+		_data.presets = value
 
 #-------------------------------------------------------------------------------
 
-func _init(_data:Dictionary, page:ComicPage):
+func _init(data:Dictionary, page:ComicPage):
 	super()
-	data = _data
+	_data = data
 	_default_data = Comic.get_preset_data("button", presets)
-	if not data.has("otype"):
-		data.otype = "button"
-	if not data.has("oid"):
+	if not _data.has("otype"):
+		_data.otype = "button"
+	if not _data.has("oid"):
 		oid = page.make_oid()
 	page.os[oid] = self
 
@@ -190,10 +196,10 @@ func set_theme_override():
 # ------------------------------------------------------------------------------
 
 func _data_get(key:Variant):
-	return data.get(key, _default_data[key])
+	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
 	if value == _default_data[key]:
-		data.erase(key)
+		_data.erase(key)
 	else:
-		data[key] = value
+		_data[key] = value

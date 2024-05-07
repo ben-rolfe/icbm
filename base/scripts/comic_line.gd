@@ -1,7 +1,7 @@
 class_name ComicLine
 extends Control
 
-var data:Dictionary
+var _data:Dictionary
 var _default_data:Dictionary
 
 # ------------------------------------------------------------------------------
@@ -44,27 +44,27 @@ var layer:int:
 
 var oid:int:
 	get:
-		return data.oid
+		return _data.oid
 	set(value):
-		data.oid = value
+		_data.oid = value
 
 var presets:Array:
 	get:
-		if not data.has("presets"):
-			data.presets = []
-		return data.presets
+		if not _data.has("presets"):
+			_data.presets = []
+		return _data.presets
 	set(value):
-		data.presets = value
+		_data.presets = value
 
 # ------------------------------------------------------------------------------
 
-func _init(_data:Dictionary, page:ComicPage):
-	data = _data
+func _init(data:Dictionary, page:ComicPage):
+	_data = data
 	_default_data = Comic.get_preset_data("line", presets)
-	if not data.has("otype"):
-		data.otype = "line"
-	if not data.has("oid"):
-		data.oid = page.make_oid()
+	if not _data.has("otype"):
+		_data.otype = "line"
+	if not _data.has("oid"):
+		_data.oid = page.make_oid()
 	page.os[oid] = self
 
 	name = str("Line (", oid, ")")
@@ -73,20 +73,20 @@ func apply_data():
 	_default_data = Comic.get_preset_data("line", presets)
 
 func draw_edge(draw_layer:ComicLayer):
-	if data.points.size() > 1:
-		draw_layer.draw_polyline(data.points, edge_color, fill_width + 2 * edge_width, true)
+	if _data.points.size() > 1:
+		draw_layer.draw_polyline(_data.points, edge_color, fill_width + 2 * edge_width, true)
 
 func draw_fill(draw_layer:ComicLayer):
-	if data.points.size() > 1:
-		draw_layer.draw_polyline(data.points, fill_color, fill_width, true)
+	if _data.points.size() > 1:
+		draw_layer.draw_polyline(_data.points, fill_color, fill_width, true)
 
 # ------------------------------------------------------------------------------
 
 func _data_get(key:Variant):
-	return data.get(key, _default_data[key])
+	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):
 	if value == _default_data[key]:
-		data.erase(key)
+		_data.erase(key)
 	else:
-		data[key] = value
+		_data[key] = value
