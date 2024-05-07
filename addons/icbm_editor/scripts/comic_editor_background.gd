@@ -28,7 +28,7 @@ func _gui_input(event:InputEvent):
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Chapter Properties" if Comic.book.page_properties.is_chapter else "Page Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
-	if Comic.book.page.data.fragments.size() > 0:
+	if Comic.book.page.fragments.size() > 0:
 		menu.add_submenu_item("Fragment Properties", "fragment")
 	else:
 		# We show the fragment properties item even if there are no fragments, so that the user can become familiar with where it is.
@@ -64,7 +64,7 @@ func add_menu_items(menu:PopupMenu):
 	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
 	menu_fragment.name = "fragment"
 	print(Comic.book.page.data)
-	for key in Comic.book.page.data.fragments:
+	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_item(key.capitalize())
 
@@ -106,7 +106,7 @@ func menu_command_pressed(id:int):
 			Comic.request_quit()
 
 func menu_fragment_index_pressed(index:int):
-	Comic.book.fragment_properties.key = Comic.book.page.data.fragments.keys()[index]
+	Comic.book.fragment_properties.key = Comic.book.page.fragments.keys()[index]
 	Comic.book.open_properties = Comic.book.fragment_properties
 
 func import_new_image(path:String):
