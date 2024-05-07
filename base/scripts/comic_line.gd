@@ -56,6 +56,12 @@ var presets:Array:
 	set(value):
 		_data.presets = value
 
+var points:Array:
+	get:
+		return _data.points
+	set(value):
+		_data.points = value
+
 # ------------------------------------------------------------------------------
 
 func _init(data:Dictionary, page:ComicPage):
