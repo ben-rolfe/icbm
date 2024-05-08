@@ -407,7 +407,7 @@ static func _save_settings_file(settings:Dictionary):
 	file.close()
 
 func save_presets_file():
-	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.cfg"), FileAccess.WRITE)
+	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.WRITE)
 	file.store_var(presets)
 	file.close()
 

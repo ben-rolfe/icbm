@@ -28,8 +28,8 @@ func _init():
 	Comic.book = self
 
 	#Load the presets
-	if FileAccess.file_exists(str(Comic.DIR_STORY, "presets.cfg")):
-		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.cfg"), FileAccess.READ)
+	if FileAccess.file_exists(str(Comic.DIR_STORY, "presets.txt")):
+		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.READ)
 		presets = file.get_var()
 		file.close()
 	else:
