@@ -73,7 +73,7 @@ func open_menu(edit_mode:bool):
 		submenu.index_pressed.connect(item_pressed.bind(chapter))
 		submenu.add_icon_item(icon_page, "Title Page")
 		for page in pages[chapter]:
-			print("Submenu page: ", page)
+			#print("Submenu page: ", page)
 			if page != "_": # We've already added the title page.
 				submenu.add_icon_item(icon_page, page)
 		if edit_mode:

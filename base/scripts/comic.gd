@@ -197,10 +197,11 @@ var default_presets:Dictionary = {
 			"width": 288,
 		},
 		"caption": {
-			"shape": "box",
-			"italic": true,
+			"align": HORIZONTAL_ALIGNMENT_LEFT,
+			"anchor_to": Vector2.ZERO,
 			"fill_color": Color(1,1,0.6),
-			"anchor_to": Vector2.ZERO
+			"italic": true,
+			"shape": "box",
 		},
 		"thought": {
 			"edge_style": "cloud",

@@ -112,7 +112,7 @@ var selected_element:Control:
 	get:
 		return selected_element
 	set(value):
-		print("SELECTED ", value)
+		#print("SELECTED ", value)
 		open_properties = null
 		if selected_element != value:
 			selected_element = value
