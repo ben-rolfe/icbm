@@ -17,6 +17,9 @@ var fill_color_before_changes:Color
 @export var font_color_revert_button:Button
 var font_color_before_changes:Color
 
+@export var align_button:OptionButton
+@export var anchor_button:OptionButton
+
 func _ready():
 	text_edit.text_changed.connect(_on_text_changed)
 	text_edit.caret_blink = true
@@ -41,6 +44,16 @@ func _ready():
 	font_color_revert_button.pressed.connect(_on_font_color_revert)
 	font_color_revert_button.modulate = Color.BLACK
 
+	for key in Comic.HORIZONTAL_ALIGNMENTS:
+		align_button.add_item(key)
+		align_button.set_item_metadata(-1, Comic.HORIZONTAL_ALIGNMENTS[key])
+	align_button.item_selected.connect(_on_align_button_item_selected)
+
+	for key in Comic.ANCHOR_POINTS:
+		anchor_button.add_icon_item(load(str(ComicEditor.DIR_ICONS, "anchor_", key.to_lower(), ".svg")), key)
+		anchor_button.set_item_metadata(-1, Comic.ANCHOR_POINTS[key])
+	anchor_button.item_selected.connect(_on_anchor_button_item_selected)
+	
 func prepare():
 	super()
 	balloon = Comic.book.selected_element
@@ -62,6 +75,11 @@ func prepare():
 
 	font_color_button.color = balloon.font_color
 	_after_font_color_change()
+
+	for i in Comic.ANCHOR_POINTS.size():
+		if Comic.ANCHOR_POINTS.values()[i] == balloon.anchor_to:
+			anchor_button.select(i)
+			break
 
 func _on_text_changed():
 	balloon.content = ComicEditor.unparse_text_edit(text_edit.text)
@@ -144,9 +162,9 @@ func _on_font_color_closed():
 		Comic.book.add_undo_step([reversion])
 
 func _on_font_color_revert():
-	if balloon.data.has("font_color"):
+	if not balloon.is_default("font_color"):
 		Comic.book.add_undo_step([ComicReversionData.new(balloon)])
-		balloon.data.erase("font_color")
+		balloon.clear_data("font_color")
 		_after_font_color_change()
 		font_color_button.color = balloon.font_color
 
@@ -156,5 +174,11 @@ func _after_font_color_change():
 		font_color_revert_button.hide()
 	else:
 		font_color_revert_button.show()
-		
 	
+func _on_align_button_item_selected(index:int):
+	balloon.align = align_button.get_item_metadata(index)
+	balloon.rebuild(true)
+
+func _on_anchor_button_item_selected(index:int):
+	balloon.anchor_to = anchor_button.get_item_metadata(index)
+	balloon.rebuild(true)

@@ -42,7 +42,7 @@ enum MenuCommand {
 
 	# Used in more than one widget
 	OPEN_PROPERTIES,
-	DELETE,
+	DELETE = 4194312, # DEL (Not backspace)
 	DEFAULT,
 	RANDOMIZE,
 	TOGGLE,
@@ -50,6 +50,7 @@ enum MenuCommand {
 	DELETE_PART,
 	FRAGMENT_PROPERTIES,
 	CLEAR_FRAGMENT,
+	OPEN_SETTINGS,
 	
 	# Tail Start and Tail End Widgets
 
@@ -66,6 +67,7 @@ enum MenuCommand {
 const DIR_ICONS:String = "res://addons/icbm_editor/theme/icons/"
 const SETTINGS_PATH:String = "user://editor_settings.cfg"
 const MAX_UNDO_STEPS:int = 50
+const BUMP_AMOUNT:float = 0.25
 
 var menu:PopupMenu
 var popup_target:Control
@@ -73,6 +75,15 @@ var _page_keys:Array
 var menu_action_position:Vector2
 var _grabbed_element:Control
 var _grab_offset:Vector2
+
+# Editor Settings
+static var grid_on:bool = true
+static var snap_on:bool = true
+static var snap_distance:Vector2 = Vector2(12, 12)
+#static var snap_angle:float = TAU * 5.0 / 360.0
+static var snap_color:Color = Color(1, 1, 1, 0.2)
+static var snap_color_strong:Color = Color(1, 1, 1, 0.4)
+static var snap_color_feature:Color = Color(1, 1, 0, 1)
 
 var undo_steps:Array
 var redo_steps:Array
@@ -83,13 +94,10 @@ var redo_steps:Array
 @export var kaboom_properties:ComicEditorKaboomProperties
 @export var page_properties:ComicEditorPageProperties
 @export var fragment_properties:ComicEditorFragmentProperties
+@export var settings_properties:ComicEditorSettingsProperties
 # Probably don't need a property panel for lines?
 # Maybe try to avoid property panels altogether?!
 
-# Editor Settings
-var snap_positions:bool = true
-var angle_snap:float = TAU * 5.0 / 360.0
-var distance_snap:float = 1
 
 # ------------------------------------------------------------------------------
 
@@ -131,6 +139,9 @@ func _init():
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _ready():
+	grid_on = load_setting("grid_on", true)
+	snap_on = load_setting("snap_on", true)
+	snap_distance = load_setting("snap_distance", Vector2(12, 12))
 	super()
 	get_window().title = str("ICBM Visual Editor: ", bookmark)
 
@@ -206,11 +217,11 @@ func _unhandled_input(event):
 					print("Unhandled keypress: ", event.get_keycode_with_modifiers())
 
 static func snap(pos:Variant) -> Variant:
-	if Comic.book.snap_positions:
+	if snap_on != Input.is_key_pressed(KEY_SHIFT):
 		if pos is Vector2:
-			return pos.snapped(Vector2.ONE * Comic.px_per_unit)
+			return pos.snapped(snap_distance)
 		else:
-			return snapped(pos, Comic.px_per_unit)
+			return snapped(pos, snap_distance.x)
 	return pos
 
 static func snap_and_contain(pos:Vector2) -> Vector2:

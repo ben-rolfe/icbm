@@ -23,6 +23,10 @@ func get_point_segment(point:Vector2, check_widgets:bool = false) -> int:
 func remove():
 	Comic.book.add_undo_step([ComicReversionParent.new(self, get_parent())])
 	get_parent().remove_child(self)
+	Comic.book.selected_element = null
+	Comic.book.page.redraw(true)
+	Comic.book.page.rebuild_widgets()
+
 
 func rebuild(_rebuild_sub_objects:bool = false):
 	apply_data()
@@ -91,9 +95,6 @@ func menu_command_pressed(id:int):
 			Comic.book.open_properties = Comic.book.fragment_properties
 		ComicEditor.MenuCommand.DELETE:
 			remove()
-			Comic.book.selected_element = null
-			Comic.book.page.redraw(true)
-			Comic.book.page.rebuild_widgets()
 		ComicEditor.MenuCommand.ADD_PART:
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			var index = get_point_segment(Comic.book.menu.position)
@@ -125,3 +126,22 @@ func _scrub_redundant_data():
 
 func get_save_data() -> Dictionary:
 	return _data.duplicate()
+
+func bump(direction:Vector2):
+	#TODO: Figure out a way to not save on multiple bumps
+	Comic.book.add_undo_step([ComicReversionData.new(self)])
+#	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
+	rebuild(true)
+
+func _on_key_pressed(event:InputEventKey):
+	match event.keycode:
+		KEY_UP:
+			bump(Vector2.UP)
+		KEY_DOWN:
+			bump(Vector2.DOWN)
+		KEY_LEFT:
+			bump(Vector2.LEFT)
+		KEY_RIGHT:
+			bump(Vector2.RIGHT)
+		KEY_DELETE:
+			remove()

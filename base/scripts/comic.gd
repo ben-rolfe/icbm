@@ -11,8 +11,9 @@ enum Overflow {
 const DIR_STORY:String = "res://story/"
 const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
-const DEFAULT_BG:String = "res://theme/background.webp"
+const DIR_SAVES:String = "user://saves/"
 
+const DEFAULT_BG:String = "res://theme/background.webp"
 const IMAGE_EXT:PackedStringArray = ["webp", "png", "jpg", "jpeg", "svg"]
 
 # These are used by balloons and tails at this point, but I think they're generic enough to go here.
@@ -37,13 +38,13 @@ var LAYERS:Array[String] = [
 
 const ANCHOR_POINTS = {
 	"TL":Vector2(0, 0),
-	"T":Vector2(0, 0.5),
-	"TR":Vector2(0, 1),
-	"L":Vector2(0.5, 0),
+	"T":Vector2(0.5, 0),
+	"TR":Vector2(1, 0),
+	"L":Vector2(0, 0.5),
 	"C":Vector2(0.5, 0.5),
-	"R":Vector2(0.5, 1),
-	"BL":Vector2(1, 0),
-	"B":Vector2(1, 0.5),
+	"R":Vector2(1, 0.5),
+	"BL":Vector2(0, 1),
+	"B":Vector2(0.5, 1),
 	"BR":Vector2(1, 1),
 }
 
@@ -62,9 +63,14 @@ var _rex_tag_params:RegEx = RegEx.new()
 var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
 
-#These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
-var _image_px_per_unit:float
-var _units_in_width:float
+signal loaded
+signal saved
+signal page_ready
+
+##These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
+#TODO: Set them differently
+#var _image_px_per_unit:float
+#var _units_in_width:float
 var tail_width:float
 
 var default_bg_path:String = ""
@@ -272,9 +278,9 @@ var get_preset_options:Dictionary = {
 func _init():
 	theme = preload("res://theme/default.tres")
 	size = Vector2(float(ProjectSettings["display/window/size/viewport_width"]), float(ProjectSettings["display/window/size/viewport_height"]))
-	_units_in_width = theme.get_constant("units_in_width", "Settings")
-	px_per_unit = float(size.x) / _units_in_width
-	_image_px_per_unit = theme.get_constant("image_px_per_unit", "Settings")
+	#_units_in_width = theme.get_constant("units_in_width", "Settings")
+	#px_per_unit = float(size.x) / _units_in_width
+	#_image_px_per_unit = theme.get_constant("image_px_per_unit", "Settings")
 	
 	tail_width = theme.get_constant("tail_width", "Balloon")
 	#Set up regular expressions
@@ -612,16 +618,6 @@ func parameterize(s:String) -> Dictionary:
 		r[pair[0].strip_edges()] = true if pair.size() == 1 else pair[1].strip_edges()
 	return r
 
-func style_embedded_code(s:String) -> String:
-	var r:String
-	var last_end:int = 0
-	for result in _rex_code_tags.search_all(s):
-		# Add the preceding unprocessed part to the return value, then the processed text between the brackets
-		r = str(r, s.substr(last_end, result.get_start() - last_end), "[bgcolor=#ccc][color=#333]", result.get_string().substr(2, result.get_string().length() - 4), "[/color][/bgcolor]")
-		last_end = result.get_end()
-	r = str(r, s.substr(last_end))
-	return r
-
 func parse_hidden_string(s:String):
 	if OS.is_debug_build():
 		print(execute_embedded_code(s))
@@ -630,17 +626,16 @@ func parse_hidden_string(s:String):
 
 func parse_rich_text_string(s: String) -> String:
 	# In the editor we'll have un-executed code that we want to style.
-	var r:String = style_embedded_code(s) if Comic.book is ComicEditor else s
 	for key in replacers:
 		if key is RegEx:
 			# Regex replacement
-			r = key.sub(r, replacers[key], true)
+			s = key.sub(s, replacers[key], true)
 		else:
 			# String replacement
-			r = r.replace(key, replacers[key])
-	if r == "":
-		r = " " # This is to ensure that empty speech balloons in the editor don't disappear entirely
-	return r
+			s = s.replace(key, replacers[key])
+	if s == "":
+		s = " " # This is to ensure that empty speech balloons in the editor don't disappear entirely
+	return s
 
 func parse_bool_string(s: String) -> bool:
 	s = s.strip_edges().to_lower()
@@ -882,3 +877,33 @@ func _code_tag_if(params:Dictionary, contents:Array) -> String:
 	elif contents.size() > 1:
 		return contents[1]
 	return ""
+
+func _code_tag_save(params:Dictionary) -> String:
+	if params.has("slot"):
+		save_savefile(int(params.slot))
+	else:
+		# No slot given - open the save menu.
+		ComicSavesMenu.open(true)
+	return ""
+
+func _code_tag_load(params:Dictionary) -> String:
+	if params.has("slot"):
+		load_savefile(int(params.slot))
+	else:
+		# No slot given - open the load menu.
+		ComicSavesMenu.open(false)
+	return ""
+
+
+func save_savefile(save_id:int):
+	var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.WRITE)
+	file.store_var(Comic.vars)
+	# We call deferred so that the menu won't appear in the thumbnail
+	var capture = Comic.book.page.get_texture().get_image()
+	capture.resize(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4)
+	capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
+
+func load_savefile(save_id:int):
+	var file = FileAccess.open(str(Comic.DIR_SAVES, "data_", save_id, ".sav"), FileAccess.READ)
+	Comic.vars = file.get_var()
+	Comic.book.change_page = true

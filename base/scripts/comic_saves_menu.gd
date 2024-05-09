@@ -2,15 +2,14 @@ class_name ComicSavesMenu
 extends Window
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-const DIR_SAVES:String = "user://saves/"
 var panels:GridContainer
 var save_mode:bool
 var blank_texture:ImageTexture = ImageTexture.create_from_image(Image.create(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4, false, Image.FORMAT_RGB8))
 
 
 func _init(_save_mode:bool):
-	if not DirAccess.dir_exists_absolute(DIR_SAVES):
-		DirAccess.make_dir_absolute(DIR_SAVES)
+	if not DirAccess.dir_exists_absolute(Comic.DIR_SAVES):
+		DirAccess.make_dir_absolute(Comic.DIR_SAVES)
 	save_mode = _save_mode
 	title = "Save" if save_mode else "Load"
 	exclusive = true
@@ -22,14 +21,14 @@ func _init(_save_mode:bool):
 	panels.resized.connect(_on_panels_resized)
 
 	for i in range(1,10):
-		var save_exists:bool = FileAccess.file_exists(str(DIR_SAVES, "data_", i, ".sav"))
+		var save_exists:bool = FileAccess.file_exists(str(Comic.DIR_SAVES, "data_", i, ".sav"))
 		var panel:VBoxContainer = VBoxContainer.new()
 		panels.add_child(panel)
 		var button = TextureButton.new()
 		panel.add_child(button)
-		if save_exists and FileAccess.file_exists(str(DIR_SAVES, "thumb_", i, ".webp")):
+		if save_exists and FileAccess.file_exists(str(Comic.DIR_SAVES, "thumb_", i, ".webp")):
 			var image:Image = Image.new()
-			var err = image.load(str(DIR_SAVES, "thumb_", i, ".webp"))
+			var err = image.load(str(Comic.DIR_SAVES, "thumb_", i, ".webp"))
 			if err == OK:
 				button.texture_normal = ImageTexture.create_from_image(image)
 			else:
@@ -41,7 +40,7 @@ func _init(_save_mode:bool):
 		var label:Label = Label.new()
 		panel.add_child(label)
 		if save_exists:
-			var dict:Dictionary = Time.get_datetime_dict_from_unix_time(FileAccess.get_modified_time(str(DIR_SAVES, "data_", i, ".sav")) + Time.get_time_zone_from_system().bias * 60)
+			var dict:Dictionary = Time.get_datetime_dict_from_unix_time(FileAccess.get_modified_time(str(Comic.DIR_SAVES, "data_", i, ".sav")) + Time.get_time_zone_from_system().bias * 60)
 			label.text = str(dict.day, " ", MONTH_NAMES[dict.month - 1], " ", dict.year, ", ", dict.hour, ":", dict.minute)
 		else:
 			label.text = str("Empty Slot")
@@ -58,17 +57,9 @@ func _on_panels_resized():
 func _on_button_pressed(save_id:int):
 	hide()
 	if save_mode:
-		var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.WRITE)
-		file.store_var(Comic.vars)
-		# We call deferred so that the menu won't appear in the thumbnail
-		var capture = Comic.book.page.get_texture().get_image()
-		capture.resize(blank_texture.get_width(), blank_texture.get_height())
-		capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
+		Comic.save_savefile(save_id)
 	else:
-		print("TEST")
-		var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.READ)
-		Comic.vars = file.get_var()
-		Comic.book.change_page = true
+		Comic.load_savefile(save_id)
 	queue_free()
 
 

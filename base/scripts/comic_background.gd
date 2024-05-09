@@ -21,9 +21,11 @@ func rebuild():
 	texture = null
 	texture = Comic.load_texture(str(Comic.book.page.bookmark, "" if Comic.book.page.bookmark.contains("/") else "/_"))
 	if texture == null:
-		if ResourceLoader.exists(Comic.DEFAULT_BG):
-			print("Background image not found - using default background")
-			texture = ResourceLoader.load(Comic.DEFAULT_BG)
-		else:
-			printerr("Background image not found and no default background found. Giving up.")
+		# No background - use black background instead.
+		texture = ImageTexture.create_from_image(Image.create(Comic.size.x, Comic.size.y, false, Image.FORMAT_RGB8))
+		#if ResourceLoader.exists(Comic.DEFAULT_BG):
+			#print("Background image not found - using default background")
+			#texture = ResourceLoader.load(Comic.DEFAULT_BG)
+		#else:
+			#printerr("Background image not found and no default background found. Giving up.")
 

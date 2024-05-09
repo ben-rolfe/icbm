@@ -1,18 +1,19 @@
-[gd_scene load_steps=12 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=13 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
 [ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_gldbu"]
 [ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_uwmni"]
 [ext_resource type="Theme" uid="uid://cfh5p5iowtmg7" path="res://addons/icbm_editor/theme/editor_panel.tres" id="3_wlsv2"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_balloon_properties.gd" id="4_nq2jk"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_page_properties.gd" id="4_nx1jt"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_balloon_properties.gd" id="4_nq2jk"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_page_properties.gd" id="4_nx1jt"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/controls/bb_text_edit.gd" id="5_cheip"]
 [ext_resource type="Texture2D" uid="uid://pr72hwmdr574" path="res://addons/icbm_editor/theme/icons/undo.svg" id="7_bibqs"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_kaboom_properties.gd" id="7_mktfq"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_button_properties.gd" id="8_lxpup"]
-[ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor_fragment_properties.gd" id="9_t8wiw"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_kaboom_properties.gd" id="7_mktfq"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_button_properties.gd" id="8_lxpup"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_fragment_properties.gd" id="9_t8wiw"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_settings_properties.gd" id="10_2xp14"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "page_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "page_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,6 +28,7 @@ button_properties = NodePath("Properties/MarginContainer/ButtonProperties")
 kaboom_properties = NodePath("Properties/MarginContainer/KaboomProperties")
 page_properties = NodePath("Properties/MarginContainer/PageProperties")
 fragment_properties = NodePath("Properties/MarginContainer/FragmentProperties")
+settings_properties = NodePath("Properties/MarginContainer/EditorSettings")
 page_container = NodePath("Page Container")
 buttons_container = NodePath("Buttons Container")
 
@@ -74,7 +76,7 @@ theme = ExtResource("3_wlsv2")
 [node name="MarginContainer" type="MarginContainer" parent="Properties"]
 layout_mode = 2
 
-[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button")]
+[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button", "align_button", "anchor_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nq2jk")
@@ -85,6 +87,8 @@ fill_color_button = NodePath("Fill Color/Fill ColorPickerButton")
 fill_color_revert_button = NodePath("Fill Color/Fill Color Revert Button")
 font_color_button = NodePath("Font Color/Font ColorPickerButton")
 font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
+align_button = NodePath("Alignment/Align OptionButton")
+anchor_button = NodePath("Anchor/Anchor OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
@@ -97,16 +101,29 @@ layout_mode = 2
 wrap_mode = 1
 script = ExtResource("5_cheip")
 
-[node name="Style" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+[node name="Alignment" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Style"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-text = "Style:"
+text = "Align Text:"
 
-[node name="OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Style"]
+[node name="Align OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
+
+[node name="Anchor" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Anchor:"
+
+[node name="Anchor OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
 custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
@@ -267,6 +284,57 @@ text = "Show in editor"
 [node name="Delete Button" type="Button" parent="Properties/MarginContainer/FragmentProperties"]
 layout_mode = 2
 text = "Remove fragment (keep contents)"
+
+[node name="EditorSettings" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("snap_to_grid_check_box", "show_grid_check_box", "grid_x_spin_box", "grid_y_spin_box")]
+visible = false
+layout_mode = 2
+script = ExtResource("10_2xp14")
+snap_to_grid_check_box = NodePath("Snap to Grid CheckBox2")
+show_grid_check_box = NodePath("Grid Size/Show Grid CheckBox")
+grid_x_spin_box = NodePath("Grid Size/grid_x")
+grid_y_spin_box = NodePath("Grid Size/grid_y")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/EditorSettings"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Editor Settings"
+
+[node name="Grid Size" type="HBoxContainer" parent="Properties/MarginContainer/EditorSettings"]
+layout_mode = 2
+
+[node name="Show Grid CheckBox" type="CheckBox" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+layout_mode = 2
+button_pressed = true
+text = "Show Grid"
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Snap distance"
+
+[node name="grid_x" type="SpinBox" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+layout_mode = 2
+min_value = 2.0
+value = 12.0
+
+[node name="x" type="Label" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+layout_mode = 2
+text = "x"
+
+[node name="grid_y" type="SpinBox" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+layout_mode = 2
+min_value = 2.0
+value = 12.0
+
+[node name="px" type="Label" parent="Properties/MarginContainer/EditorSettings/Grid Size"]
+layout_mode = 2
+text = "px"
+
+[node name="Snap to Grid CheckBox2" type="CheckBox" parent="Properties/MarginContainer/EditorSettings"]
+layout_mode = 2
+button_pressed = true
+text = "Snap to Grid (Shift for opposite)"
 
 [node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false

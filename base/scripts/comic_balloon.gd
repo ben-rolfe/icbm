@@ -462,10 +462,13 @@ func rebuild_tail(tail_oid:int):
 
 # ------------------------------------------------------------------------------
 
-func is_default(key:Variant):
+func is_default(key:Variant) -> bool:
 	return _data_get(key) == _default_data[key]
 
-func _data_get(key:Variant):
+func clear_data(key:Variant):
+	_data.erase(key)
+
+func _data_get(key:Variant) -> Variant:
 	return _data.get(key, _default_data[key])
 
 func _data_set(key:Variant, value:Variant):

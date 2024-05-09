@@ -28,7 +28,7 @@ func _get_drag_data(at_position:Vector2):
 	super(at_position)
 
 func dragged(global_position:Vector2):
-	serves.width = Comic.book.snap(abs(global_position.x - serves.anchor.x))
+	serves.width = Comic.book.snap(abs(global_position.x - serves.anchor.x)) * (2 if is_equal_approx(serves.anchor_to.x, 0.5) else 1)
 	serves.rebuild(true)
 	Comic.book.page.redraw()
 

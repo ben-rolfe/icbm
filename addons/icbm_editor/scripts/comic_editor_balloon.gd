@@ -92,7 +92,7 @@ func draw_widgets(layer:ComicWidgetLayer):
 	layer.draw_line(anchor + Vector2.LEFT * ComicWidget.RADIUS, anchor + Vector2.RIGHT * ComicWidget.RADIUS, ComicEditorBalloon.WIDGET_COLOR, ComicWidget.THICK)
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Balloon Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Balloon Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
 	menu.add_separator()
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_submenu_item("Style", "style")
@@ -104,8 +104,8 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_submenu_item("Layer", "layer")
 	menu.add_separator()
 	if fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "fragment.svg")), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "clear_fragment.svg")), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
 	else:
 		menu.add_submenu_item("Add to Fragment", "fragment")
 	menu.add_separator()
@@ -267,7 +267,7 @@ func _scrub_redundant_data():
 func bump(direction:Vector2):
 	#TODO: Figure out a way to not save on multiple bumps
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	anchor += direction * Comic.px_per_unit * 0.25
+	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
 	for oids in tail_backlinks:
 		Comic.book.page.os[oids.x].rebuild_tail(oids.y)
 	rebuild(true)
