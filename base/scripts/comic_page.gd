@@ -72,6 +72,8 @@ var fragments:Dictionary:
 #-------------------------------------------------------------------------------
 
 func _init(_bookmark: String):
+	# With each new page, we reset the temp variables to empty.
+	Comic.temp = {}
 	bookmark = _bookmark
 	name = bookmark.replace("/","__")
 

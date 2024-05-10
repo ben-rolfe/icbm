@@ -77,6 +77,7 @@ var default_bg_path:String = ""
 
 var book:ComicBook
 var vars:Dictionary
+var temp:Dictionary = {}
 
 var theme:Theme
 
@@ -467,12 +468,12 @@ func execute(command: String) -> Variant:
 
 	#print("Executing ", command, " as ", command.replace("~", "vars."))
 	var expression = Expression.new()
-	var error = expression.parse(command.replace("~", "vars."), ["vars"])
+	var error = expression.parse(command.replace("~", "vars.").replace("@", "temp."), ["vars", "temp"])
 	if error != OK:
 		print(expression.get_error_text())
 		push_error(expression.get_error_text())
 		return "<<Error>>"
-	var result = expression.execute([Comic.vars])
+	var result = expression.execute([vars, temp])
 	if expression.has_execute_failed():
 		# We don't need to push an error - that already happened when we tried to execute.
 #		push_error("Error in executed string. No more information is available. Check your spelling, that variables are preceded by ~ and exist in Comic.vars, and that strings are encapsulated in quote marks.")
@@ -714,73 +715,76 @@ func _code_tag_store(params:Dictionary, contents:Array) -> String:
 	print("STORING")
 	if params.has("var"):
 		var key:String = params.var
-		# Remove optional tilde
+		var dict:Dictionary = vars
 		if key[0] == "~":
+			# Remove optional tilde
 			key = key.substr(1)
-		print(key)
+		elif key[0] == "@":
+			# Store in temp variables instead of vars
+			dict = temp
+			key = key.substr(1)
 		var s = execute_embedded_code(contents[0])
 		print(s)
 		var data_type:String = params["type"].to_lower() if params.has("type") else ""
 		match data_type:
 			"string", "str":
-				vars[key] = s
+				dict[key] = s
 			"int":
-				vars[key] = int(s)
+				dict[key] = int(s)
 			"float":
-				vars[key] = float(s)
+				dict[key] = float(s)
 			"bool":
-				vars[key] = parse_bool_string(s)
+				dict[key] = parse_bool_string(s)
 			"color":
 				var parts = s.split(",")
 				match parts.size():
 					1:
 						# Hex code or standardized color name
-						vars[key] = Color(s)
+						dict[key] = Color(s)
 					3:
-						vars[key] = Color(float(s[0]), float(s[1]), float(s[2]))
+						dict[key] = Color(float(s[0]), float(s[1]), float(s[2]))
 					4:
-						vars[key] = Color(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+						dict[key] = Color(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
 					_:
-						vars[key] = Color.BLACK
+						dict[key] = Color.BLACK
 			"vector2":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					vars[key] = Vector2(float(s[0]), float(s[1]))
+					dict[key] = Vector2(float(s[0]), float(s[1]))
 				else:
-					vars[key] = Vector2.ZERO
+					dict[key] = Vector2.ZERO
 			"vector3":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					vars[key] = Vector3(float(s[0]), float(s[1]), float(s[2]))
+					dict[key] = Vector3(float(s[0]), float(s[1]), float(s[2]))
 				else:
-					vars[key] = Vector3.ZERO
+					dict[key] = Vector3.ZERO
 			"vector4":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					vars[key] = Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+					dict[key] = Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
 				else:
-					vars[key] = Vector4.ZERO
+					dict[key] = Vector4.ZERO
 			"vector2i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					vars[key] = Vector2i(int(s[0]), int(s[1]))
+					dict[key] = Vector2i(int(s[0]), int(s[1]))
 				else:
-					vars[key] = Vector2i.ZERO
+					dict[key] = Vector2i.ZERO
 			"vector3i":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					vars[key] = Vector3i(int(s[0]), int(s[1]), int(s[2]))
+					dict[key] = Vector3i(int(s[0]), int(s[1]), int(s[2]))
 				else:
-					vars[key] = Vector3i.ZERO
+					dict[key] = Vector3i.ZERO
 			"vector4i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					vars[key] = Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3]))
+					dict[key] = Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3]))
 				else:
-					vars[key] = Vector4i.ZERO
+					dict[key] = Vector4i.ZERO
 			_: # Default to code, which gets executed
-				vars[key] = execute(s)
-		print(vars["myvar"])
+				dict[key] = execute(s)
 	else:
 		return "<store error - no var given>"
 	return ""
