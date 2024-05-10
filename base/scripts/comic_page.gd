@@ -130,11 +130,11 @@ func _init(_bookmark: String):
 
 func _process(_delta:float):
 	if save_slot > -1:
-		save_slot = -1
 		Comic.save_savefile(save_slot)
+		save_slot = -1
 	if load_slot > -1:
-		load_slot = -1
 		Comic.load_savefile(load_slot)
+		load_slot = -1
 
 func add_fragment(key:String, fragment:Dictionary):
 #	print("Adding fragment: ", key)

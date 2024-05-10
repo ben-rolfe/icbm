@@ -817,9 +817,12 @@ func _code_tag_save(params:Dictionary) -> String:
 func _code_tag_load(params:Dictionary) -> String:
 	if params.has("slot"):
 		load_savefile(int(params.slot))
-	else:
+	elif book.manual_save_slots:
 		# No slot given - open the load menu.
 		ComicSavesMenu.open(false)
+	elif book.auto_save_slot:
+		# No slot given but we only have the autosave slot, so load it.
+		load_savefile(0)
 	return ""
 
 func _code_tag_save_exists(params:Dictionary) -> String:
