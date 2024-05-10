@@ -381,7 +381,7 @@ func _ready():
 	add_code_tag("if", _code_tag_if, true, "else")
 	add_code_tag("save", _code_tag_save)
 	add_code_tag("load", _code_tag_load)
-	add_code_tag("save_exists", _code_tag_save_exists)
+	add_code_tag("save_exists", _code_tag_save_exists, true)
 	add_code_tag("quit", _code_tag_quit)
 
 	replacers["[b]"] = "[b][i]"
@@ -764,12 +764,12 @@ func _code_tag_load(params:Dictionary) -> String:
 		ComicSavesMenu.open(false)
 	return ""
 
-func _code_tag_save_exists(params:Dictionary) -> String:
+func _code_tag_save_exists(params:Dictionary, contents:Array) -> String:
 	var slot:int = -1
 	if params.has("slot"):
 		slot = int(params.slot)
 	if save_exists(slot):
-		return "true"
+		return contents[0]
 	return ""
 
 func save_savefile(save_id:int):
