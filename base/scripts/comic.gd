@@ -354,34 +354,12 @@ func _ready():
 	add_tail_style(ComicZigTailStyle.new())
 	add_tail_style(ComicZagTailStyle.new())
 
-	#add_tag_replacer("b", _replace_b, true)
-	#if theme.get_constant("replace_capital_i", "Settings") != 0:
-		#var _regex_capital_i_in_word:RegEx = RegEx.new()
-		#_regex_capital_i_in_word.compile("I(?=\\w)|(?<=\\w)I")
-		#add_regex_replacer("capital_i_in_word", _regex_capital_i_in_word, _replace_capital_i_in_word)
-		#add_tag_replacer("I", _replace_capital_i)
-	#add_tag_replacer("br", _replace_br)
-	#add_tag_replacer("tab", _replace_tab)
-	#add_tag_replacer("tilde", _replace_tilde)
-	#add_tag_replacer("-", _replace_hyphen)
-	#add_tag_replacer("at", _replace_at)
-	#add_tag_replacer("img", _replace_img, true)
-	#add_tag_replacer("small", _replace_small, true)
-	#var _regex_breath_marks:RegEx = RegEx.new()
-	#_regex_breath_marks.compile("-\\)|\\(-")
-	#add_regex_replacer("breath_marks", _regex_breath_marks, _replace_breath_marks)
-	#var _regex_left_quotes:RegEx = RegEx.new()
-	#_regex_left_quotes.compile("^[\\\"\\']|(?<=[\\s\\(\\{\\[\\]])[\\\"\\']")
-	#add_regex_replacer("left_quotes", _regex_left_quotes, _replace_left_quotes)
-	#var _regex_remaining_quotes:RegEx = RegEx.new()
-	#_regex_remaining_quotes.compile("[\\\"\\']")
-	#add_regex_replacer("remaining_quotes", _regex_remaining_quotes, _replace_remaining_quotes)
-
 	add_code_tag("set", _code_tag_set)
+	add_code_tag("store", _code_tag_store, true)
 	add_code_tag("if", _code_tag_if, true, "else")
 	add_code_tag("save", _code_tag_save)
 	add_code_tag("load", _code_tag_load)
-	add_code_tag("save_exists", _code_tag_save_exists, true)
+	add_code_tag("save_exists", _code_tag_save_exists)
 	add_code_tag("quit", _code_tag_quit)
 
 	replacers["[b]"] = "[b][i]"
@@ -727,10 +705,86 @@ func sort_dictionary(unsorted:Dictionary) -> Dictionary:
 func _code_tag_set(params:Dictionary) -> String:
 	for key in params:
 		if key != "":
-			if key[0] == "~": # Remove the optional tilde
+			if key[0] == "~": # Remove optional tilde
 				key = key.substr(1)
 			vars[key] = execute(params[key])
 	return ""
+
+func _code_tag_store(params:Dictionary, contents:Array) -> String:
+	print("STORING")
+	if params.has("var"):
+		var key:String = params.var
+		# Remove optional tilde
+		if key[0] == "~":
+			key = key.substr(1)
+		print(key)
+		var s = execute_embedded_code(contents[0])
+		print(s)
+		var data_type:String = params["type"].to_lower() if params.has("type") else ""
+		match data_type:
+			"string", "str":
+				vars[key] = s
+			"int":
+				vars[key] = int(s)
+			"float":
+				vars[key] = float(s)
+			"bool":
+				vars[key] = parse_bool_string(s)
+			"color":
+				var parts = s.split(",")
+				match parts.size():
+					1:
+						# Hex code or standardized color name
+						vars[key] = Color(s)
+					3:
+						vars[key] = Color(float(s[0]), float(s[1]), float(s[2]))
+					4:
+						vars[key] = Color(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+					_:
+						vars[key] = Color.BLACK
+			"vector2":
+				var parts = s.split(",")
+				if parts.size() == 2:
+					vars[key] = Vector2(float(s[0]), float(s[1]))
+				else:
+					vars[key] = Vector2.ZERO
+			"vector3":
+				var parts = s.split(",")
+				if parts.size() == 3:
+					vars[key] = Vector3(float(s[0]), float(s[1]), float(s[2]))
+				else:
+					vars[key] = Vector3.ZERO
+			"vector4":
+				var parts = s.split(",")
+				if parts.size() == 2:
+					vars[key] = Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+				else:
+					vars[key] = Vector4.ZERO
+			"vector2i":
+				var parts = s.split(",")
+				if parts.size() == 2:
+					vars[key] = Vector2i(int(s[0]), int(s[1]))
+				else:
+					vars[key] = Vector2i.ZERO
+			"vector3i":
+				var parts = s.split(",")
+				if parts.size() == 3:
+					vars[key] = Vector3i(int(s[0]), int(s[1]), int(s[2]))
+				else:
+					vars[key] = Vector3i.ZERO
+			"vector4i":
+				var parts = s.split(",")
+				if parts.size() == 2:
+					vars[key] = Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3]))
+				else:
+					vars[key] = Vector4i.ZERO
+			_: # Default to code, which gets executed
+				vars[key] = execute(s)
+		print(vars["myvar"])
+	else:
+		return "<store error - no var given>"
+	return ""
+
 
 func _code_tag_if(params:Dictionary, contents:Array) -> String:
 	if execute(params[""]):
@@ -764,13 +818,14 @@ func _code_tag_load(params:Dictionary) -> String:
 		ComicSavesMenu.open(false)
 	return ""
 
-func _code_tag_save_exists(params:Dictionary, contents:Array) -> String:
+func _code_tag_save_exists(params:Dictionary) -> String:
 	var slot:int = -1
 	if params.has("slot"):
 		slot = int(params.slot)
 	if save_exists(slot):
-		return contents[0]
-	return ""
+		return "true"
+	else:
+		return "false"
 
 func save_savefile(save_id:int):
 	book.has_unsaved_changes = false

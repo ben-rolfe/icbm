@@ -240,7 +240,7 @@ func add_undo_step(reversions:Array):
 func last_undo_matched(o:Control, key:String) -> bool:
 	# Checks if the last undo step was a single reversion data change of the given control, and the data in the given key was changed
 	# Used to avoid adding multiple undo steps for small sequential changes, like every letter of a text change, or every step of a keyboard-bump move
-	return undo_steps.size() > 0 and undo_steps[-1].size() == 1 and undo_steps[-1][0] is ComicReversionData and undo_steps[-1][0].o == o and undo_steps[-1][0].data.get(key) != o.data.get(key)
+	return undo_steps.size() > 0 and undo_steps[-1].size() == 1 and undo_steps[-1][0] is ComicReversionData and undo_steps[-1][0].o == o and undo_steps[-1][0].data.get(key) != o._data.get(key)
 
 func undo():
 	if undo_steps.size() > 0:

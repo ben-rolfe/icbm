@@ -154,6 +154,7 @@ func add_o(o_data:Dictionary):
 			for child in Comic.book.buttons_container.get_children():
 				if child != o and child.order > o.order:
 					Comic.book.buttons_container.move_child(o, child.get_index())
+					break
 		"line":
 			o = ComicLine.new(o_data, self)
 			layers[o.layer].add_child(o)
