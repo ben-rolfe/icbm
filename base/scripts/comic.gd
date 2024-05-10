@@ -130,6 +130,10 @@ var preset_properties:Dictionary = {
 		"squirk": "percent",
 		"width": "int",
 	},
+	"book": {
+		"auto_save_slot": "bool",
+		"manual_save_slots": "bool",
+	},
 	"button": {
 		"action": ComicButton.Action,
 		"action_bookmark": "bookmark",
@@ -144,11 +148,7 @@ var preset_properties:Dictionary = {
 		"fragment": "string",
 	},
 	"kaboom": {
-		"align": {
-			"Left":HORIZONTAL_ALIGNMENT_LEFT,
-			"Center":HORIZONTAL_ALIGNMENT_CENTER,
-			"Right":HORIZONTAL_ALIGNMENT_RIGHT,
-		},
+		"align": HORIZONTAL_ALIGNMENTS,
 		"anchor": "vector2",
 		"bulge": "percent",
 		"content": "string",
@@ -181,6 +181,14 @@ var preset_properties:Dictionary = {
 		"layer": "int",
 		"width": "int",
 	},
+	"page": {
+		"action": "int",
+		"action_bookmark": "string",
+		"action_commands": "string",
+		"allow_back": "bool",
+		"allow_save": "bool",
+		"auto_save": "bool",
+	}
 }
 var preset_property_misc_defaults = {
 	"balloon": {
@@ -222,6 +230,12 @@ var default_presets:Dictionary = {
 			"edge_style": "burst",
 			"bold": true,
 		},
+	},
+	"book": {
+		"": {
+			"auto_save_slot": true,
+			"manual_save_slots": true,
+		}
 	},
 	"button": {
 		"": {
@@ -268,6 +282,16 @@ var default_presets:Dictionary = {
 			"width": 288,
 		},
 	},
+	"page": {
+		"": {
+			"action": ComicButton.Action.NEXT,
+			"action_bookmark": "",
+			"action_commands": "",
+			"allow_back": true,
+			"allow_save": true,
+			"auto_save": false,
+		}
+	}
 }
 var get_preset_options:Dictionary = {
 	"shape": get_preset_options_shape,
@@ -355,9 +379,14 @@ func _ready():
 
 	add_code_tag("set", _code_tag_set)
 	add_code_tag("if", _code_tag_if, true, "else")
+	add_code_tag("save", _code_tag_save)
+	add_code_tag("load", _code_tag_load)
+	add_code_tag("save_exists", _code_tag_save_exists)
+	add_code_tag("quit", _code_tag_quit)
 
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
+	#TODO: Make some of these font features instead? Or allow them to be somehow toggled off for other fonts?
 	var rex_capital_i_in_word:RegEx = RegEx.new()
 	rex_capital_i_in_word.compile("I(?=\\w)|(?<=\\w)I")
 	replacers[rex_capital_i_in_word] = "i"
@@ -424,46 +453,6 @@ func add_tail_style(tail_style:ComicTailStyle):
 func get_tail_style(id:String) -> ComicTailStyle:
 	return tail_styles.get(id, tail_styles.values()[0])
 
-#func add_tag_replacer(key:String, callable:Callable, has_closing_tag:bool = false, separator_tags:Array[String] = [], add_before:String = ""):
-	#assert(has_closing_tag or separator_tags == [], "A tag with separator tags must have a closing tag")
-	#assert(not (key.contains("[") or key.contains("]")), "A tag replacer key may not contain \"[\" or \"]\" characters")
-	#var replacer:Dictionary = {
-		#"key": key,
-		#"callable": callable,
-		#"is_tag_replacer":true,
-	#}
-	#var escaped_key = escape_regex(key)
-	#var regex = RegEx.new()
-	#if has_closing_tag:
-		#regex.compile(str("\\[(", escaped_key, ")(?:\\s+([^\\]]*))?\\]([\\s\\S]*?)\\[\\/", escaped_key, "\\]")) # the opening tag (the key in []s), parameters (capture group 1), content (capture group 2), the closing tag - parameters and content may be of 0 length
-		#if separator_tags.size() > 0:
-			#var regex_separators:RegEx = RegEx.new()
-			#regex_separators.compile(str("\\[(", "|".join(separator_tags) ,")([^\\]]*)]"))
-				##	([\s\S]*?)\[(elif|else)([^\]]*)] - works but messy
-			#replacer.regex_separators = regex_separators
-	#else:
-		#regex.compile(str("\\[(", escaped_key, ")(?:\\s+([^\\]]*))?\\]()")) # the key in []s. Group 1: The tag key. Group 2: The params. Group 3: Empty, as this tag has no content.
-##		regex.compile(str("\\[(", escaped_key, ")([^\\]]*)\\]()")) # the key in []s. Group 1: The tag key. Group 2: The params. Group 3: Empty, as this tag has no content.
-	#replacer.regex = regex
-	#_add_replacer(replacer, add_before)
-#
-#func add_regex_replacer(key:String, regex:RegEx, callable:Callable, regex_separators:RegEx = null, add_before:String = ""):
-	#var replacer:Dictionary = {
-		#"key": key,
-		#"callable": callable,
-		#"regex": regex,
-	#}
-	#if regex_separators != null:
-		#replacer.regex_separators = regex_separators
-	#_add_replacer(replacer, add_before)
-
-#func add_replacer(key:Variant, value:String):
-	#_replacers[key] = value
-#
-#func remove_replacer(key:String):
-	#if _replacer_keys_ordered.has(key):
-		#_replacers.erase(key)
-		##_replacer_keys_ordered.erase(key)
 #
 func add_code_tag(key:String, f:Callable, has_closing_tag:bool = false, separator_tag:String = ""):
 	_code_tags[key] = {"f": f}
@@ -493,21 +482,12 @@ func recompile_rex_code_tags():
 		rex_string = str(rex_string, ")(\\s.*?)?)\\](?!\\])")
 		_rex_code_tags.compile(rex_string)
 
-#func _add_replacer(replacer:Dictionary, add_before:String):
-	#assert(not _replacers.has(replacer.key), str("You cannot add a replacer with the key '", replacer.key , "' because one already exists. Try removing it with Comic.remove_replacer first."))
-	#_replacers[replacer.key] = replacer
-	#var add_before_pos:int = _replacer_keys_ordered.find(add_before)
-	#if add_before_pos > -1:
-		#_replacer_keys_ordered.insert(add_before_pos, replacer.key)
-	#else:
-		#_replacer_keys_ordered.push_back(replacer.key)
-
 func execute(command: String) -> Variant:
 	#if Comic.book is ComicEditor:
 		## We don't execute code in the editor - we display it.
 		#return str("[bgcolor=#ccc]", command, "[/bgcolor]")
 
-	print("Executing ", command, " as ", command.replace("~", "vars."))
+	#print("Executing ", command, " as ", command.replace("~", "vars."))
 	var expression = Expression.new()
 	var error = expression.parse(command.replace("~", "vars."), ["vars"])
 	if error != OK:
@@ -541,7 +521,7 @@ func load_texture(path:String, dir:String = DIR_STORY) -> Texture2D:
 	#return r
 
 func execute_embedded_code(s:String, depth:int = 0) -> String:
-	print("Executing embedded code: ", s)
+	#print("Executing embedded code: ", s)
 	if depth > MAX_RECURSION:
 		push_error("Too much recursion in embedded code - failing on: ", s)
 		return ""
@@ -553,18 +533,14 @@ func execute_embedded_code(s:String, depth:int = 0) -> String:
 		var rex_match = _rex_code_tags.search(s, offset)
 		if rex_match == null:
 			# No matches left - just add what's left of the input string to the return string
-			print("No matches left")
+			#print("No matches left")
 			r = str(r, s.substr(offset))
 			finished = true
 		else:
-			print("Regex match!")
 			#Add all content before the match to the return string
 			r = str(r, s.substr(offset, rex_match.get_start() - offset))
-			print(rex_match.strings)
 			if rex_match.strings[1][0] == "[":
 				# This is double-bracketed raw code. index 1 is the match with one set of brackets - we need to strip them off and execute the contents
-				print("Raw code: ", rex_match.strings[1].substr(1, rex_match.strings[1].length() - 2))
-				print(Comic.vars)
 				r = str(r, execute(rex_match.strings[1].substr(1, rex_match.strings[1].length() - 2)))
 				offset = rex_match.get_end()
 			else:
@@ -578,13 +554,10 @@ func execute_embedded_code(s:String, depth:int = 0) -> String:
 				var key:String = rex_match.strings[2]
 				var params = parameterize(rex_match.strings[3])
 				
-				print("Tag found! ")
 				if _code_tags[key].has("rex_closing_tags"):
-					print("With closing tags")
 					var nest_level:int = 0
 					var contents:Array = []
 					for closing_match in _code_tags[key].rex_closing_tags.search_all(s, offset):
-						print("BEFORE ", nest_level, ": ", closing_match.strings[1])
 						if closing_match.strings[1] == key:
 							# opening tag - increase nesting level
 							nest_level += 1
@@ -641,97 +614,11 @@ func parse_bool_string(s: String) -> bool:
 	s = s.strip_edges().to_lower()
 	return s == "true" or s == "yes" or s == "1"
 
-
-#func replacer_execute(s:String, replacer:Dictionary) -> String:
-	#var matches:Array[RegExMatch] = replacer.regex.search_all(s)
-	#var pos:int = 0
-	#var r = ""
-	#for match in matches:
-		#r += s.substr(pos, match.get_start() - pos)
-		#if replacer.has("is_tag_replacer"):
-			#r += replacer.callable.call({
-				#"tag": match.strings[1],
-				#"params": split_tag_params(match.strings[2]),
-				#"content": match.strings[3],
-			#})
-		#else:
-			#r += replacer.callable.call(match)
-		#pos = match.get_end()
-	#r += s.substr(pos)
-	#return r
-
 func split_tag_params(s:String) -> Dictionary:
 	var r:Dictionary = {}
 	for match in _rex_tag_params.search_all(s):
 		r[match.strings[1]] = match.strings[2]
 	return r
-
-# ------------------------------------------------------------------------------
-# Tag methods
-# ------------------------------------------------------------------------------
-#func _replace_b(match_dict:Dictionary) -> String:
-	## Catches [b] and replaces it with [b][/i], unless plain is specified
-	#if match_dict.params.has("plain"):
-		#return str("[b]", match_dict.content, "[/b]")
-	#else:
-		#return str("[b][i]", match_dict.content, "[/i][/b]")
-#
-#func _replace_br(_match_dict:Dictionary) -> String:
-	#return "\n"
-#
-#func _replace_tab(_match_dict:Dictionary) -> String:
-	#return "	"
-#
-#func _replace_tilde(_match_dict:Dictionary) -> String:
-	#return "~"
-#
-#func _replace_at(_match_dict:Dictionary) -> String:
-	#return "@"
-#
-#func _replace_hyphen(_match_dict:Dictionary) -> String:
-	#return "‑" # Non-Hreaking Hyphen U+2011
-#
-#func _replace_capital_i(_match_dict:Dictionary) -> String:
-	#return "I"
-#
-#func _replace_capital_i_in_word(_regex_match:RegExMatch) -> String:
-	#return "i"
-#
-#func _replace_left_quotes(regex_match:RegExMatch) -> String:
-	#return "‘" if regex_match.strings[0] == "'" else "“"
-#
-#func _replace_remaining_quotes(regex_match:RegExMatch) -> String:
-	#return "’" if regex_match.strings[0] == "'" else "”"
-#
-#func _replace_breath_marks(regex_match:RegExMatch) -> String:
-	#return "⚞" if regex_match.strings[0] == "-)" else "⚟"
-#
-#func _replace_small(match_dict:Dictionary) -> String:
-	#return str("[font size=", theme.get_font_size("normal_font_size", "RichTextLabel") * theme.get_constant("small_scale", "Balloon") / 100.0, "]", match_dict.content, "[/font]")
-#
-#func _replace_img(match_dict:Dictionary) -> String:
-	#var s = "[img"
-	#for key in match_dict.params.keys():
-		#s = str(s, " ", key, "=", match_dict.params[key])
-	#s = str(s, "]")
-	#if match_dict.content.left(6) == "res://":
-		## Absolute file path. Don't do anything with it.
-		#s = str(s, match_dict.content)
-	#else:
-		## Relative file path
-		#var found:bool = false
-		#for ext in IMAGE_EXT:
-			#var path:String = str("res://images/", match_dict.content, ".", ext)
-			#if ResourceLoader.exists(path):
-				#found = true
-				#s = str(s, path)
-				#break
-		#if not found:
-			#return "<Image not found>"
-	#s = str(s, "[/img]")
-	#return s
-
-# ------------------------------------------------------------------------------
 
 func validate_name(s:String) -> String:
 	s = s.replace("-", "_")
@@ -741,7 +628,7 @@ func validate_name(s:String) -> String:
 	
 func request_quit():
 	if book.has_unsaved_changes:
-		confirm("Discard Changes?", "You have unsaved changes.\n\nIf you quit, they will be lost.\n\nAre you sure you want to quit?", quit)
+		confirm("Really quit?", "Any unsaved progress will be lost.\n\nAre you sure you want to quit?", quit)
 	else:
 		quit()
 
@@ -767,30 +654,6 @@ func confirm(title:String, text:String, confirm_callback:Callable = Callable(), 
 		dialog.canceled.connect(cancel_callback)
 	add_child(dialog)
 	dialog.popup_centered()
-
-#
-#You can use the OS / platform's alert system:
-#
-#OS.alert('This is your message', 'Message Title')
-#
-#You can use WindowDialog or subclass on any node like this:
-#
-#func alert(text: String, title: String='Message') -> void:
-	#var dialog = AcceptDialog.new()
-	#dialog.dialog_text = text
-	#dialog.window_title = title
-	#dialog.connect('modal_closed', dialog, 'queue_free')
-	#add_child(dialog)
-	#dialog.popup_centered()
-#
-#You can do the above, but globally:
-#
-#func alert(text: String, title: String='Message') -> void:
-	## ... code from above, but instead of `add_child(dialog)` do
-	#var scene_tree = Engine.get_main_loop()
-	#scene_tree.current_scene.add_child(dialog)
-	#dialog.popup_centered()
-#
 
 func get_preset_data(category:String, chosen_presets:Array = []) -> Dictionary:
 	var r = {}
@@ -870,13 +733,20 @@ func _code_tag_set(params:Dictionary) -> String:
 	return ""
 
 func _code_tag_if(params:Dictionary, contents:Array) -> String:
-	print("IF!")
-	print(contents)
 	if execute(params[""]):
 		return contents[0]
 	elif contents.size() > 1:
 		return contents[1]
 	return ""
+
+func _code_tag_quit(params:Dictionary) -> String:
+	# By default we confirm that the player wants to quit
+	if not params.has("ask") or not parse_bool_string(params.ask):
+		quit()
+	else:
+		request_quit()
+	return ""
+
 
 func _code_tag_save(params:Dictionary) -> String:
 	if params.has("slot"):
@@ -894,16 +764,35 @@ func _code_tag_load(params:Dictionary) -> String:
 		ComicSavesMenu.open(false)
 	return ""
 
+func _code_tag_save_exists(params:Dictionary) -> String:
+	var slot:int = -1
+	if params.has("slot"):
+		slot = int(params.slot)
+	if save_exists(slot):
+		return "true"
+	return ""
 
 func save_savefile(save_id:int):
+	book.has_unsaved_changes = false
 	var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.WRITE)
 	file.store_var(Comic.vars)
-	# We call deferred so that the menu won't appear in the thumbnail
 	var capture = Comic.book.page.get_texture().get_image()
 	capture.resize(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4)
 	capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
 
 func load_savefile(save_id:int):
-	var file = FileAccess.open(str(Comic.DIR_SAVES, "data_", save_id, ".sav"), FileAccess.READ)
-	Comic.vars = file.get_var()
-	Comic.book.change_page = true
+	var path = str(Comic.DIR_SAVES, "data_", save_id, ".sav")
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		Comic.vars = file.get_var()
+		Comic.book.change_page = true
+	
+func save_exists(slot:int = -1) -> bool:
+	if slot > -1:
+		return FileAccess.file_exists(str(Comic.DIR_SAVES, "data_", slot, ".sav"))
+	elif Comic.book.auto_save_slot or Comic.book.manual_save_slots:
+		# No slot specified - check if ANY saves exist
+		for i in 9 if Comic.book.manual_save_slots else 1:
+			if FileAccess.file_exists(str(Comic.DIR_SAVES, "data_", i, ".sav")):
+				return true
+	return false

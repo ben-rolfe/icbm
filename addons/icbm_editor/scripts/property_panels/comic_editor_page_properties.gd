@@ -19,6 +19,10 @@ var commands_before_changes:String
 var original_chapter_name:String = ""
 var original_page_name:String = ""
 
+@export var allow_back_check_box:CheckBox
+@export var allow_save_check_box:CheckBox
+@export var auto_save_check_box:CheckBox
+
 @export var promote_button:Button
 @export var delete_button:Button
 
@@ -39,6 +43,10 @@ func _ready():
 
 	new_name_lineedit.text_submitted.connect(_on_new_name_submitted)
 	new_name_lineedit.focus_exited.connect(_on_new_name_unfocused)
+
+	allow_back_check_box.toggled.connect(_on_allow_back_check_box_toggled)
+	allow_save_check_box.toggled.connect(_on_allow_save_check_box_toggled)
+	auto_save_check_box.toggled.connect(_on_auto_save_check_box_toggled)
 
 	promote_button.pressed.connect(_on_promote_pressed)
 	delete_button.pressed.connect(_on_delete_pressed)
@@ -74,6 +82,10 @@ func prepare():
 			delete_button.text = "Delete Chapter"
 
 	new_name_lineedit.text = page.new_name
+
+	allow_back_check_box.button_pressed = page.allow_back
+	allow_save_check_box.button_pressed = page.allow_save
+	auto_save_check_box.button_pressed = page.auto_save
 
 	action_button.select(page.action)
 	after_action_changed()
@@ -153,6 +165,14 @@ func _on_commands_textedit_unfocused():
 		reversion.data.action_commands = ComicEditor.unparse_text_edit(commands_before_changes)
 		Comic.book.add_undo_step([reversion])
 
+func _on_allow_back_check_box_toggled(toggled_on:bool):
+	page.allow_back = toggled_on
+
+func _on_allow_save_check_box_toggled(toggled_on:bool):
+	page.allow_save = toggled_on
+
+func _on_auto_save_check_box_toggled(toggled_on:bool):
+	page.auto_save = toggled_on
 
 func _on_delete_pressed():
 	if page.bookmark.contains("/"):

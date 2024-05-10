@@ -51,15 +51,15 @@ func _on_key_lineedit_unfocused():
 
 func _on_show_textedit_changed():
 	page.fragments[key].show = ComicEditor.unparse_text_edit(show_textedit.text)
-	page.rebuild(true)
 
 func _on_show_textedit_focused():
 	show_before_changes = show_textedit.text
 	
 func _on_show_textedit_unfocused():
 	if show_textedit.text != show_before_changes:
+		print(key)
 		var reversion:ComicReversionData = ComicReversionData.new(page)
-		reversion.fragments[key].show = ComicEditor.unparse_text_edit(show_before_changes)
+		reversion.data.fragments[key].show = ComicEditor.unparse_text_edit(show_before_changes)
 		Comic.book.add_undo_step([reversion])
 
 func _on_show_in_editor_checkbox_toggled(toggled_on:bool):

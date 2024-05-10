@@ -85,7 +85,6 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_child(menu_fragment)
 	menu_fragment.index_pressed.connect(menu_fragment_index_pressed)
 	menu_fragment.name = "fragment"
-	print(Comic.book.page.data)
 	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), key.capitalize())

@@ -14,12 +14,16 @@ var last_oid:int = -1
 var os = {}
 #NOTE: The data object of the page is only the data relating to the page itself, not of the contained objects
 var _data:Dictionary
-const _default_data:Dictionary = {
-	"action": ComicButton.Action.NEXT,
-	"action_bookmark": "",
-	"action_commands": "",
-}
+var _default_data:Dictionary
 
+# These variables are for when we want to save or load a slot on process
+# Reasons for doing this, rather than calling Comic.save_savefile or Comic.load_savefile include:
+# - We're autosaving on page load, and want to let the page fully render before saving, to get a thumbnail
+# - We're saving from a tag, and want the page to be fully resolved before we save.
+# - We're loading from a tag, and don't want to load Comic.vars from the file and then have it affected by other processes later in the text/page before the page is loaded. 
+# - We want to save the page to a slot and then load from a different slot without risking things getting messy
+var save_slot:int = -1
+var load_slot:int = -1
 
 #-------------------------------------------------------------------------------
 
@@ -41,6 +45,24 @@ var action_commands:String:
 	set(value):
 		_data_set("action_commands", value)
 
+var allow_back:bool:
+	get:
+		return _data_get("allow_back")
+	set(value):
+		_data_set("allow_back", value)
+
+var allow_save:bool:
+	get:
+		return _data_get("allow_save")
+	set(value):
+		_data_set("allow_save", value)
+
+var auto_save:bool:
+	get:
+		return _data_get("auto_save")
+	set(value):
+		_data_set("auto_save", value)
+
 var fragments:Dictionary:
 	get:
 		return _data.fragments
@@ -52,6 +74,8 @@ var fragments:Dictionary:
 func _init(_bookmark: String):
 	bookmark = _bookmark
 	name = bookmark.replace("/","__")
+
+	_default_data = Comic.get_preset_data("page", [])
 
 	#var theme:Theme = preload("res://theme/root_theme.tres")
 	#layer_depth = Comic.theme.get_constant("layer_depth", "Settings")
@@ -95,6 +119,20 @@ func _init(_bookmark: String):
 	for key in all_data.fragments:
 		add_fragment(key, all_data.fragments[key])
 	file.close()
+	
+	if not self is ComicEditorPage:
+		Comic.book.has_unsaved_changes = true
+		# Set up auto-save - it will happen on _process
+		if auto_save and Comic.book.auto_save_slot:
+			save_slot = 0
+
+func _process(_delta:float):
+	if save_slot > -1:
+		save_slot = -1
+		Comic.save_savefile(save_slot)
+	if load_slot > -1:
+		load_slot = -1
+		Comic.load_savefile(load_slot)
 
 func add_fragment(key:String, fragment:Dictionary):
 #	print("Adding fragment: ", key)

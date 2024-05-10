@@ -48,14 +48,14 @@ enum MenuCommand {
 	TOGGLE,
 	ADD_PART,
 	DELETE_PART,
+	
+	# Page menu
+	BOOK_PROPERTIES,
+	OPEN_SETTINGS,
 	FRAGMENT_PROPERTIES,
 	CLEAR_FRAGMENT,
-	OPEN_SETTINGS,
-	
-	# Tail Start and Tail End Widgets
-
-	#Background
 	CHANGE_BACKGROUND,
+
 	#TODO: Test these codes on mac
 	UNDO = 268435546, # Ctrl+Z
 	REDO = 301989978, # Shift+Ctrl+Z
@@ -95,9 +95,8 @@ var redo_steps:Array
 @export var page_properties:ComicEditorPageProperties
 @export var fragment_properties:ComicEditorFragmentProperties
 @export var settings_properties:ComicEditorSettingsProperties
+@export var book_properties:ComicEditorBookProperties
 # Probably don't need a property panel for lines?
-# Maybe try to avoid property panels altogether?!
-
 
 # ------------------------------------------------------------------------------
 
@@ -277,9 +276,11 @@ func clean_up_reversion(reversion:ComicReversion, is_redo_step:bool):
 		reversion.o.queue_free()
 
 func save(quit_after_saving:bool = false):
+	# Save book data to default book preset
+	presets["book"][""] = _data
+	save_presets_file()
+	
 	var save_data:Dictionary = page.get_save_data()
-	#print(save_data)
-
 	# There are some properties of page.data that we don't want to save - we deal with them and erase them, first.
 	var new_bookmark = page.bookmark
 	if save_data.page_data.has("new_name"):

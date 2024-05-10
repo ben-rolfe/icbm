@@ -28,6 +28,7 @@ func _gui_input(event:InputEvent):
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Chapter Properties" if Comic.book.page_properties.is_chapter else "Page Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Book Properties", ComicEditor.MenuCommand.BOOK_PROPERTIES)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "settings.svg")), "Editor Settings", ComicEditor.MenuCommand.OPEN_SETTINGS)
 	if Comic.book.page.fragments.size() > 0:
 		menu.add_submenu_item("Fragment Properties", "fragment")
@@ -72,6 +73,8 @@ func menu_command_pressed(id:int):
 	match id:
 		ComicEditor.MenuCommand.OPEN_PROPERTIES:
 			Comic.book.open_properties = Comic.book.page_properties
+		ComicEditor.MenuCommand.BOOK_PROPERTIES:
+			Comic.book.open_properties = Comic.book.book_properties
 		ComicEditor.MenuCommand.OPEN_SETTINGS:
 			Comic.book.open_properties = Comic.book.settings_properties
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=14 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
 [ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_gldbu"]
@@ -12,8 +12,9 @@
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_button_properties.gd" id="8_lxpup"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_fragment_properties.gd" id="9_t8wiw"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_settings_properties.gd" id="10_2xp14"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_book_properties.gd" id="11_npbar"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "page_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "page_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,6 +30,7 @@ kaboom_properties = NodePath("Properties/MarginContainer/KaboomProperties")
 page_properties = NodePath("Properties/MarginContainer/PageProperties")
 fragment_properties = NodePath("Properties/MarginContainer/FragmentProperties")
 settings_properties = NodePath("Properties/MarginContainer/EditorSettings")
+book_properties = NodePath("Properties/MarginContainer/BookProperties")
 page_container = NodePath("Page Container")
 buttons_container = NodePath("Buttons Container")
 
@@ -178,7 +180,7 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "promote_button", "delete_button")]
+[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "promote_button", "delete_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nx1jt")
@@ -189,6 +191,9 @@ chapter_row = NodePath("Chapter")
 chapter_button = NodePath("Chapter/Chapter OptionButton")
 new_name_label = NodePath("Page Name/New Name Label")
 new_name_lineedit = NodePath("Page Name/New Name LineEdit")
+allow_back_check_box = NodePath("AllowBack CheckBox")
+allow_save_check_box = NodePath("AllowSave CheckBox")
+auto_save_check_box = NodePath("AutoSave CheckBox")
 promote_button = NodePath("Promote Button")
 delete_button = NodePath("Delete Button")
 
@@ -240,6 +245,21 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."
 
+[node name="AllowBack CheckBox" type="CheckBox" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Allow right-click to go back"
+
+[node name="AllowSave CheckBox" type="CheckBox" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Allow save  (if manual slots exist)"
+
+[node name="AutoSave CheckBox" type="CheckBox" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Auto-save (if auto slot exists)"
+
 [node name="Promote Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2
 text = "Promote to Title Page"
@@ -289,7 +309,7 @@ text = "Remove fragment (keep contents)"
 visible = false
 layout_mode = 2
 script = ExtResource("10_2xp14")
-snap_to_grid_check_box = NodePath("Snap to Grid CheckBox2")
+snap_to_grid_check_box = NodePath("Snap to Grid CheckBox")
 show_grid_check_box = NodePath("Grid Size/Show Grid CheckBox")
 grid_x_spin_box = NodePath("Grid Size/grid_x")
 grid_y_spin_box = NodePath("Grid Size/grid_y")
@@ -331,10 +351,32 @@ value = 12.0
 layout_mode = 2
 text = "px"
 
-[node name="Snap to Grid CheckBox2" type="CheckBox" parent="Properties/MarginContainer/EditorSettings"]
+[node name="Snap to Grid CheckBox" type="CheckBox" parent="Properties/MarginContainer/EditorSettings"]
 layout_mode = 2
 button_pressed = true
 text = "Snap to Grid (Shift for opposite)"
+
+[node name="BookProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("auto_save_slot_check_box", "manual_save_slots_check_box")]
+visible = false
+layout_mode = 2
+script = ExtResource("11_npbar")
+auto_save_slot_check_box = NodePath("AutoSaveSlot CheckBox")
+manual_save_slots_check_box = NodePath("ManualSaveSlots CheckBox")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/BookProperties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Book Properties"
+
+[node name="ManualSaveSlots CheckBox" type="CheckBox" parent="Properties/MarginContainer/BookProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Manual Save Slots"
+
+[node name="AutoSaveSlot CheckBox" type="CheckBox" parent="Properties/MarginContainer/BookProperties"]
+layout_mode = 2
+button_pressed = true
+text = "Auto Save Slot"
 
 [node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
 visible = false

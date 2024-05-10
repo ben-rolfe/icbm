@@ -14,6 +14,8 @@ var has_unsaved_changes:bool
 var pages:Dictionary
 var bookmarks:PackedStringArray
 var presets:Dictionary
+
+var _data:Dictionary
 # ------------------------------------------------------------------------------
 
 var bookmark:String:
@@ -21,6 +23,20 @@ var bookmark:String:
 		return Comic.vars._bookmarks[-1]
 	set(value):
 		Comic.vars._bookmarks[-1] = value
+
+#NOTE: Unlike other Comic objects, we don't have _default_data, and we don't have _data_get and _data_set methods.
+# Instead, ComicBook's _data is directly pulled from the default preset. 
+var auto_save_slot:bool:
+	get:
+		return _data["auto_save_slot"]
+	set(value):
+		_data["auto_save_slot"] = value
+
+var manual_save_slots:bool:
+	get:
+		return _data["manual_save_slots"]
+	set(value):
+		_data["manual_save_slots"] = value
 
 # ------------------------------------------------------------------------------
 
@@ -32,9 +48,22 @@ func _init():
 		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.READ)
 		presets = file.get_var()
 		file.close()
+		# Make sure that the loaded presets are compatible with the presets defined in Comic
+		# (This will help avoid errors from old save files if the presets are changed between ICBM versions, or altered by a module)
+		for preset_key in Comic.default_presets:
+			if presets.has(preset_key):
+				for property_key in Comic.default_presets[preset_key]:
+					if not presets[preset_key].has(property_key):
+						presets[preset_key][property_key] = Comic.default_presets[preset_key][property_key]
+			else:
+				presets[preset_key] = Comic.default_presets[preset_key]
 	else:
 		# Presets file doesn't exist - use default presets:
 		presets = Comic.default_presets
+	
+	# We store data relating to the book as a whole in default book preset.
+	_data = Comic.get_preset_data("book", [])
+	print(_data)
 
 	_history_size = Comic.theme.get_constant("history_size", "Settings")
 	default_balloon_layer = Comic.theme.get_constant("default_layer", "Balloon")
@@ -93,6 +122,12 @@ func left_clicked(control:Control, _event:InputEvent):
 
 func right_clicked(control:Control, _event:InputEvent):
 	if control is ComicBackground:
+		back_if_allowed()
+
+# This is for back calls initiated by the user right clicking or pressing the left arrow key.
+# Other ways of going back (such as a button or hotspot) don't test page.allow_back
+func back_if_allowed():
+	if page.allow_back:
 		page_back()
 
 func _show_page():
@@ -169,7 +204,4 @@ func get_relative_bookmark(from_key:String, offset:int) -> String:
 	#has_unsaved_changes = false
 	#if quit_after_saving:
 		#Comic.quit()
-
-
-
 
