@@ -97,13 +97,13 @@ func _input(event):
 		#get_tree().quit()
 	elif event is InputEventKey and event.pressed:
 		match event.keycode:
+			Key.KEY_LEFT:
+				back_if_allowed()
 			KEY_PRINT:
 				get_viewport().get_texture().get_image().save_webp("user://" + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
 				OS.shell_open(ProjectSettings.globalize_path("user://"))
-			#Key.KEY_SPACE, Key.KEY_RIGHT, Key.KEY_0, Key.KEY_KP_0:
-				#page.activate_bg_button()
-			Key.KEY_LEFT:
-				page_back()
+			Key.KEY_RIGHT:
+				page.activate()
 
 func _process(_delta:float):
 	if change_page:
@@ -187,7 +187,6 @@ func page_visit(_bookmark:String):
 	change_page = true
 
 func get_relative_bookmark_index(from_key:String, offset:int) -> int:
-	print("seeking ", from_key, " in ", bookmarks) 
 	var index = bookmarks.find(from_key)
 	if index == null:
 		# We default to the title page.

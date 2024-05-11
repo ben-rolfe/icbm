@@ -310,14 +310,6 @@ func apply_data():
 			add_theme_font_size_override("mono_font_size", roundi(_final_scale_font * get_theme_font_size("mono_font_size", "RichTextLabel")))
 			add_theme_font_size_override("normal_font_size", roundi(_final_scale_font * get_theme_font_size("normal_font_size", "RichTextLabel")))
 
-	if Comic.book is ComicEditor:
-		mouse_filter = Control.MOUSE_FILTER_STOP
-	elif text.contains("[url"):
-		mouse_filter = Control.MOUSE_FILTER_PASS
-		connect("meta_clicked", _on_meta_clicked);
-	else:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-
 	# --------------------------------------------------------------------------
 	# TEXT
 	# --------------------------------------------------------------------------
@@ -346,6 +338,14 @@ func apply_data():
 		post_text = str("[/i]", post_text)
 
 	text = str(pre_text, Comic.parse_rich_text_string(content), post_text)
+
+	if Comic.book is ComicEditor:
+		mouse_filter = Control.MOUSE_FILTER_STOP
+	elif text.contains("[url"):
+		mouse_filter = Control.MOUSE_FILTER_PASS
+		connect("meta_clicked", _on_meta_clicked);
+	else:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# ----------------------------------------------------------------------------------------------
 	# BOX AND FRAME

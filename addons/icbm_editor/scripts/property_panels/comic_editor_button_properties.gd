@@ -49,7 +49,10 @@ func after_action_changed():
 			action_target_button.show()
 			button.action_commands = ""
 			# If bookmark is blank, default to the next page, otherwise, set it.
-			action_target_button.select(Comic.book.get_relative_bookmark_index(Comic.book.page.bookmark, 1) if button.action_bookmark == "" else Comic.book.bookmarks.find(button.action_bookmark))
+			var index:int = Comic.book.get_relative_bookmark_index(Comic.book.page.bookmark, 1) if button.action_bookmark == "" else Comic.book.bookmarks.find(button.action_bookmark)
+			action_target_button.select(index)
+			button.action_bookmark = Comic.book.bookmarks[index]
+
 
 		ComicButton.Action.PARSE_COMMANDS:
 			action_target_button.hide()
