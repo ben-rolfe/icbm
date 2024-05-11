@@ -143,7 +143,7 @@ func _init(data:Dictionary, page:ComicPage):
 
 func apply_data():
 	_default_data = Comic.get_preset_data("button", presets)
-	text = str("[center]", content, "[/center]")
+	text = str("[center]", Comic.parse_rich_text_string(content), "[/center]")
 	set_theme_override()
 
 func _gui_input(event):

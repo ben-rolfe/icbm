@@ -355,13 +355,16 @@ func _ready():
 	add_tail_style(ComicZigTailStyle.new())
 	add_tail_style(ComicZagTailStyle.new())
 
-	add_code_tag("set", _code_tag_set)
 	add_code_tag("store", _code_tag_store, true)
 	add_code_tag("if", _code_tag_if, true, "else")
 	add_code_tag("save", _code_tag_save)
 	add_code_tag("load", _code_tag_load)
 	add_code_tag("save_exists", _code_tag_save_exists)
-	add_code_tag("quit", _code_tag_quit)
+	add_code_tag("go", _code_tag_go, true)
+	add_code_tag("visit", _code_tag_visit, true)
+	add_code_tag("back", _code_tag_back)
+	add_code_tag("next", _code_tag_next)
+	add_code_tag("return", _code_tag_return)
 
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
@@ -703,16 +706,7 @@ func sort_dictionary(unsorted:Dictionary) -> Dictionary:
 	return sorted
 
 
-func _code_tag_set(params:Dictionary) -> String:
-	for key in params:
-		if key != "":
-			if key[0] == "~": # Remove optional tilde
-				key = key.substr(1)
-			vars[key] = execute(params[key])
-	return ""
-
 func _code_tag_store(params:Dictionary, contents:Array) -> String:
-	print("STORING")
 	if params.has("var"):
 		var key:String = params.var
 		var dict:Dictionary = vars
@@ -795,6 +789,26 @@ func _code_tag_if(params:Dictionary, contents:Array) -> String:
 		return contents[0]
 	elif contents.size() > 1:
 		return contents[1]
+	return ""
+
+func _code_tag_go(params:Dictionary, contents:Array) -> String:
+	book.page_go(execute_embedded_code(contents[0]))
+	return ""
+
+func _code_tag_visit(params:Dictionary, contents:Array) -> String:
+	book.page_visit(execute_embedded_code(contents[0]))
+	return ""
+
+func _code_tag_back(params:Dictionary) -> String:
+	book.page_back()
+	return ""
+
+func _code_tag_next(params:Dictionary) -> String:
+	book.page_next()
+	return ""
+
+func _code_tag_return(params:Dictionary) -> String:
+	book.page_return()
 	return ""
 
 func _code_tag_quit(params:Dictionary) -> String:
