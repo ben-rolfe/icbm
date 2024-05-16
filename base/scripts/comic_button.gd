@@ -184,14 +184,17 @@ func set_theme_override():
 		mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
 		add_theme_color_override("default_color", font_color_disabled)
 		style_box.bg_color = fill_color_disabled
+		style_box.border_color = fill_color_disabled
 	else:
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		if hovered:
 			add_theme_color_override("default_color", font_color_hovered)
 			style_box.bg_color = fill_color_hovered
+			style_box.border_color = fill_color_hovered
 		else:
 			add_theme_color_override("default_color", font_color)
 			style_box.bg_color = fill_color
+			style_box.border_color = fill_color
 
 # ------------------------------------------------------------------------------
 
