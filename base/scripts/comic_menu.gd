@@ -10,6 +10,12 @@ func _init():
 	buttons = VBoxContainer.new()
 	add_child(buttons)
 	buttons.resized.connect(_on_buttons_resized)
+
+	var home_button:Button = Button.new()
+	buttons.add_child(home_button)
+	home_button.text = "Back to Main Menu"
+	home_button.pressed.connect(_on_home_pressed)
+
 	# Only show the save button if the comic and the page both allow manual saving.
 	if Comic.book.manual_save_slots and Comic.book.page.allow_save:
 		var save_button:Button = Button.new()
@@ -33,6 +39,11 @@ static func open():
 	var menu:ComicMenu = ComicMenu.new()
 	Comic.add_child(menu)
 	menu.popup_centered()
+
+func _on_home_pressed():
+	hide()
+	Comic.book.start()
+	queue_free()
 
 func _on_quit_pressed():
 	Comic.request_quit()

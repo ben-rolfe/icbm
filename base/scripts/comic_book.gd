@@ -88,32 +88,32 @@ func _ready():
 		# We reset the bookmark to start, so that that will be open next time the game is run (unless changed by ComicEditorPlugin, in the meantime
 		ComicEditor.save_setting("bookmark", "start")
 	else:
-		start("start")
+		start()
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		ComicMenu.open()
 		#print("TODO: Open menu instead")
 		#get_tree().quit()
-	elif event is InputEventKey and event.pressed:
-		match event.keycode:
-			Key.KEY_LEFT:
-				back_if_allowed()
-			KEY_PRINT:
-				get_viewport().get_texture().get_image().save_webp("user://" + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
-				OS.shell_open(ProjectSettings.globalize_path("user://"))
-			Key.KEY_RIGHT:
-				page.activate()
+	elif event is InputEventKey:
+		if event.keycode == Key.KEY_PRINT:
+			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
+			DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
+			get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
+			OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
+		elif event.pressed:
+			match event.keycode:
+				Key.KEY_LEFT:
+					back_if_allowed()
+				Key.KEY_RIGHT:
+					page.activate()
 
 func _process(_delta:float):
 	if change_page:
 		_show_page()
 
-func start(start_page:String):
+func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
-	#TODO: Reinstate setup?
-	#if _page_data.has("_setup"):
-		#read_lines(_page_data._setup, self)
 	change_page = true
 
 func left_clicked(control:Control, _event:InputEvent):

@@ -12,6 +12,7 @@ const DIR_STORY:String = "res://story/"
 const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
 const DIR_SAVES:String = "user://saves/"
+const DIR_SCREENSHOTS:String = "user://screenshots/"
 
 const DEFAULT_BG:String = "res://theme/background.webp"
 const IMAGE_EXT:PackedStringArray = ["webp", "png", "jpg", "jpeg", "svg"]
@@ -57,8 +58,6 @@ const HORIZONTAL_ALIGNMENTS:Dictionary = {
 #Regular expressions
 #var _rex_bracketed_expressions:RegEx = RegEx.new()
 var _rex_code_tags:RegEx = RegEx.new()
-var _rex_code_tags_end:Dictionary = {}
-var _rex_code_tags_separators:Dictionary = {}
 var _rex_tag_params:RegEx = RegEx.new()
 var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
@@ -91,13 +90,13 @@ var tail_tips:Dictionary = {}
 var tail_styles:Dictionary = {}
 
 # These are ComicScript language constructs, rather than callable commands - we put them in the _commands dictionary to stop people from adding a command of the same name (which would be ignored without error, otherwise)
-var commands:Dictionary = {
-	"*": null, 
-	"+": null, 
-	"set": null,
-	"if": null, "while": null, 
-	"else": null, "elif": null,
-}
+#var commands:Dictionary = {
+	#"*": null, 
+	#"+": null, 
+	#"set": null,
+	#"if": null, "while": null, 
+	#"else": null, "elif": null,
+#}
 #var _replacer_keys_ordered:Array[String] = []
 var replacers:Dictionary = {}
 var _code_tags:Dictionary = {}
@@ -570,7 +569,10 @@ func parameterize(s:String) -> Dictionary:
 	var r:Dictionary = { "":s.strip_edges() }
 	for rex_match in _rex_tag_params.search_all(r[""]):
 		var pair = rex_match.get_string().split("=", false, 1)
-		r[pair[0].strip_edges()] = true if pair.size() == 1 else pair[1].strip_edges()
+		if pair.size() == 1:
+			r[pair[0].strip_edges()] = null
+		else:
+			r[pair[0].strip_edges()] = pair[1].strip_edges()
 	return r
 
 func parse_hidden_string(s:String):
@@ -791,23 +793,23 @@ func _code_tag_if(params:Dictionary, contents:Array) -> String:
 		return contents[1]
 	return ""
 
-func _code_tag_go(params:Dictionary, contents:Array) -> String:
+func _code_tag_go(_params:Dictionary, contents:Array) -> String:
 	book.page_go(execute_embedded_code(contents[0]))
 	return ""
 
-func _code_tag_visit(params:Dictionary, contents:Array) -> String:
+func _code_tag_visit(_params:Dictionary, contents:Array) -> String:
 	book.page_visit(execute_embedded_code(contents[0]))
 	return ""
 
-func _code_tag_back(params:Dictionary) -> String:
+func _code_tag_back(_params:Dictionary) -> String:
 	book.page_back()
 	return ""
 
-func _code_tag_next(params:Dictionary) -> String:
+func _code_tag_next(_params:Dictionary) -> String:
 	book.page_next()
 	return ""
 
-func _code_tag_return(params:Dictionary) -> String:
+func _code_tag_return(_params:Dictionary) -> String:
 	book.page_return()
 	return ""
 
@@ -872,3 +874,4 @@ func save_exists(slot:int = -1) -> bool:
 			if FileAccess.file_exists(str(Comic.DIR_SAVES, "data_", i, ".sav")):
 				return true
 	return false
+
