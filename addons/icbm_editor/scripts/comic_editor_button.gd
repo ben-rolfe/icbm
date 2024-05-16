@@ -3,7 +3,7 @@ extends ComicButton
 
 func _gui_input(event):
 	#NOTE: We don't call super() - we don't want to activate the button
-	if enabled and event is InputEventMouseButton and get_global_rect().has_point(event.global_position):
+	if enabled and event is InputEventMouseButton and hovered:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.is_double_click():
 			Comic.book.selected_element = self
 			Comic.book.open_properties = Comic.book.button_properties

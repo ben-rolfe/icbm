@@ -364,6 +364,7 @@ func _ready():
 	add_code_tag("back", _code_tag_back)
 	add_code_tag("next", _code_tag_next)
 	add_code_tag("return", _code_tag_return)
+	add_code_tag("menu", _code_tag_menu)
 
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
@@ -849,6 +850,11 @@ func _code_tag_save_exists(params:Dictionary) -> String:
 		return "true"
 	else:
 		return "false"
+
+func _code_tag_menu(_params:Dictionary) -> String:
+	ComicMenu.open()
+	return ""
+
 
 func save_savefile(save_id:int):
 	book.has_unsaved_changes = false

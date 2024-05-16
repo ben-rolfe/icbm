@@ -11,10 +11,11 @@ func _init():
 	add_child(buttons)
 	buttons.resized.connect(_on_buttons_resized)
 
-	var home_button:Button = Button.new()
-	buttons.add_child(home_button)
-	home_button.text = "Back to Main Menu"
-	home_button.pressed.connect(_on_home_pressed)
+	if Comic.book.bookmark != "start":
+		var home_button:Button = Button.new()
+		buttons.add_child(home_button)
+		home_button.text = "Back to Main Menu"
+		home_button.pressed.connect(_on_home_pressed)
 
 	# Only show the save button if the comic and the page both allow manual saving.
 	if Comic.book.manual_save_slots and Comic.book.page.allow_save:
