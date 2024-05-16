@@ -147,7 +147,7 @@ func apply_data():
 	set_theme_override()
 
 func _gui_input(event):
-	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and get_global_rect().has_point(event.global_position):
+	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and hovered:
 			activate()
 
 func _input(event):
