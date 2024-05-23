@@ -20,18 +20,18 @@ func prepare():
 
 func _on_snap_to_grid_check_box_toggled(toggled_on:bool):
 	ComicEditor.snap_on = toggled_on
-	ComicEditor.save_setting("snap_on", toggled_on)
+	Comic.config.set_value("editor", "snap_on", toggled_on)
 
 func _on_show_grid_check_box_toggled(toggled_on:bool):
 	print("Show toggled ", toggled_on)
 	ComicEditor.grid_on = toggled_on
-	ComicEditor.save_setting("grid_on", toggled_on)
+	Comic.config.set_value("editor", "grid_on", toggled_on)
 	Comic.book.page.background.rebuild()
 	Comic.book.page.redraw()
 #	Comic.book.page.rebuild()
 
 func _on_grid_value_changed(new_value:float):
 	ComicEditor.snap_distance = Vector2(grid_x_spin_box.value, grid_y_spin_box.value)
-	ComicEditor.save_setting("snap_distance", ComicEditor.snap_distance)
+	Comic.config.set_value("editor", "snap_distance", ComicEditor.snap_distance)
 	if ComicEditor.grid_on:
 		Comic.book.page.rebuild()

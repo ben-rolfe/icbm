@@ -65,7 +65,6 @@ enum MenuCommand {
 }
 
 const DIR_ICONS:String = "res://addons/icbm_editor/theme/icons/"
-const SETTINGS_PATH:String = "user://editor_settings.cfg"
 const MAX_UNDO_STEPS:int = 50
 const BUMP_AMOUNT:float = 0.25
 
@@ -138,9 +137,9 @@ func _init():
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _ready():
-	grid_on = load_setting("grid_on", true)
-	snap_on = load_setting("snap_on", true)
-	snap_distance = load_setting("snap_distance", Vector2(12, 12))
+	grid_on = Comic.config.get_value("editor", "grid_on", true)
+	snap_on = Comic.config.get_value("editor", "snap_on", true)
+	snap_distance = Comic.config.get_value("editor", "snap_distance", Vector2(12, 12))
 	super()
 	get_window().title = str("ICBM Visual Editor: ", bookmark)
 
@@ -185,6 +184,21 @@ func grab(control:Control, offset:Vector2):
 	_grab_offset = offset
 
 func _input(event:InputEvent):
+	if event.is_action_pressed("ui_cancel"):
+		# When escape is pressed, we bring up the right click menu for the background, which includes the quit option.
+		# This behaviour might also be useful in the event that the user buries the background under other elements.
+		right_clicked(page.background, null)
+	elif event is InputEventKey:
+		if event.keycode == KEY_PRINT:
+			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
+			DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
+			get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
+			OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
+		elif event.pressed:
+			match event.keycode:
+				KEY_F11:
+					Comic.full_screen = not Comic.full_screen
+
 	#NOTE: super() is not called - we don't want the normal reader input events.
 	pass
 
@@ -212,8 +226,8 @@ func _unhandled_input(event):
 			_:
 				if selected_element != null and selected_element.has_method("_on_key_pressed"):
 					selected_element._on_key_pressed(event)
-				else:
-					print("Unhandled keypress: ", event.get_keycode_with_modifiers())
+				#else:
+					#print("Unhandled keypress: ", event.get_keycode_with_modifiers())
 
 static func snap(pos:Variant) -> Variant:
 	if snap_on != Input.is_key_pressed(KEY_SHIFT):
@@ -311,7 +325,7 @@ func save(quit_after_saving:bool = false):
 		page.bookmark = new_bookmark
 	
 	# Update the last_bookmark editor setting, in case we changed the bookmark
-	save_setting("last_bookmark", page.bookmark)
+	Comic.config.set_value("editor", "last_bookmark", page.bookmark)
 	
 	has_unsaved_changes = false
 	if quit_after_saving:
@@ -379,7 +393,7 @@ func delete():
 		delete_page(bookmark)
 	else:
 		delete_chapter(bookmark)
-	save_setting("last_bookmark", "start")
+	Comic.config.set_value("editor", "last_bookmark", "start")
 	Comic.quit()
 
 static func update_links(from_bookmark:String, to_bookmark:String, entire_chapter:bool = true):
@@ -390,33 +404,33 @@ static func update_links(from_bookmark:String, to_bookmark:String, entire_chapte
 	else:
 		print("TODO: Update links")
 
-static func load_setting(key:String, default_value:Variant = null) -> Variant:
-	var settings = _load_settings_file()
-	return settings.get(key, default_value)
-
-static func save_setting(key:String, value:Variant):
-	var settings = _load_settings_file()
-	settings[key] = value
-	_save_settings_file(settings)
-
-static func save_settings(dict:Dictionary):
-	var settings = _load_settings_file()
-	for key in dict:
-		settings[key] = dict[key]
-	_save_settings_file(settings)
-
-static func _load_settings_file() -> Dictionary:
-	if FileAccess.file_exists(SETTINGS_PATH):
-		var file = FileAccess.open(SETTINGS_PATH, FileAccess.READ)
-		var settings:Dictionary = file.get_var()
-		file.close()
-		return settings
-	return {}
-	
-static func _save_settings_file(settings:Dictionary):
-	var file = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
-	file.store_var(settings)
-	file.close()
+#static func load_setting(key:String, default_value:Variant = null) -> Variant:
+	#var settings = _load_settings_file()
+	#return settings.get(key, default_value)
+#
+#static func save_setting(key:String, value:Variant):
+	#var settings = _load_settings_file()
+	#settings[key] = value
+	#_save_settings_file(settings)
+#
+#static func save_settings(dict:Dictionary):
+	#var settings = _load_settings_file()
+	#for key in dict:
+		#settings[key] = dict[key]
+	#_save_settings_file(settings)
+#
+#static func _load_settings_file() -> Dictionary:
+	#if FileAccess.file_exists(SETTINGS_PATH):
+		#var file = FileAccess.open(SETTINGS_PATH, FileAccess.READ)
+		#var settings:Dictionary = file.get_var()
+		#file.close()
+		#return settings
+	#return {}
+	#
+#static func _save_settings_file(settings:Dictionary):
+	#var file = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
+	#file.store_var(settings)
+	#file.close()
 
 func save_presets_file():
 	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.WRITE)

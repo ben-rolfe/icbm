@@ -16,7 +16,7 @@ var os = {}
 var _data:Dictionary
 var _default_data:Dictionary
 
-# These variables are for when we want to save or load a slot on process
+# These variables are for when we want to save or load a slot on _process
 # Reasons for doing this, rather than calling Comic.save_savefile or Comic.load_savefile include:
 # - We're autosaving on page load, and want to let the page fully render before saving, to get a thumbnail
 # - We're saving from a tag, and want the page to be fully resolved before we save.

@@ -44,7 +44,7 @@ func _init(_oid: int, _balloon:ComicBalloon):
 	if not data.has("linked"):
 		data.linked = false
 	if not data.linked and not data.has("p_end"):
-		data.p_end = ComicEditor.snap(balloon.center_point + balloon.shape.get_edge_transform(balloon, TAU / 4).origin + Vector2.DOWN * 5 * Comic.px_per_unit)
+		data.p_end = ComicEditor.snap(balloon.center_point + balloon.shape.get_edge_transform(balloon, TAU / 4).origin + Vector2.DOWN * 40)
 
 func apply_data():
 	style = Comic.get_tail_style(data.get("style", balloon.edge_style.tail_style_id))

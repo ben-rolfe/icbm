@@ -13,6 +13,7 @@ const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
 const DIR_SAVES:String = "user://saves/"
 const DIR_SCREENSHOTS:String = "user://screenshots/"
+const CONFIG_FILE:String = "user://config.cfg"
 
 const DEFAULT_BG:String = "res://theme/background.webp"
 const IMAGE_EXT:PackedStringArray = ["webp", "png", "jpg", "jpeg", "svg"]
@@ -62,9 +63,8 @@ var _rex_tag_params:RegEx = RegEx.new()
 var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
 
-signal loaded
-signal saved
-signal page_ready
+signal before_save
+signal after_load
 
 ##These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
 #TODO: Set them differently
@@ -74,6 +74,7 @@ var tail_width:float
 
 var default_bg_path:String = ""
 
+var config:ConfigFile = ConfigFile.new()
 var book:ComicBook
 var vars:Dictionary
 var temp:Dictionary = {}
@@ -82,7 +83,6 @@ var theme:Theme
 
 var size:Vector2
 var image_scale:float = 1
-var px_per_unit:float = 1
 
 var shapes:Dictionary = {}
 var edge_styles:Dictionary = {}
@@ -298,8 +298,22 @@ var get_preset_options:Dictionary = {
 	"edge_style": get_preset_options_edge_style,
 }
 
+# ------------------------------------------------------------------------------
+# Getters and setters
+
+var full_screen:bool:
+	get:
+		return config.get_value("viewer", "full_screen", true)
+	set(value):
+		config.set_value("viewer", "full_screen", value)
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if value else DisplayServer.WINDOW_MODE_WINDOWED)
+
+# ------------------------------------------------------------------------------
+
 
 func _init():
+	config.load(CONFIG_FILE)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if full_screen else DisplayServer.WINDOW_MODE_WINDOWED)
 	theme = preload("res://theme/default.tres")
 	size = Vector2(float(ProjectSettings["display/window/size/viewport_width"]), float(ProjectSettings["display/window/size/viewport_height"]))
 	#_units_in_width = theme.get_constant("units_in_width", "Settings")
@@ -327,6 +341,9 @@ func _init():
 	assert(default_bg_path != "", "A default background must be supplied at res://theme/background.webp (or other valid image file extension)")
 
 func _ready():
+	#We want to manually handle quit requests via the quit() method, which does things like save the config file.
+	get_tree().set_auto_accept_quit(false)
+
 	add_shape(ComicShape.new(), ComicEdgeStyle.new())
 	add_edge_style(ComicBurstEdgeStyle.new())
 	add_edge_style(ComicCloudEdgeStyle.new())
@@ -389,6 +406,9 @@ func _ready():
 	replacers[rex_ldq] = "“" # Left double-quote
 	replacers["\""] = "”" # Right double-quote
 
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit()
 
 # Escapes a string for use within a regex
 func escape_regex(s:String) -> String:
@@ -469,14 +489,16 @@ func execute(command: String) -> Variant:
 		## We don't execute code in the editor - we display it.
 		#return str("[bgcolor=#ccc]", command, "[/bgcolor]")
 
-	#print("Executing ", command, " as ", command.replace("~", "vars."))
+	#print("Executing ", command, " as ", command.replace("~", "vars.").replace("@", "temp."))
 	var expression = Expression.new()
-	var error = expression.parse(command.replace("~", "vars.").replace("@", "temp."), ["vars", "temp"])
+#	var error = expression.parse(command.replace("~", "vars.").replace("@", "temp."), ["vars", "temp"])
+	var error = expression.parse(command.replace("~", "vars.").replace("@", "temp."))
 	if error != OK:
 		print(expression.get_error_text())
 		push_error(expression.get_error_text())
 		return "<<Error>>"
-	var result = expression.execute([vars, temp])
+#	var result = expression.execute([vars, temp], self)
+	var result = expression.execute([], self)
 	if expression.has_execute_failed():
 		# We don't need to push an error - that already happened when we tried to execute.
 #		push_error("Error in executed string. No more information is available. Check your spelling, that variables are preceded by ~ and exist in Comic.vars, and that strings are encapsulated in quote marks.")
@@ -618,6 +640,7 @@ func request_quit():
 		quit()
 
 func quit():
+	config.save(CONFIG_FILE)
 	get_tree().quit()
 
 func get_seed_from_position(v:Vector2) -> int:
@@ -708,80 +731,70 @@ func sort_dictionary(unsorted:Dictionary) -> Dictionary:
 		sorted[key] = unsorted[key]
 	return sorted
 
-
 func _code_tag_store(params:Dictionary, contents:Array) -> String:
 	if params.has("var"):
-		var key:String = params.var
-		var dict:Dictionary = vars
-		if key[0] == "~":
-			# Remove optional tilde
-			key = key.substr(1)
-		elif key[0] == "@":
-			# Store in temp variables instead of vars
-			dict = temp
-			key = key.substr(1)
 		var s = execute_embedded_code(contents[0])
-		print(s)
+		#print(s)
 		var data_type:String = params["type"].to_lower() if params.has("type") else ""
 		match data_type:
 			"string", "str":
-				dict[key] = s
+				set_var(params.var, s)
 			"int":
-				dict[key] = int(s)
+				set_var(params.var, int(s))
 			"float":
-				dict[key] = float(s)
+				set_var(params.var, float(s))
 			"bool":
-				dict[key] = parse_bool_string(s)
+				set_var(params.var, parse_bool_string(s))
 			"color":
 				var parts = s.split(",")
 				match parts.size():
 					1:
 						# Hex code or standardized color name
-						dict[key] = Color(s)
+						set_var(params.var, Color(s))
 					3:
-						dict[key] = Color(float(s[0]), float(s[1]), float(s[2]))
+						set_var(params.var, Color(float(s[0]), float(s[1]), float(s[2])))
 					4:
-						dict[key] = Color(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+						set_var(params.var, Color(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
 					_:
-						dict[key] = Color.BLACK
+						set_var(params.var, Color.BLACK)
 			"vector2":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					dict[key] = Vector2(float(s[0]), float(s[1]))
+					set_var(params.var, Vector2(float(s[0]), float(s[1])))
 				else:
-					dict[key] = Vector2.ZERO
+					set_var(params.var, Vector2.ZERO)
 			"vector3":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					dict[key] = Vector3(float(s[0]), float(s[1]), float(s[2]))
+					set_var(params.var, Vector3(float(s[0]), float(s[1]), float(s[2])))
 				else:
-					dict[key] = Vector3.ZERO
+					set_var(params.var, Vector3.ZERO)
 			"vector4":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					dict[key] = Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3]))
+					set_var(params.var, Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
 				else:
-					dict[key] = Vector4.ZERO
+					set_var(params.var, Vector4.ZERO)
 			"vector2i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					dict[key] = Vector2i(int(s[0]), int(s[1]))
+					set_var(params.var, Vector2i(int(s[0]), int(s[1])))
 				else:
-					dict[key] = Vector2i.ZERO
+					set_var(params.var, Vector2i.ZERO)
 			"vector3i":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					dict[key] = Vector3i(int(s[0]), int(s[1]), int(s[2]))
+					set_var(params.var, Vector3i(int(s[0]), int(s[1]), int(s[2])))
 				else:
-					dict[key] = Vector3i.ZERO
+					set_var(params.var, Vector3i.ZERO)
 			"vector4i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					dict[key] = Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3]))
+					set_var(params.var, Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3])))
 				else:
-					dict[key] = Vector4i.ZERO
+					set_var(params.var, Vector4i.ZERO)
 			_: # Default to code, which gets executed
-				dict[key] = execute(s)
+				set_var(params.var, execute(s))
 	else:
 		return "<store error - no var given>"
 	return ""
@@ -857,6 +870,7 @@ func _code_tag_menu(_params:Dictionary) -> String:
 
 
 func save_savefile(save_id:int):
+	before_save.emit()
 	book.has_unsaved_changes = false
 	var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.WRITE)
 	file.store_var(Comic.vars)
@@ -864,13 +878,15 @@ func save_savefile(save_id:int):
 	capture.resize(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4)
 	capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
 
+
 func load_savefile(save_id:int):
 	var path = str(Comic.DIR_SAVES, "data_", save_id, ".sav")
 	if FileAccess.file_exists(path):
 		var file = FileAccess.open(path, FileAccess.READ)
 		Comic.vars = file.get_var()
 		Comic.book.change_page = true
-	
+	after_load.emit()
+
 func save_exists(slot:int = -1) -> bool:
 	if slot > -1:
 		return FileAccess.file_exists(str(Comic.DIR_SAVES, "data_", slot, ".sav"))
@@ -881,3 +897,30 @@ func save_exists(slot:int = -1) -> bool:
 				return true
 	return false
 
+func set_var(key:String, value:Variant):
+	if key[0] == "~":
+		# Remove optional tilde
+		key = key.substr(1)
+		vars[key] = value
+	elif key[0] == "@":
+		# Store in temp variables instead of vars
+		# Remove at sign
+		key = key.substr(1)
+		temp[key] = value
+	else:
+		# No preceding character - assume it's meant to go in vars.
+		vars[key] = value
+
+func get_var(key:String) -> Variant:
+	if key[0] == "~":
+		# Remove optional tilde
+		key = key.substr(1)
+		return vars.get(key)
+	elif key[0] == "@":
+		# Store in temp variables instead of vars
+		# Remove at sign
+		key = key.substr(1)
+		return temp.get(key)
+	else:
+		# No preceding character - assume it's meant to go in vars.
+		return vars.get(key)

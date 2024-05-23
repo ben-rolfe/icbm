@@ -23,6 +23,7 @@ general/text_to_speech=true
 
 Comic="*res://base/scripts/comic.gd"
 Messages="*res://modules/messages/scripts/messages.gd"
+Random="*res://modules/random/scripts/random.gd"
 
 [debug]
 

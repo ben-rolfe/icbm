@@ -7,8 +7,11 @@ var play_button:Button
 var edit_mode:bool
 var menu:PopupMenu
 var pages:Dictionary
+var config:ConfigFile = ConfigFile.new()
+
 
 func _enter_tree():
+	config.load(Comic.CONFIG_FILE)
 	menu = PopupMenu.new()
 	get_editor_interface().get_base_control().add_child(menu)
 	menu.index_pressed.connect(item_pressed.bind(""))
@@ -85,7 +88,7 @@ func open_menu(edit_mode:bool):
 	menu.show()
 
 func run():
-	var bookmark:String = ComicEditor.load_setting("bookmark", "start")
+	var bookmark:String = config.get_value("editor", "bookmark", "start")
 	var file_path = str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt")
 	# Ensure that the file exists, and contains the page
 	if FileAccess.file_exists(file_path):
@@ -94,7 +97,8 @@ func run():
 
 func run_last(edit_mode:bool):
 	self.edit_mode = edit_mode
-	ComicEditor.save_setting("bookmark", ComicEditor.load_setting("last_bookmark", "start"))
+	config.set_value("editor", "bookmark", config.get_value("editor", "last_bookmark", "start"))
+	config.save(Comic.CONFIG_FILE)
 	run()
 
 func item_pressed(index:int, chapter:String = ""):
@@ -118,10 +122,9 @@ func item_pressed(index:int, chapter:String = ""):
 		# EDIT PAGE
 		var page:String = pages[chapter][index]
 		bookmark = chapter if page == "_" else str(chapter, "/", page)
-	ComicEditor.save_settings({
-		"bookmark": bookmark,
-		"last_bookmark": bookmark,
-	})
+	config.set_value("editor", "bookmark", bookmark)
+	config.set_value("editor", "last_bookmark", bookmark)
+	config.save(Comic.CONFIG_FILE)
 	run()
 
 # This is a duplicate of the natural_sort function in Comic - but we can't call that from this @tool class

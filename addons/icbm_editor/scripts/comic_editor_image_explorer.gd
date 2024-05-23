@@ -57,7 +57,7 @@ static func open(callable:Callable):
 	singleton.path = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
 	#TODO: Open faved folder.
 	singleton.show()
-	singleton.open_dir(ComicEditor.load_setting("favorite_image_path", ""))
+	singleton.open_dir(Comic.config.get_value("editor", "favorite_image_path", ""))
 
 func open_dir(new_path:String):
 	if new_path.length() == 0:
@@ -106,7 +106,7 @@ func _on_up_pressed():
 	open_dir("/".join(path_parts))
 
 func _on_favorite_pressed():
-	ComicEditor.save_setting("favorite_image_path", path)
+	Comic.config.set_value("editor", "favorite_image_path", path)
 
 func _on_address_submitted(new_text:String):
 	open_dir(new_text)

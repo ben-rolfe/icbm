@@ -84,9 +84,9 @@ func _init():
 func _ready():
 #	read_story_directory()
 	if OS.is_debug_build():
-		start(ComicEditor.load_setting("bookmark", "start"))
+		start(Comic.config.get_value("editor", "bookmark", "start"))
 		# We reset the bookmark to start, so that that will be open next time the game is run (unless changed by ComicEditorPlugin, in the meantime
-		ComicEditor.save_setting("bookmark", "start")
+		Comic.config.set_value("editor", "bookmark", "start")
 	else:
 		start()
 
@@ -96,17 +96,19 @@ func _input(event):
 		#print("TODO: Open menu instead")
 		#get_tree().quit()
 	elif event is InputEventKey:
-		if event.keycode == Key.KEY_PRINT:
+		if event.keycode == KEY_PRINT:
 			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
 			DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
 			get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
 			OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
 		elif event.pressed:
 			match event.keycode:
-				Key.KEY_LEFT:
+				KEY_LEFT:
 					back_if_allowed()
-				Key.KEY_RIGHT:
+				KEY_RIGHT:
 					page.activate()
+				KEY_F11:
+					Comic.full_screen = not Comic.full_screen
 
 func _process(_delta:float):
 	if change_page:
