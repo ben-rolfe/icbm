@@ -11,6 +11,7 @@ enum Overflow {
 const DIR_STORY:String = "res://story/"
 const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
+const DIR_IMAGES:String = "res://library/images"
 const DIR_SAVES:String = "user://saves/"
 const DIR_SCREENSHOTS:String = "user://screenshots/"
 const CONFIG_FILE:String = "user://config.cfg"

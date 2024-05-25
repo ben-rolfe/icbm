@@ -267,7 +267,7 @@ func _scrub_redundant_data():
 func bump(direction:Vector2):
 	#TODO: Figure out a way to not save on multiple bumps
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
+	anchor += direction * ComicEditor.snap_distance * ComicEditor.BUMP_AMOUNT
 	for oids in tail_backlinks:
 		Comic.book.page.os[oids.x].rebuild_tail(oids.y)
 	rebuild(true)

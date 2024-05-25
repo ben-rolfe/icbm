@@ -46,6 +46,7 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), "Change Background", ComicEditor.MenuCommand.CHANGE_BACKGROUND)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "frame_border.svg")), "Add Border Line", ComicEditor.MenuCommand.ADD_LINE)
+	menu.add_submenu_item("Add Image", "image")
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "note.svg")), "Add Note", ComicEditor.MenuCommand.ADD_NOTE)
 	menu.add_separator()
@@ -68,6 +69,17 @@ func add_menu_items(menu:PopupMenu):
 	for key in Comic.book.page.fragments:
 		if key != "":
 			menu_fragment.add_item(key.capitalize())
+
+	# Fragment Submenu
+	var menu_image:PopupMenu = PopupMenu.new()
+	menu.add_child(menu_image)
+	menu_image.index_pressed.connect(menu_image_index_pressed)
+	menu_image.name = "image"
+	for file_name in DirAccess.get_files_at(Comic.DIR_IMAGES):
+		menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
+		menu_image.set_item_metadata(-1, file_name)
+	menu_image.add_separator()
+	menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add.svg")), "Import image")
 
 func menu_command_pressed(id:int):
 	match id:
@@ -113,6 +125,9 @@ func menu_command_pressed(id:int):
 func menu_fragment_index_pressed(index:int):
 	Comic.book.fragment_properties.key = Comic.book.page.fragments.keys()[index]
 	Comic.book.open_properties = Comic.book.fragment_properties
+
+func menu_image_index_pressed(index:int):
+	pass
 
 func import_new_image(path:String):
 	Comic.book.add_undo_step([ComicReversionData.new(self)])

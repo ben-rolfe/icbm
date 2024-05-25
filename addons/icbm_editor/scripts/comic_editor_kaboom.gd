@@ -196,7 +196,7 @@ func get_save_data() -> Dictionary:
 func bump(direction:Vector2):
 	#TODO: Figure out a way to not save on multiple bumps
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
+	anchor += direction * ComicEditor.snap_distance * ComicEditor.BUMP_AMOUNT
 	rebuild(true)
 
 func _on_key_pressed(event:InputEventKey):
