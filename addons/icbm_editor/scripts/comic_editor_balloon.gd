@@ -56,8 +56,7 @@ func has_point(point:Vector2) -> bool:
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()
-	if width > 0:
-		draw_layer.add_child(ComicBalloonWidthWidget.new(self))
+	draw_layer.add_child(ComicBalloonWidthWidget.new(self))
 	for tail_oid in tails:
 		add_tail_widgets(tails[tail_oid], draw_layer)
 	for oids in tail_backlinks:
@@ -96,7 +95,6 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_submenu_item("Presets", "preset")
 	menu.add_submenu_item("Style", "style")
-	menu.add_submenu_item("Size", "size")
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Edge", ComicEditor.MenuCommand.RANDOMIZE)
 	if not edge_style.is_randomized:
 		menu.set_item_disabled(-1, true)
@@ -144,15 +142,6 @@ func add_menu_items(menu:PopupMenu):
 			menu_preset.set_item_checked(-1, presets.has(key))
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
-
-	# Size Submenu
-	var menu_size:PopupMenu = PopupMenu.new()
-	menu.add_child(menu_size)
-	menu_size.id_pressed.connect(menu.id_pressed.get_connections()[0].callable)
-	menu_size.name = "size"
-	menu_size.add_icon_item(load(str(ComicEditor.DIR_ICONS, "collapse.svg")), "Preserve Width" if collapse else "Collapse Width", ComicEditor.MenuCommand.TOGGLE_COLLAPSE)
-	menu_size.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("width.svg"))), "Clear Fixed Width" if width > 0 else "Fixed Width", ComicEditor.MenuCommand.TOGGLE_WIDTH_CONTROL)
-	menu_size.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("height.svg"))), "Clear Fixed Height" if height > 0 else "Fixed Height", ComicEditor.MenuCommand.TOGGLE_HEIGHT_CONTROL)
 
 	# Shape and Edge Style Submenu
 	var menu_style:PopupMenu = PopupMenu.new()
@@ -227,18 +216,6 @@ func menu_command_pressed(id:int):
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			rng_seed = randi()
 			rebuild(false)
-		ComicEditor.MenuCommand.TOGGLE_COLLAPSE:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			collapse = !collapse
-			rebuild(true)
-		ComicEditor.MenuCommand.TOGGLE_WIDTH_CONTROL:
-			Comic.book.add_undo_step([ComicReversionData.new(self)])
-			if width > 0:
-				width = 0
-			else:
-				_data.erase("width") # Reset to the default width
-			Comic.book.page.redraw()
-			rebuild_widgets()
 
 func remove():
 	# Create the undo step.

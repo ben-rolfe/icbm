@@ -56,6 +56,8 @@ var width:int:
 		return _data_get("width")
 	set(value):
 		_data_set("width", value)
+		recalc_size()
+
 
 # ------------------------------------------------------------------------------
 
@@ -69,7 +71,7 @@ func _init(data:Dictionary, page:ComicPage):
 	page.os[oid] = self
 	name = str("Image (", oid, ")")
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-
+	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 
 func apply_data():
 	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
@@ -92,7 +94,12 @@ func apply_data():
 	if texture == null:
 		# No background - use black background instead.
 		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
-	var scale:float = width / texture.get_width()
+	recalc_size()
+	
+func recalc_size():
+	var scale:float = float(width) / texture.get_width()
+	if scale <= 0:
+		scale = 1
 	size = texture.get_size() * scale
 	position = anchor - anchor_to * size
 

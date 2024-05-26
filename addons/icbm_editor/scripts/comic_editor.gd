@@ -97,6 +97,7 @@ var redo_steps:Array
 @export var fragment_properties:ComicEditorFragmentProperties
 @export var settings_properties:ComicEditorSettingsProperties
 @export var book_properties:ComicEditorBookProperties
+@export var image_properties:ComicEditorImageProperties
 # Probably don't need a property panel for lines?
 
 # ------------------------------------------------------------------------------

@@ -70,14 +70,15 @@ func add_menu_items(menu:PopupMenu):
 		if key != "":
 			menu_fragment.add_item(key.capitalize())
 
-	# Fragment Submenu
+	# Image Submenu
 	var menu_image:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_image)
 	menu_image.index_pressed.connect(menu_image_index_pressed.bind(menu_image))
 	menu_image.name = "image"
 	for file_name in DirAccess.get_files_at(Comic.DIR_IMAGES):
-		menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
-		menu_image.set_item_metadata(-1, file_name)
+		if Comic.IMAGE_EXT.has(file_name.get_extension().to_lower()):
+			menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
+			menu_image.set_item_metadata(-1, file_name)
 	menu_image.add_separator()
 	menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add.svg")), "Import image")
 
@@ -128,7 +129,7 @@ func menu_fragment_index_pressed(index:int):
 
 func menu_image_index_pressed(index:int, menu_image:PopupMenu):
 	if index < menu_image.item_count - 1:
-		Comic.book.page.add_image(menu_image.get_item_metadata(index))
+		Comic.book.page.add_image({"file_name":menu_image.get_item_metadata(index)})
 	else:
 		# Add new image pressed.
 		ComicEditorImageExplorer.open(import_new_image)
@@ -193,8 +194,6 @@ func save():
 
 		# Save new image
 		var save_path:String = str(Comic.DIR_STORY, path_base, _data.new_bg_path.get_extension().to_lower())
-		#print(_data.new_bg_path)
-		#print(save_path)
 		if dir != null:
-			print(dir.copy(_data.new_bg_path, save_path))
+			dir.copy(_data.new_bg_path, save_path)
 
