@@ -73,7 +73,7 @@ func add_menu_items(menu:PopupMenu):
 	# Fragment Submenu
 	var menu_image:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_image)
-	menu_image.index_pressed.connect(menu_image_index_pressed)
+	menu_image.index_pressed.connect(menu_image_index_pressed.bind(menu_image))
 	menu_image.name = "image"
 	for file_name in DirAccess.get_files_at(Comic.DIR_IMAGES):
 		menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
@@ -103,7 +103,7 @@ func menu_command_pressed(id:int):
 			Comic.book.page.add_hotspot()
 
 		ComicEditor.MenuCommand.CHANGE_BACKGROUND:
-			ComicEditorImageExplorer.open(import_new_image)
+			ComicEditorImageExplorer.open(import_new_bg)
 		ComicEditor.MenuCommand.ADD_LINE:
 			Comic.book.page.add_line()
 
@@ -126,19 +126,26 @@ func menu_fragment_index_pressed(index:int):
 	Comic.book.fragment_properties.key = Comic.book.page.fragments.keys()[index]
 	Comic.book.open_properties = Comic.book.fragment_properties
 
-func menu_image_index_pressed(index:int):
-	pass
+func menu_image_index_pressed(index:int, menu_image:PopupMenu):
+	if index < menu_image.item_count - 1:
+		Comic.book.page.add_image(menu_image.get_item_metadata(index))
+	else:
+		# Add new image pressed.
+		ComicEditorImageExplorer.open(import_new_image)
 
-func import_new_image(path:String):
+func import_new_bg(path:String):
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
-	_data.new_image_path = path
+	_data.new_bg_path = path
 	rebuild()
 	Comic.book.page.redraw()
 
+func import_new_image(path:String):
+	Comic.book.page.add_image({"new_path":path})
+
 func rebuild():
-	if _data.has("new_image_path"):
+	if _data.has("new_bg_path"):
 		# Using an image that isn't in the resources, yet - load it from the filesystem 
-		texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_image_path))
+		texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_bg_path))
 	else:
 		super()
 
@@ -175,7 +182,7 @@ func after_reversion():
 	rebuild()
 
 func save():
-	if _data.get("new_image_path", "") != "":
+	if _data.get("new_bg_path", "") != "":
 		print("Save background")
 		# Delete old images and .import files
 		var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
@@ -185,9 +192,9 @@ func save():
 			dir.remove(str(path_base, ext, ".import"))
 
 		# Save new image
-		var save_path:String = str(Comic.DIR_STORY, path_base, _data.new_image_path.get_extension().to_lower())
-		#print(_data.new_image_path)
+		var save_path:String = str(Comic.DIR_STORY, path_base, _data.new_bg_path.get_extension().to_lower())
+		#print(_data.new_bg_path)
 		#print(save_path)
 		if dir != null:
-			print(dir.copy(_data.new_image_path, save_path))
+			print(dir.copy(_data.new_bg_path, save_path))
 

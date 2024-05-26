@@ -46,7 +46,7 @@ func dragged(global_position:Vector2):
 	rebuild()
 
 func rebuild(_rebuild_subobjects:bool = false):
-	apply_data()
+	super()
 	Comic.book.page.redraw()
 
 func after_reversion():

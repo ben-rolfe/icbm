@@ -5,6 +5,7 @@ var depth:int
 
 func _init(_depth:int):
 	depth = _depth
+	name = str("Layer ", depth)
 
 func _draw():
 	# First we draw all the edges

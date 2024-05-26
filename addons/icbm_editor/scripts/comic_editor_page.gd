@@ -71,6 +71,9 @@ func add_o(data:Dictionary) -> Variant:
 					if child != o and child.order > o.order:
 						Comic.book.buttons_container.move_child(o, child.get_index())
 						break
+			"image":
+				o = ComicEditorImage.new(data, self)
+				layers[o.layer].add_child(o)
 			"line":
 				o = ComicEditorLine.new(data, self)
 				layers[o.layer].add_child(o)
@@ -108,14 +111,14 @@ func add_line(data:Dictionary = {}):
 	data.otype = "line"
 	if not data.has("points"):
 		data.points = [Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,0)), Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,Comic.size.y))]
-	var line:ComicLine = Comic.book.page.add_o(data)
+	var line:ComicLine = add_o(data)
 	Comic.book.add_undo_step([ComicReversionParent.new(line, null)])
 	redraw()
 
 func add_label(data:Dictionary = {}):
 	data.otype = "label"
 	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
-	var label:ComicKaboom = Comic.book.page.add_o(data)
+	var label:ComicKaboom = add_o(data)
 	label.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(label, null)])
@@ -124,10 +127,20 @@ func add_label(data:Dictionary = {}):
 func add_note(data:Dictionary = {}):
 	data.otype = "note"
 	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
-	var note:ComicEditorNote = Comic.book.page.add_o(data)
+	var note:ComicEditorNote = add_o(data)
 	note.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(note, null)])
+	redraw()
+
+func add_image(data:Dictionary = {}):
+	data.otype = "image"
+	#if not data.has("anchor"):
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	var image:ComicEditorImage = add_o(data)
+	image.rebuild(true)
+
+	Comic.book.add_undo_step([ComicReversionParent.new(image, null)])
 	redraw()
 
 func redraw(rebuild_lookups_first:bool = false):

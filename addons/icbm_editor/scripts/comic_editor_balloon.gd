@@ -3,7 +3,7 @@ extends ComicBalloon
 
 const WIDGET_COLOR:Color = Color.RED
 
-var long_r_squared:float
+#var long_r_squared:float
 var bounds_rect:Rect2i
 
 func _init(data:Dictionary, page:ComicPage):
@@ -23,11 +23,11 @@ func apply_data():
 	# We do some calculations now to speed up has_point
 	if shape is ComicBoxShape:
 		bounds_rect = Rect2i(center_point - frame_half_size, frame_half_size * 2)
-	else:
-		# Get the long radius
-		long_r_squared = max(shape.get_edge_offset(self, 0).x, shape.get_edge_offset(self, TAU / 4).y)
-		# Square it for efficiency, so we can compare it with the results of squared distance methods
-		long_r_squared *= long_r_squared
+	#else:
+		## Get the long radius
+		#long_r_squared = max(shape.get_edge_offset(self, 0).x, shape.get_edge_offset(self, TAU / 4).y)
+		## Square it for efficiency, so we can compare it with the results of squared distance methods
+		#long_r_squared *= long_r_squared
 
 func rebuild(rebuild_subobjects:bool = false):
 	super(rebuild_subobjects)

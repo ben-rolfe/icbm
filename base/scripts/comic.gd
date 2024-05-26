@@ -11,7 +11,7 @@ enum Overflow {
 const DIR_STORY:String = "res://story/"
 const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
-const DIR_IMAGES:String = "res://library/images"
+const DIR_IMAGES:String = "res://library/images/"
 const DIR_SAVES:String = "user://saves/"
 const DIR_SCREENSHOTS:String = "user://screenshots/"
 const CONFIG_FILE:String = "user://config.cfg"
@@ -148,6 +148,14 @@ var preset_properties:Dictionary = {
 		"font_color_hovered": "color",
 		"fragment": "string",
 	},
+	"image": {
+		"anchor": "vector2",
+		"anchor_to": ANCHOR_POINTS,
+		"file_name": "string",
+		"fragment": "string",
+		"layer": LAYERS,
+		"width": "int",
+	},
 	"kaboom": {
 		"align": HORIZONTAL_ALIGNMENTS,
 		"anchor": "vector2",
@@ -252,6 +260,10 @@ var default_presets:Dictionary = {
 			"font_color_hovered": Color.YELLOW,
 		},
 	},
+	"image": {
+		"": {
+		},
+	},
 	"kaboom": {
 		"": {
 			"align": HORIZONTAL_ALIGNMENT_CENTER,
@@ -314,6 +326,7 @@ var full_screen:bool:
 
 func _init():
 	config.load(CONFIG_FILE)
+	print(config.get_sections())
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN if full_screen else DisplayServer.WINDOW_MODE_WINDOWED)
 	theme = preload("res://theme/default.tres")
 	size = Vector2(float(ProjectSettings["display/window/size/viewport_width"]), float(ProjectSettings["display/window/size/viewport_height"]))

@@ -95,8 +95,9 @@ func run():
 		EditorInterface.play_custom_scene("res://addons/icbm_editor/editor.tscn" if edit_mode else "res://base/ICBM.tscn")
 	#if failed, play unhappy thunk
 
-func run_last(edit_mode:bool):
-	self.edit_mode = edit_mode
+func run_last(_edit_mode:bool):
+	edit_mode = _edit_mode
+	config.load(Comic.CONFIG_FILE)
 	config.set_value("editor", "bookmark", config.get_value("editor", "last_bookmark", "start"))
 	config.save(Comic.CONFIG_FILE)
 	run()
@@ -122,6 +123,7 @@ func item_pressed(index:int, chapter:String = ""):
 		# EDIT PAGE
 		var page:String = pages[chapter][index]
 		bookmark = chapter if page == "_" else str(chapter, "/", page)
+	config.load(Comic.CONFIG_FILE)
 	config.set_value("editor", "bookmark", bookmark)
 	config.set_value("editor", "last_bookmark", bookmark)
 	config.save(Comic.CONFIG_FILE)

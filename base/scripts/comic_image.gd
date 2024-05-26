@@ -59,7 +59,45 @@ var width:int:
 
 # ------------------------------------------------------------------------------
 
+func _init(data:Dictionary, page:ComicPage):
+	_data = data
+	_default_data = Comic.get_preset_data("image", presets)
+	if not _data.has("otype"):
+		_data.otype = "image"
+	if not _data.has("oid"):
+		oid = page.make_oid()
+	page.os[oid] = self
+	name = str("Image (", oid, ")")
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+
+func apply_data():
+	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
+	_default_data = Comic.get_preset_data("image", presets)
+	
+	var parent_layer = Comic.book.page.layers[layer]
+	if get_parent() != parent_layer:
+		if get_parent() != null:
+			get_parent().remove_child(self)
+		parent_layer.add_child(self)
+
+	# Setting null seems necessary to change the bg after updating the file.
+	texture = null
+	if _data.has("new_path"):
+		# Using an image that isn't in the resources, yet - load it from the filesystem 
+		texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_path))
+	else:
+		#NOTE: We don't use Comic.load_texture to load from the library, because file_name includes the extension
+		texture = ResourceLoader.load(str(Comic.DIR_IMAGES, file_name))
+	if texture == null:
+		# No background - use black background instead.
+		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
+	var scale:float = width / texture.get_width()
+	size = texture.get_size() * scale
+	position = anchor - anchor_to * size
+
+func rebuild(_rebuild_sub_objects:bool = false):
+	apply_data()
 
 # ------------------------------------------------------------------------------
 

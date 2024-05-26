@@ -5,8 +5,10 @@ enum MenuCommand {
 	# Add
 	ADD_BALLOON,
 	ADD_CAPTION,
-	ADD_LINE,
 	ADD_KABOOM,
+
+	ADD_LINE,
+	ADD_IMAGE,
 
 	ADD_BUTTON,
 	ADD_HOTSPOT,
