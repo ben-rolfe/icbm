@@ -270,6 +270,9 @@ func rebuild(_rebuild_sub_objects:bool = false):
 func is_default(key:Variant):
 	return _data_get(key) == _default_data[key]
 
+func clear_data(key:Variant):
+	_data.erase(key)
+
 func _data_get(key:Variant):
 	return _data.get(key, _default_data[key])
 

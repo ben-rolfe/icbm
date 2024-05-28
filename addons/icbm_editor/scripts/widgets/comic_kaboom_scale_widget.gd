@@ -28,14 +28,14 @@ func set_by_distance(distance:float):
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), "Reset", ComicEditor.MenuCommand.DEFAULT)
-	if kaboom[property_name] == kaboom.default_data[property_name]:
+	if kaboom.is_default(property_name):
 		menu.set_item_disabled(-1, true)
 
 func menu_command_pressed(id:int):
 	match id:
 		ComicEditor.MenuCommand.DEFAULT:
 			Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
-			kaboom[property_name] = kaboom.default_data[property_name]
+			kaboom.clear_data(property_name)
 			kaboom.rebuild(false)
 
 func get_adjusted_anchor():
