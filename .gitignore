@@ -18,5 +18,4 @@ mono_crash.*.json
 # Delete these lines if you've downloaded the project to make your own game and you're using git
 .build/
 .workfiles/
-library/
 story/

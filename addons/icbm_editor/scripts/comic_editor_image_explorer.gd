@@ -55,6 +55,8 @@ static func open(callable:Callable):
 
 	singleton.callable = callable
 	singleton.path = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+	if not singleton.path.ends_with(("/")):
+		singleton.path = str(singleton.path, "/")
 	#TODO: Open faved folder.
 	singleton.show()
 	singleton.open_dir(Comic.config.get_value("editor", "favorite_image_path", ""))
@@ -63,8 +65,9 @@ func open_dir(new_path:String):
 	if new_path.length() == 0:
 		new_path = path
 	# Remove multiple slashes
-	new_path = "/".join(new_path.split("/", false))
-	if new_path.right(1) != "/":
+	while new_path.contains("//"):
+		new_path.replace("//", "/")
+	if not new_path.ends_with("/"):
 		new_path = str(new_path, "/")
 	var dir:DirAccess = DirAccess.open(new_path)
 	if dir == null:
@@ -101,7 +104,7 @@ func open_dir(new_path:String):
 
 
 func _on_up_pressed():
-	var path_parts:Array = path.split("/", false)
+	var path_parts:Array = path.rstrip("/").split("/")
 	path_parts.pop_back()
 	open_dir("/".join(path_parts))
 
