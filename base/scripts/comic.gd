@@ -396,6 +396,7 @@ func _ready():
 	add_code_tag("next", _code_tag_next)
 	add_code_tag("return", _code_tag_return)
 	add_code_tag("menu", _code_tag_menu)
+	add_code_tag("wait", _code_tag_wait, true)
 
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
@@ -880,6 +881,18 @@ func _code_tag_save_exists(params:Dictionary) -> String:
 
 func _code_tag_menu(_params:Dictionary) -> String:
 	ComicMenu.open()
+	return ""
+
+func _code_tag_wait(params:Dictionary, contents:Array) -> String:
+	var timer:Dictionary = {
+		"t": 1,
+		"s": contents[0],
+	}
+	if params.has("t"):
+		timer.t = float(params.t)
+	if params.has("persist"):
+		timer.persist = null
+	Comic.book.timers.push_back(timer)
 	return ""
 
 

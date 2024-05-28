@@ -15,6 +15,8 @@ var pages:Dictionary
 var bookmarks:PackedStringArray
 var presets:Dictionary
 
+var timers:Array = []
+
 var _data:Dictionary
 # ------------------------------------------------------------------------------
 
@@ -110,9 +112,15 @@ func _input(event):
 				KEY_F11:
 					Comic.full_screen = not Comic.full_screen
 
-func _process(_delta:float):
+func _process(delta:float):
 	if change_page:
 		_show_page()
+	for i in range(timers.size() - 1, -1, -1):
+		timers[i].t -= delta
+		if timers[i].t < 0: # We don't execute timers while changing pages
+			Comic.execute_embedded_code(timers[i].s)
+			timers.remove_at(i)
+
 
 func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
@@ -134,6 +142,12 @@ func back_if_allowed():
 
 func _show_page():
 	change_page = false
+	
+	#Clear all non-persistent timers on page change
+	for i in range(timers.size() - 1, -1, -1):
+		if not timers[i].has("persist"):
+			timers.remove_at(i)
+			
 	print("--- NEW PAGE ---")
 	history.push_back(Comic.vars.duplicate(true))
 	#print(history)
