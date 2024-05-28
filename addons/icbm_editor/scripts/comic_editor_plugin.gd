@@ -11,6 +11,11 @@ var config:ConfigFile = ConfigFile.new()
 
 
 func _enter_tree():
+	if not DirAccess.dir_exists_absolute(Comic.DIR_STORY):
+		DirAccess.make_dir_absolute(Comic.DIR_STORY)
+	if not DirAccess.dir_exists_absolute(Comic.DIR_IMAGES):
+		DirAccess.make_dir_absolute(Comic.DIR_IMAGES)
+
 	config.load(Comic.CONFIG_FILE)
 	menu = PopupMenu.new()
 	get_editor_interface().get_base_control().add_child(menu)

@@ -139,6 +139,7 @@ func _init():
 #	menu.mouse_passthrough = true
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
+
 func _ready():
 	grid_on = Comic.config.get_value("editor", "grid_on", true)
 	snap_on = Comic.config.get_value("editor", "snap_on", true)
