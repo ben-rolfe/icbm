@@ -58,12 +58,11 @@ enum MenuCommand {
 	CLEAR_FRAGMENT,
 	CHANGE_BACKGROUND,
 
-	#TODO: Test these codes on mac
-	UNDO = 268435546, # Ctrl+Z
-	REDO = 301989978, # Shift+Ctrl+Z
-	SAVE = 268435539, # Ctrl+S
-	SAVE_AND_QUIT = 301989971, # Ctrl+Shift+S
-	QUIT_WITHOUT_SAVING = 268435537, # Ctrl + Q
+	UNDO,
+	REDO,
+	SAVE,
+	SAVE_AND_QUIT,
+	QUIT_WITHOUT_SAVING,
 }
 
 const DIR_ICONS:String = "res://addons/icbm_editor/theme/icons/"
@@ -85,6 +84,8 @@ static var snap_distance:Vector2 = Vector2(12, 12)
 static var snap_color:Color = Color(1, 1, 1, 0.2)
 static var snap_color_strong:Color = Color(1, 1, 1, 0.4)
 static var snap_color_feature:Color = Color(1, 1, 0, 1)
+
+static var command_or_control:String = "Ctrl"
 
 var undo_steps:Array
 var redo_steps:Array
@@ -138,6 +139,8 @@ func _init():
 	menu.id_pressed.connect(_on_menu_item_pressed)
 #	menu.mouse_passthrough = true
 	mouse_filter = Control.MOUSE_FILTER_PASS
+	if OS.get_name() == "macOS":
+		command_or_control = "Command"
 
 
 func _ready():
@@ -192,6 +195,16 @@ func _input(event:InputEvent):
 		# When escape is pressed, we bring up the right click menu for the background, which includes the quit option.
 		# This behaviour might also be useful in the event that the user buries the background under other elements.
 		right_clicked(page.background, null)
+	elif event.is_action_pressed("ui_redo"):
+		redo()
+	elif event.is_action_pressed("ui_undo"):
+		undo()
+	elif event.is_action_pressed("editor_save_quit"): #NOTE: Must come before editor_save, because that will also be true
+		save(true)
+	elif event.is_action_pressed("editor_save"):
+		save()
+	elif event.is_action_pressed("editor_quit"):
+		Comic.request_quit()
 	elif event is InputEventKey:
 		if event.keycode == KEY_PRINT:
 			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
@@ -216,22 +229,10 @@ func _gui_input(event:InputEvent):
 
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
-		match event.get_keycode_with_modifiers():
-			MenuCommand.REDO:
-				redo()
-			MenuCommand.UNDO:
-				undo()
-			MenuCommand.SAVE:
-				save()
-			MenuCommand.SAVE_AND_QUIT:
-				save(true)
-			MenuCommand.QUIT_WITHOUT_SAVING:
-				Comic.request_quit()
-			_:
-				if selected_element != null and selected_element.has_method("_on_key_pressed"):
-					selected_element._on_key_pressed(event)
-				#else:
-					#print("Unhandled keypress: ", event.get_keycode_with_modifiers())
+		if selected_element != null and selected_element.has_method("_on_key_pressed"):
+			selected_element._on_key_pressed(event)
+		#else:
+			#print("Unhandled keypress: ", event.get_keycode_with_modifiers())
 
 static func snap(pos:Variant) -> Variant:
 	if snap_on != Input.is_key_pressed(KEY_SHIFT):

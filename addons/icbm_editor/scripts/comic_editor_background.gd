@@ -50,16 +50,16 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "note.svg")), "Add Note", ComicEditor.MenuCommand.ADD_NOTE)
 	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), str("Undo (", OS.get_keycode_string(int(ComicEditor.MenuCommand.UNDO)) , ")"), ComicEditor.MenuCommand.UNDO)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), str("Undo (", ComicEditor.command_or_control , "+Z)"), ComicEditor.MenuCommand.UNDO)
 	if Comic.book.undo_steps.size() == 0:
 		menu.set_item_disabled(-1, true)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "redo.svg")), str("Redo (", OS.get_keycode_string(int(ComicEditor.MenuCommand.REDO)) , ")"), ComicEditor.MenuCommand.REDO)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "redo.svg")), str("Redo (", ComicEditor.command_or_control , "+Y)"), ComicEditor.MenuCommand.REDO)
 	if Comic.book.redo_steps.size() == 0:
 		menu.set_item_disabled(-1, true)
 	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save (", OS.get_keycode_string(int(ComicEditor.MenuCommand.SAVE)) , ")"), ComicEditor.MenuCommand.SAVE)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save and Quit (", OS.get_keycode_string(int(ComicEditor.MenuCommand.SAVE_AND_QUIT)) , ")"), ComicEditor.MenuCommand.SAVE_AND_QUIT)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), str("Quit Without Saving (", OS.get_keycode_string(int(ComicEditor.MenuCommand.QUIT_WITHOUT_SAVING)) , ")"), ComicEditor.MenuCommand.QUIT_WITHOUT_SAVING)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save (", ComicEditor.command_or_control , "+S)"), ComicEditor.MenuCommand.SAVE)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save and Quit (", ComicEditor.command_or_control , "+Shift+S)"), ComicEditor.MenuCommand.SAVE_AND_QUIT)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), str("Quit Without Saving (", ComicEditor.command_or_control , "+Q)"), ComicEditor.MenuCommand.QUIT_WITHOUT_SAVING)
 
 	# Fragment Submenu
 	var menu_fragment:PopupMenu = PopupMenu.new()
