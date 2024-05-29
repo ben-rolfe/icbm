@@ -15,13 +15,14 @@
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_book_properties.gd" id="11_npbar"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_image_properties.gd" id="13_jcyyd"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "page_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "page_container", "hotspots_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme = ExtResource("1_gldbu")
 script = ExtResource("1_3vmmw")
 properties_panel = NodePath("Properties")
@@ -34,6 +35,7 @@ settings_properties = NodePath("Properties/MarginContainer/EditorSettings")
 book_properties = NodePath("Properties/MarginContainer/BookProperties")
 image_properties = NodePath("Properties/MarginContainer/ImageProperties")
 page_container = NodePath("Page Container")
+hotspots_container = NodePath("Hotspots Container")
 buttons_container = NodePath("Buttons Container")
 
 [node name="Page Container" type="SubViewportContainer" parent="."]
@@ -44,6 +46,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 stretch = true
+
+[node name="Hotspots Container" type="Node2D" parent="."]
 
 [node name="Buttons Container" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -497,6 +501,51 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Action Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/ButtonProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+placeholder_text = "Enter Commands..."
+
+[node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit")]
+visible = false
+layout_mode = 2
+script = ExtResource("8_lxpup")
+text_edit = NodePath("../ButtonProperties/Text/Text LineEdit")
+action_button = NodePath("../ButtonProperties/Action/Action OptionButton")
+action_target_button = NodePath("../ButtonProperties/Action Target OptionButton")
+action_commands_textedit = NodePath("../ButtonProperties/Action Commands TextEdit")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Button Properties"
+
+[node name="Text" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+
+[node name="Text Label" type="Label" parent="Properties/MarginContainer/HotspotProperties/Text"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text:"
+
+[node name="Text LineEdit" type="LineEdit" parent="Properties/MarginContainer/HotspotProperties/Text"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Action" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+
+[node name="Action Label" type="Label" parent="Properties/MarginContainer/HotspotProperties/Action"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Action:"
+
+[node name="Action OptionButton" type="OptionButton" parent="Properties/MarginContainer/HotspotProperties/Action"]
+layout_mode = 2
+
+[node name="Action Target OptionButton" type="OptionButton" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+
+[node name="Action Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/HotspotProperties"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."

@@ -70,7 +70,6 @@ func dropped(global_position:Vector2):
 	dragged(global_position)
 	
 func dragged(global_position:Vector2):
-	# convert position to units
 	anchor = ComicEditor.snap(global_position)
 	rebuild(true)
 

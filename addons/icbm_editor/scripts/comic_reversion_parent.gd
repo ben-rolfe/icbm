@@ -6,7 +6,7 @@ var parent
 # Note: We're unparenting nodes instead of freeing them, here, and we need to avoid data leaks.
 # When the redo list is cleared out, or when something is removed from the end of an undo or redo buffer, we check if it's without a parent and also without a ComicReversionParent reversion in either buffer, and if so, we free it to avoid a data leak.
 
-func _init(o:Control, parent:Control, focus_after:bool = true):
+func _init(o:CanvasItem, parent:CanvasItem, focus_after:bool = true):
 	super()
 	self.o = o
 	self.parent = parent

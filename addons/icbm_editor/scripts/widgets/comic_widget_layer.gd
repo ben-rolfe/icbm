@@ -7,7 +7,12 @@ func clear():
 		child.queue_free()
 
 func _draw():
-		# The selected element itself (not its widgets) may also want to draw onto this layer
+	# Hotspots draw on the widget layer
+	for o in Comic.book.page.os:
+		if Comic.book.page.os[o] is ComicHotspot and Comic.book.page.os[o].get_parent() != null:
+			Comic.book.page.os[o].draw_shape(self)
+
+	# The selected element itself (not its widgets) may also want to draw onto this layer
 	if Comic.book.selected_element != null:
 		var selected_widget_parent:Object = Comic.book.selected_element
 		while selected_widget_parent is ComicWidget:

@@ -11,12 +11,16 @@ var _data:Dictionary = {}
 var undo_refcount:int
 
 func _get_drag_data(at_position:Vector2):
-	if Comic.book.selected_element != self and Comic.book.selected_element is Control:
+	if Comic.book.selected_element != self and Comic.book.selected_element.has_method("_get_drag_data"):
 		Comic.book.selected_element._get_drag_data(at_position)
 
 func _gui_input(event:InputEvent):
 	if event is InputEventMouseButton and event.pressed:
-		var o = Comic.book.page.get_o_at_point(get_viewport().get_mouse_position())
+		var o:CanvasItem
+		if Comic.book.page.hovered_hotspots.size() > 0:
+			o = Comic.book.page.hovered_hotspots[-1]
+		else:
+			o = Comic.book.page.get_o_at_point(get_viewport().get_mouse_position())
 		if o != null:
 			if event.button_index == MOUSE_BUTTON_LEFT:
 				if event.is_double_click():

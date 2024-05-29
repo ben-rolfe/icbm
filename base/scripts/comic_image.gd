@@ -97,10 +97,10 @@ func apply_data():
 	recalc_size()
 	
 func recalc_size():
-	var scale:float = float(width) / texture.get_width()
-	if scale <= 0:
-		scale = 1
-	size = texture.get_size() * scale
+	var image_scale:float = float(width) / texture.get_width()
+	if image_scale <= 0:
+		image_scale = 1
+	size = texture.get_size() * image_scale
 	position = anchor - anchor_to * size
 
 func rebuild(_rebuild_sub_objects:bool = false):

@@ -94,6 +94,13 @@ func rebuild(_rebuild_subobjects:bool = false):
 func after_reversion():
 	rebuild()
 
+func remove():
+	Comic.book.add_undo_step([ComicReversionParent.new(self, get_parent())])
+	get_parent().remove_child(self)
+	Comic.book.selected_element = null
+	Comic.book.page.redraw(true)
+	Comic.book.page.rebuild_widgets()
+
 func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()

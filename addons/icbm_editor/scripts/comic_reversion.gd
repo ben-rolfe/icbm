@@ -1,7 +1,7 @@
 class_name ComicReversion
 extends RefCounted
 
-var o:Control
+var o:CanvasItem
 var focus_after:bool = true
 
 func _init():

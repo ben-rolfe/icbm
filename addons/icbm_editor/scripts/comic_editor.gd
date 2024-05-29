@@ -70,10 +70,10 @@ const MAX_UNDO_STEPS:int = 50
 const BUMP_AMOUNT:float = 0.25
 
 var menu:PopupMenu
-var popup_target:Control
+var popup_target:CanvasItem
 var _page_keys:Array
 var menu_action_position:Vector2
-var _grabbed_element:Control
+var _grabbed_element:CanvasItem
 var _grab_offset:Vector2
 
 # Editor Settings
@@ -84,6 +84,9 @@ static var snap_distance:Vector2 = Vector2(12, 12)
 static var snap_color:Color = Color(1, 1, 1, 0.2)
 static var snap_color_strong:Color = Color(1, 1, 1, 0.4)
 static var snap_color_feature:Color = Color(1, 1, 0, 1)
+static var hotspot_color_edge:Color = Color(0, 1, 1, 1)
+static var hotspot_color_fill:Color = Color(0, 1, 1, 0.2)
+
 
 static var command_or_control:String = "Ctrl"
 
@@ -118,7 +121,7 @@ var open_properties:ComicEditorProperties:
 				open_properties.show()
 				properties_panel.show()
 
-var selected_element:Control:
+var selected_element:CanvasItem:
 	get:
 		return selected_element
 	set(value):
@@ -150,7 +153,7 @@ func _ready():
 	super()
 	get_window().title = str("ICBM Visual Editor: ", bookmark)
 
-func open_menu(target:Control, pos:Vector2):
+func open_menu(target:CanvasItem, pos:Vector2):
 	open_properties = null
 	# Open the right-click menu
 	popup_target = target
@@ -173,21 +176,21 @@ func open_menu(target:Control, pos:Vector2):
 func _on_menu_item_pressed(id:int):
 	popup_target.menu_command_pressed(id)
 
-func left_clicked(target:Control, _event:InputEvent):
+func left_clicked(target:CanvasItem, _event:InputEvent):
 	selected_element = target
 
-func double_clicked(target:Control, _event:InputEvent):
+func double_clicked(target:CanvasItem, _event:InputEvent):
 	if target.has_method("menu_command_pressed"):
 		target.menu_command_pressed(MenuCommand.OPEN_PROPERTIES)
 
-func right_clicked(target:Control, event:InputEvent):
+func right_clicked(target:CanvasItem, event:InputEvent):
 	if not target is ComicWidget:
 		#For widgets, the owner is already selected, and we don't want to change that.
 		selected_element = target
 	Comic.book.open_menu(target, get_viewport().get_mouse_position())
 
-func grab(control:Control, offset:Vector2):
-	_grabbed_element = control
+func grab(target:CanvasItem, offset:Vector2):
+	_grabbed_element = target
 	_grab_offset = offset
 
 func _input(event:InputEvent):

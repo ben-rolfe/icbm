@@ -2,6 +2,7 @@ class_name ComicBook
 extends Control
 
 @export var page_container:SubViewportContainer
+@export var hotspots_container:Node2D
 @export var buttons_container:BoxContainer
 
 var aliases:Dictionary = {}
@@ -126,13 +127,21 @@ func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
 	change_page = true
 
-func left_clicked(control:Control, _event:InputEvent):
-	if control is ComicBackground:
+func left_clicked(target:CanvasItem, _event:InputEvent):
+	print(target)
+	if target is ComicBackground:
 		page.activate()
+	elif target is ComicHotspot:
+		target.activate()
 
-func right_clicked(control:Control, _event:InputEvent):
-	if control is ComicBackground:
+func right_clicked(target:CanvasItem, _event:InputEvent):
+	if target is ComicBackground:
 		back_if_allowed()
+	#NOTE: We ignore right clicks on hotspots
+
+func double_clicked(target:CanvasItem, event:InputEvent):
+	# If we're not in the editor, we don't do anything special with a double-click - just treat it like a normal left click
+	left_clicked(target, event)
 
 # This is for back calls initiated by the user right clicking or pressing the left arrow key.
 # Other ways of going back (such as a button or hotspot) don't test page.allow_back

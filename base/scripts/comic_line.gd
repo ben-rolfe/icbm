@@ -3,6 +3,7 @@ extends Control
 
 var _data:Dictionary
 var _default_data:Dictionary
+var anchor:Vector2 = Vector2.ZERO
 
 # ------------------------------------------------------------------------------
 

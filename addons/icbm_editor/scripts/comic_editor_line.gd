@@ -16,7 +16,7 @@ func get_point_segment(point:Vector2, check_widgets:bool = false) -> int:
 		if i > 0:
 			var l:float = _data.points[i].distance_to(_data.points[i - 1])
 			var d1:float = point.distance_to(_data.points[i - 1])
-			if d0 < l and d1 < l and d0 * abs(sin((_data.points[i] - _data.points[i - 1]).angle_to(_data.points[i] - point))) < fill_width / 2.0:
+			if d0 < l and d1 < l and d0 * abs(sin((_data.points[i] - _data.points[i - 1]).angle_to(_data.points[i] - point))) < fill_width / 2.0 + edge_width:
 				return i - 1
 	return -1
 	

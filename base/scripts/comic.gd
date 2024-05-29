@@ -148,6 +148,15 @@ var preset_properties:Dictionary = {
 		"font_color_hovered": "color",
 		"fragment": "string",
 	},
+	"hotspot": {
+		"action": ComicButton.Action,
+		"action_bookmark": "bookmark",
+		"action_commands": "string",
+		"anchor": "vector2",
+		"change_cursor": "bool",
+		"fragment": "string",
+		"points": "array",
+	},
 	"image": {
 		"anchor": "vector2",
 		"anchor_to": ANCHOR_POINTS,
@@ -259,6 +268,14 @@ var default_presets:Dictionary = {
 			"font_color_disabled": Color(0.6, 0.6, 0.6),
 			"font_color_hovered": Color.YELLOW,
 		},
+	},
+	"hotspot": {
+		"": {
+			"action": ComicButton.Action.NEXT,
+			"action_bookmark": "",
+			"action_commands": "",
+			"change_cursor": true,
+		}
 	},
 	"image": {
 		"": {

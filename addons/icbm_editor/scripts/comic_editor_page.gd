@@ -71,6 +71,9 @@ func add_o(data:Dictionary) -> Variant:
 					if child != o and child.order > o.order:
 						Comic.book.buttons_container.move_child(o, child.get_index())
 						break
+			"hotspot":
+				o = ComicEditorHotspot.new(data, self)
+				Comic.book.hotspots_container.add_child(o)
 			"image":
 				o = ComicEditorImage.new(data, self)
 				layers[o.layer].add_child(o)
@@ -131,6 +134,15 @@ func add_note(data:Dictionary = {}):
 	note.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(note, null)])
+	redraw()
+
+func add_hotspot(data:Dictionary = {}):
+	data.otype = "hotspot"
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	var hotspot:ComicEditorHotspot = add_o(data)
+	hotspot.rebuild(true)
+
+#	Comic.book.add_undo_step([ComicReversionParent.new(hotspot, null)])
 	redraw()
 
 func add_image(data:Dictionary = {}):
