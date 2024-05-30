@@ -132,16 +132,3 @@ func bump(direction:Vector2):
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
 #	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
 	rebuild(true)
-
-func _on_key_pressed(event:InputEventKey):
-	match event.keycode:
-		KEY_UP:
-			bump(Vector2.UP)
-		KEY_DOWN:
-			bump(Vector2.DOWN)
-		KEY_LEFT:
-			bump(Vector2.LEFT)
-		KEY_RIGHT:
-			bump(Vector2.RIGHT)
-		KEY_DELETE:
-			remove()

@@ -52,14 +52,11 @@ func after_action_changed():
 			var index:int = Comic.book.get_relative_bookmark_index(Comic.book.page.bookmark, 1) if button.action_bookmark == "" else Comic.book.bookmarks.find(button.action_bookmark)
 			action_target_button.select(index)
 			button.action_bookmark = Comic.book.bookmarks[index]
-
-
 		ComicButton.Action.PARSE_COMMANDS:
 			action_target_button.hide()
 			action_commands_textedit.show()
 			button.action_bookmark = ""
 			action_commands_textedit.text = button.action_commands
-
 		_:
 			action_target_button.hide()
 			action_commands_textedit.hide()

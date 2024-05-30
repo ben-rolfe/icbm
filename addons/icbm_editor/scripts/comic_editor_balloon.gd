@@ -249,18 +249,5 @@ func bump(direction:Vector2):
 		Comic.book.page.os[oids.x].rebuild_tail(oids.y)
 	rebuild(true)
 
-func _on_key_pressed(event:InputEventKey):
-	match event.keycode:
-		KEY_UP:
-			bump(Vector2.UP)
-		KEY_DOWN:
-			bump(Vector2.DOWN)
-		KEY_LEFT:
-			bump(Vector2.LEFT)
-		KEY_RIGHT:
-			bump(Vector2.RIGHT)
-		KEY_DELETE:
-			remove()
-
 func get_save_data() -> Dictionary:
 	return _data.duplicate()

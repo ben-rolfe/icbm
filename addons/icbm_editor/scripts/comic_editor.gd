@@ -87,7 +87,6 @@ static var snap_color_feature:Color = Color(1, 1, 0, 1)
 static var hotspot_color_edge:Color = Color(0, 1, 1, 1)
 static var hotspot_color_fill:Color = Color(0, 1, 1, 0.2)
 
-
 static var command_or_control:String = "Ctrl"
 
 var undo_steps:Array
@@ -102,6 +101,7 @@ var redo_steps:Array
 @export var settings_properties:ComicEditorSettingsProperties
 @export var book_properties:ComicEditorBookProperties
 @export var image_properties:ComicEditorImageProperties
+@export var hotspot_properties:ComicEditorHotspotProperties
 # Probably don't need a property panel for lines?
 
 # ------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ func grab(target:CanvasItem, offset:Vector2):
 	_grabbed_element = target
 	_grab_offset = offset
 
-func _input(event:InputEvent):
+func _unhandled_key_input(event):
 	if event.is_action_pressed("ui_cancel"):
 		# When escape is pressed, we bring up the right click menu for the background, which includes the quit option.
 		# This behaviour might also be useful in the event that the user buries the background under other elements.
@@ -208,19 +208,28 @@ func _input(event:InputEvent):
 		save()
 	elif event.is_action_pressed("editor_quit"):
 		Comic.request_quit()
-	elif event is InputEventKey:
-		if event.keycode == KEY_PRINT:
-			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
-			DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
-			get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
-			OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
-		elif event.pressed:
-			match event.keycode:
-				KEY_F11:
-					Comic.full_screen = not Comic.full_screen
-
+	elif event.is_action_pressed("ui_fullscreen"):
+		Comic.full_screen = not Comic.full_screen
+	elif event.keycode == KEY_PRINT:
+		# KEY_PRINT seems to work differently to other keys - it can't be set as an action.
+		# Also, we don't get an event on key released, and the key pressed event has pressed = false
+		DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
+		get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
+		OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
+	elif selected_element != null:
+		if selected_element.has_method("bump"):
+			if event.is_action_pressed("ui_up"):
+				selected_element.bump(Vector2.UP)
+			elif event.is_action_pressed("ui_down"):
+				selected_element.bump(Vector2.DOWN)
+			elif event.is_action_pressed("ui_left"):
+				selected_element.bump(Vector2.LEFT)
+			elif event.is_action_pressed("ui_right"):
+				selected_element.bump(Vector2.RIGHT)
+		if selected_element.has_method("remove"):
+			if event.is_action_pressed("editor_delete"):
+				selected_element.remove()
 	#NOTE: super() is not called - we don't want the normal reader input events.
-	pass
 
 func _gui_input(event:InputEvent):
 	if _grabbed_element != null:

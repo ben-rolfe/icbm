@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=16 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
 [ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_gldbu"]
@@ -14,8 +14,9 @@
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_settings_properties.gd" id="10_2xp14"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_book_properties.gd" id="11_npbar"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_image_properties.gd" id="13_jcyyd"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_hotspot_properties.gd" id="15_va7ba"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "page_container", "hotspots_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "hotspot_properties", "page_container", "hotspots_container", "buttons_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,6 +35,7 @@ fragment_properties = NodePath("Properties/MarginContainer/FragmentProperties")
 settings_properties = NodePath("Properties/MarginContainer/EditorSettings")
 book_properties = NodePath("Properties/MarginContainer/BookProperties")
 image_properties = NodePath("Properties/MarginContainer/ImageProperties")
+hotspot_properties = NodePath("Properties/MarginContainer/HotspotProperties")
 page_container = NodePath("Page Container")
 hotspots_container = NodePath("Hotspots Container")
 buttons_container = NodePath("Buttons Container")
@@ -505,31 +507,19 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."
 
-[node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit")]
+[node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "change_cursor_checkbox")]
 visible = false
 layout_mode = 2
-script = ExtResource("8_lxpup")
-text_edit = NodePath("../ButtonProperties/Text/Text LineEdit")
-action_button = NodePath("../ButtonProperties/Action/Action OptionButton")
-action_target_button = NodePath("../ButtonProperties/Action Target OptionButton")
-action_commands_textedit = NodePath("../ButtonProperties/Action Commands TextEdit")
+script = ExtResource("15_va7ba")
+action_button = NodePath("Action/Action OptionButton")
+action_target_button = NodePath("Action Target OptionButton")
+action_commands_textedit = NodePath("Action Commands TextEdit")
+change_cursor_checkbox = NodePath("Cursor CheckBox")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/HotspotProperties"]
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
-text = "Button Properties"
-
-[node name="Text" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
-layout_mode = 2
-
-[node name="Text Label" type="Label" parent="Properties/MarginContainer/HotspotProperties/Text"]
-custom_minimum_size = Vector2(140, 0)
-layout_mode = 2
-text = "Text:"
-
-[node name="Text LineEdit" type="LineEdit" parent="Properties/MarginContainer/HotspotProperties/Text"]
-layout_mode = 2
-size_flags_horizontal = 3
+text = "Hotspot Properties"
 
 [node name="Action" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
 layout_mode = 2
@@ -549,3 +539,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."
+
+[node name="Cursor CheckBox" type="CheckBox" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+text = "Change Cursor on Hover"

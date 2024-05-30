@@ -31,6 +31,12 @@ var anchor:Vector2:
 	set(value):
 		_data_set("anchor", value)
 
+var change_cursor:bool:
+	get:
+		return _data_get("change_cursor")
+	set(value):
+		_data_set("change_cursor", value)
+
 var fragment:String:
 	get:
 		return _data_get("fragment")

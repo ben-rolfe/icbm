@@ -228,12 +228,19 @@ func activate():
 func enter_hotspot(hotspot:ComicHotspot):
 	if not hovered_hotspots.has(hotspot):
 		hovered_hotspots.push_back(hotspot)
-		background.set_default_cursor_shape(Control.CURSOR_POINTING_HAND)
+		if hotspot.change_cursor:
+			background.set_default_cursor_shape(Control.CURSOR_POINTING_HAND)
 
 func exit_hotspot(hotspot:ComicHotspot):
 	hovered_hotspots.erase(hotspot)
-	if hovered_hotspots.size() == 0:
-		background.set_default_cursor_shape(Control.CURSOR_ARROW)
+	if hotspot.change_cursor:
+		var change_cursor = false
+		for hovered_hotspot in hovered_hotspots:
+			if hovered_hotspot.change_cursor:
+				change_cursor = true
+				break
+		if not change_cursor:
+			background.set_default_cursor_shape(Control.CURSOR_ARROW)
 
 # ------------------------------------------------------------------------------
 
