@@ -213,9 +213,7 @@ func _unhandled_key_input(event):
 	elif event.keycode == KEY_PRINT:
 		# KEY_PRINT seems to work differently to other keys - it can't be set as an action.
 		# Also, we don't get an event on key released, and the key pressed event has pressed = false
-		DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
-		get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
-		OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
+		screen_shot()
 	elif selected_element != null:
 		if selected_element.has_method("bump"):
 			if event.is_action_pressed("ui_up"):

@@ -113,7 +113,8 @@ func add_button(data:Dictionary = {}):
 func add_line(data:Dictionary = {}):
 	data.otype = "line"
 	if not data.has("points"):
-		data.points = [Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,0)), Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,Comic.size.y))]
+		data.anchor = Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,0))
+		data.points = [Vector2.ZERO, Comic.book.snap_and_contain(Vector2(Comic.book.menu.position.x,Comic.size.y)) - data.anchor]
 	var line:ComicLine = add_o(data)
 	Comic.book.add_undo_step([ComicReversionParent.new(line, null)])
 	redraw()

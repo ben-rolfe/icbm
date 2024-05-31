@@ -10,13 +10,13 @@ func _get_drag_data(_at_position):
 
 func get_point_segment(point:Vector2, check_widgets:bool = false) -> int:
 	for i in _data.points.size():
-		var d0:float = point.distance_to(_data.points[i])
+		var d0:float = point.distance_to(offset_points[i])
 		if check_widgets and d0 < ComicWidget.RADIUS:
 			return i
 		if i > 0:
-			var l:float = _data.points[i].distance_to(_data.points[i - 1])
-			var d1:float = point.distance_to(_data.points[i - 1])
-			if d0 < l and d1 < l and d0 * abs(sin((_data.points[i] - _data.points[i - 1]).angle_to(_data.points[i] - point))) < fill_width / 2.0 + edge_width:
+			var l:float = offset_points[i].distance_to(offset_points[i - 1])
+			var d1:float = point.distance_to(offset_points[i - 1])
+			if d0 < l and d1 < l and d0 * abs(sin((offset_points[i] - offset_points[i - 1]).angle_to(offset_points[i] - point))) < fill_width / 2.0 + edge_width:
 				return i - 1
 	return -1
 	
@@ -26,7 +26,6 @@ func remove():
 	Comic.book.selected_element = null
 	Comic.book.page.redraw(true)
 	Comic.book.page.rebuild_widgets()
-
 
 func rebuild(_rebuild_sub_objects:bool = false):
 	apply_data()
@@ -99,10 +98,9 @@ func menu_command_pressed(id:int):
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 			var index = get_point_segment(Comic.book.menu.position)
 			if index > -1:
-				_data.points.insert(index + 1, Comic.book.snap_and_contain(Comic.book.menu.position))
+				_data.points.insert(index + 1, Comic.book.snap_and_contain(Vector2(Comic.book.menu.position) - anchor))
 			Comic.book.page.redraw(true)
 			Comic.book.page.rebuild_widgets()
-
 
 func _menu_preset_index_pressed(index:int, menu_preset:PopupMenu):
 	if index == menu_preset.item_count - 1:
@@ -130,5 +128,5 @@ func get_save_data() -> Dictionary:
 func bump(direction:Vector2):
 	#TODO: Figure out a way to not save on multiple bumps
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
-#	anchor += direction * Comic.px_per_unit * ComicEditor.BUMP_AMOUNT
+	anchor += direction * ComicEditor.snap_distance * ComicEditor.BUMP_AMOUNT
 	rebuild(true)

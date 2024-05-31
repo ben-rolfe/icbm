@@ -180,10 +180,10 @@ func rebuild_lookups():
 
 	# Clear out old tail_backlinks and remake them
 	for oid in os:
-		if os[oid] is ComicBalloon:
+		if os[oid] is ComicBalloon and os[oid].get_parent() != null:
 			os[oid].tail_backlinks.clear()
 	for oid in os:
-		if os[oid] is ComicBalloon:
+		if os[oid] is ComicBalloon and os[oid].get_parent() != null:
 			var tails_to_remove:Array = []
 			for tail_oid in os[oid].tail_data:
 				var tail_data:Dictionary = os[oid].tail_data[tail_oid]
@@ -198,7 +198,7 @@ func rebuild(rebuild_sub_objects:bool = true):
 	if rebuild_sub_objects:
 		rebuild_lookups()
 		for oid in os:
-			if os[oid].has_method("rebuild"):
+			if os[oid].has_method("rebuild") and os[oid].get_parent() != null:
 				os[oid].rebuild(true)
 
 func make_oid() -> int:

@@ -93,25 +93,27 @@ func _ready():
 	else:
 		start()
 
-func _input(event):
+func _unhandled_key_input(event):
 	if event.is_action_pressed("ui_cancel"):
+		# When escape is pressed, we bring up the right click menu for the background, which includes the quit option.
+		# This behaviour might also be useful in the event that the user buries the background under other elements.
 		ComicMenu.open()
-		#print("TODO: Open menu instead")
-		#get_tree().quit()
-	elif event is InputEventKey:
-		if event.keycode == KEY_PRINT:
-			# KEY_PRINT seems to work differently to other keys - we don't get an event on key released, and the key pressed event has pressed = false
-			DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
-			get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
-			OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
-		elif event.pressed:
-			match event.keycode:
-				KEY_LEFT:
-					back_if_allowed()
-				KEY_RIGHT:
-					page.activate()
-				KEY_F11:
-					Comic.full_screen = not Comic.full_screen
+	elif event.is_action_pressed("ui_fullscreen"):
+		Comic.full_screen = not Comic.full_screen
+	elif event.keycode == KEY_PRINT:
+		# KEY_PRINT seems to work differently to other keys - it can't be set as an action.
+		# Also, we don't get an event on key released, and the key pressed event has pressed = false
+		screen_shot()
+	elif event.is_action_pressed("ui_left"):
+		back_if_allowed()
+	elif event.is_action_pressed("ui_right"):
+		page.activate()
+
+func screen_shot():
+	DirAccess.make_dir_absolute(Comic.DIR_SCREENSHOTS)
+	get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
+	OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
+
 
 func _process(delta:float):
 	if change_page:

@@ -78,7 +78,10 @@ func menu_command_pressed(id:int):
 			if best_point.is_equal_approx(points[best_i]) or best_point.is_equal_approx(points[best_i - 1]):
 				# The closest point to the click is an existing point - go halfway along the line that it's an endpoint of, instead.
 				best_point = (points[best_i] + points[best_i - 1]) * 0.5
-			points.insert(best_i, best_point)
+			if best_i == 0:
+				points.push_back(best_point)
+			else:
+				points.insert(best_i, best_point)
 			rebuild()
 			rebuild_widgets()
 		ComicEditor.MenuCommand.DELETE:

@@ -25,12 +25,8 @@ func dragged(global_position:Vector2):
 		for i in range(1, serves.points.size()):
 			serves.points[i] -= diff
 		serves.anchor += diff
-	Comic.book.page.redraw()
-	
-func dropped(global_position:Vector2):
-	super(global_position)
 	serves.rebuild()
-
+	
 func add_menu_items(menu:PopupMenu):
 	if serves is ComicLine:
 		if serves.points.size() > 2:

@@ -3,9 +3,16 @@ extends Control
 
 var _data:Dictionary
 var _default_data:Dictionary
-var anchor:Vector2 = Vector2.ZERO
+
+var offset_points:Array
 
 # ------------------------------------------------------------------------------
+
+var anchor:Vector2:
+	get:
+		return _data_get("anchor")
+	set(value):
+		_data_set("anchor", value)
 
 var edge_color:Color:
 	get:
@@ -75,17 +82,21 @@ func _init(data:Dictionary, page:ComicPage):
 	page.os[oid] = self
 
 	name = str("Line (", oid, ")")
+	apply_data()
 
 func apply_data():
 	_default_data = Comic.get_preset_data("line", presets)
+	offset_points = points.duplicate()
+	for i in offset_points.size():
+		offset_points[i] += anchor
 
 func draw_edge(draw_layer:ComicLayer):
-	if _data.points.size() > 1:
-		draw_layer.draw_polyline(_data.points, edge_color, fill_width + 2 * edge_width, true)
+	if offset_points.size() > 1:
+		draw_layer.draw_polyline(offset_points, edge_color, fill_width + 2 * edge_width, true)
 
 func draw_fill(draw_layer:ComicLayer):
-	if _data.points.size() > 1:
-		draw_layer.draw_polyline(_data.points, fill_color, fill_width, true)
+	if offset_points.size() > 1:
+		draw_layer.draw_polyline(offset_points, fill_color, fill_width, true)
 
 # ------------------------------------------------------------------------------
 

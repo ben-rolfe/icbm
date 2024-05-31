@@ -185,6 +185,7 @@ var preset_properties:Dictionary = {
 		"spacing": "percent",
 	},
 	"line": {
+		"anchor": "vector2",
 		"edge_color": "color",
 		"edge_width": "int",
 		"fill_color": "color",
@@ -720,6 +721,8 @@ func _get_preset_default(category:String, key:Variant) -> Variant:
 		return 0
 	else:
 		match(Comic.preset_properties[category][key]):
+			"array":
+				return []
 			"bookmark":
 				return "start"
 			"bool":
