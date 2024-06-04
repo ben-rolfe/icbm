@@ -1,12 +1,12 @@
 class_name ComicWidget
 extends Control
 
-const RADIUS = 12
-const THICK = 4
-const THIN = 1
-const HALO_COLOR = Color.BLACK
-const HALO_THICKNESS = 1
-const CIRCLE_POINTS = 13 # The number of points to draw a circle widget
+const RADIUS:int = 12
+const THICK:int = 4
+const THIN:int = 1
+const HALO_COLOR:Color = Color.BLACK
+const HALO_THICKNESS:int = 1
+const CIRCLE_POINTS:int = 13 # The number of points to draw a circle widget
 
 enum Action {
 	STATIC,
@@ -47,11 +47,16 @@ func draw(layer:ComicWidgetLayer):
 		Action.TURN:
 			mouse_default_cursor_shape = Control.CURSOR_DRAG
 			draw_connector(layer)
-			draw_shape(layer, 5)
+			layer.draw_arc(anchor, RADIUS, 0, TAU, CIRCLE_POINTS, HALO_COLOR, THICK + HALO_THICKNESS)
+			layer.draw_arc(anchor + Vector2.RIGHT.rotated(rotation) * (RADIUS - THICK*0.75) + Vector2.DOWN.rotated(rotation) * THICK * 2, THICK * 2, rotation - 7*TAU/16, rotation + TAU/16, 3, HALO_COLOR, THICK + HALO_THICKNESS)
+			layer.draw_arc(anchor + Vector2.LEFT.rotated(rotation) * (RADIUS - THICK*0.75) + Vector2.UP.rotated(rotation) * THICK * 2, THICK * 2, rotation + TAU/16, rotation + 9*TAU/16, 3, HALO_COLOR, THICK + HALO_THICKNESS)
+			layer.draw_arc(anchor, RADIUS, 0, TAU, CIRCLE_POINTS, color, THICK)
+			layer.draw_arc(anchor + Vector2.RIGHT.rotated(rotation) * (RADIUS - THICK*0.75) + Vector2.DOWN.rotated(rotation) * THICK * 2, THICK * 2, rotation - 7*TAU/16, rotation + TAU/16, 3, color, THICK)
+			layer.draw_arc(anchor + Vector2.LEFT.rotated(rotation) * (RADIUS - THICK*0.75) + Vector2.UP.rotated(rotation) * THICK * 2, THICK * 2, rotation + TAU/16, rotation + 9*TAU/16, 3, color, THICK)
 		Action.SLIDE_H:
 			mouse_default_cursor_shape = Control.CURSOR_HSIZE
 			draw_connector(layer)
-			layer.draw_arc(anchor, RADIUS, rotation - TAU/6, TAU/6, 3, HALO_COLOR, THICK + HALO_THICKNESS)
+			layer.draw_arc(anchor, RADIUS, rotation - TAU/6, rotation + TAU/6, 3, HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_arc(anchor, RADIUS, rotation + PI - TAU/6, rotation + PI + TAU/6, 3, HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_line(anchor + Vector2.LEFT.rotated(rotation) * (RADIUS - THICK * 0.5), anchor + Vector2.RIGHT.rotated(rotation) * (RADIUS - THICK * 0.5), HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_arc(anchor, RADIUS, rotation - TAU/6, rotation + TAU/6, 3, color, THICK)
@@ -60,7 +65,7 @@ func draw(layer:ComicWidgetLayer):
 		Action.SLIDE_V:
 			mouse_default_cursor_shape = Control.CURSOR_VSIZE
 			draw_connector(layer)
-			layer.draw_arc(anchor, RADIUS, rotation + TAU/12, 5*TAU/12, 3, HALO_COLOR, THICK + HALO_THICKNESS)
+			layer.draw_arc(anchor, RADIUS, rotation + TAU/12, rotation + 5*TAU/12, 3, HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_arc(anchor, RADIUS, rotation + 7*TAU/12, rotation + 11*TAU/12, 3, HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_line(anchor + Vector2.UP.rotated(rotation) * (RADIUS - THICK * 0.5), anchor + Vector2.DOWN.rotated(rotation) * (RADIUS - THICK * 0.5), HALO_COLOR, THICK + HALO_THICKNESS)
 			layer.draw_arc(anchor, RADIUS, rotation + TAU/12, rotation + 5*TAU/12, 3, color, THICK)

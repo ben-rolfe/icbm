@@ -51,6 +51,12 @@ var presets:Array:
 	set(value):
 		_data.presets = value
 
+var rotate:float:
+	get:
+		return _data_get("rotate")
+	set(value):
+		_data_set("rotate", value)
+
 var width:int:
 	get:
 		return _data_get("width")
@@ -95,6 +101,9 @@ func apply_data():
 		# No background - use black background instead.
 		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
 	recalc_size()
+	
+	pivot_offset = anchor_to * size
+	rotation = rotate
 	
 func recalc_size():
 	var image_scale:float = float(width) / texture.get_width()

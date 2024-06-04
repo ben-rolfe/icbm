@@ -1,6 +1,8 @@
 class_name ComicEditorImage
 extends ComicImage
 
+const WIDGET_COLOR:Color = Color.RED
+
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Image Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
 	menu.add_separator()
@@ -61,6 +63,7 @@ func rebuild_widgets():
 	var draw_layer:ComicWidgetLayer = Comic.book.page.layers[-1]
 	draw_layer.clear()
 	draw_layer.add_child(ComicWidthWidget.new(self))
+	draw_layer.add_child(ComicRotateWidget.new(self))
 
 func _get_drag_data(at_position:Vector2):
 	Comic.book.add_undo_step([ComicReversionData.new(self)])
@@ -74,11 +77,20 @@ func dragged(global_position:Vector2):
 	rebuild(true)
 
 func has_point(point:Vector2) -> bool:
-	return get_rect().has_point(point)
+	# Rect2 has no rotation, so before we test if it has the point, we need to apply an inverse rotation (around the anchor) to the point
+	# We don't use get_rect because it gives us the rotated top-left as the position, but we want the unrotated top-left
+	return Rect2(anchor - anchor_to * size, size).has_point((point - anchor).rotated(-rotation) + anchor)
 
 func draw_widgets(layer:ComicWidgetLayer):
 	# Draw a box around the image
-	layer.draw_polyline(PackedVector2Array([position, position + Vector2.RIGHT * size.x, position + size, position + Vector2.DOWN * size.y, position]), ComicEditorBalloon.WIDGET_COLOR, ComicWidget.THIN)
+	var bounds:PackedVector2Array = [0, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN, 0]
+	for i in bounds.size():
+		bounds[i] = ((bounds[i] - anchor_to) * size).rotated(rotation) + position + anchor_to * size
+		
+		#bounds[i] = bounds[i].rotated(rotation) + position
+	layer.draw_polyline(bounds, ComicEditorImage.WIDGET_COLOR, ComicWidget.THIN)
+
+#	layer.draw_rect(get_rect(), ComicEditorImage.WIDGET_COLOR, false, ComicWidget.THIN)
 	
 	# Draw a cross-hairs at the anchor
 	layer.draw_line(anchor + Vector2.UP * ComicWidget.RADIUS, anchor + Vector2.DOWN * ComicWidget.RADIUS, ComicEditorBalloon.WIDGET_COLOR, ComicWidget.THICK)

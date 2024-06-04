@@ -12,11 +12,11 @@ func draw_connector(layer):
 
 func reposition():
 	if is_zero_approx(serves.anchor_to.x):
-		anchor = serves.anchor + Vector2(serves.size.x, 0)
+		anchor = serves.anchor + Vector2(serves.size.x, 0).rotated(serves.rotation)
 	elif is_equal_approx(serves.anchor_to.x, 1.0):
-		anchor = serves.anchor - Vector2(serves.size.x, 0)
+		anchor = serves.anchor - Vector2(serves.size.x, 0).rotated(serves.rotation)
 	else:
-		anchor = serves.anchor + Vector2(serves.size.x * 0.5, 0)
+		anchor = serves.anchor + Vector2(serves.size.x * 0.5, 0).rotated(serves.rotation)
 
 	#if is_equal_approx(serves.anchor_to.x, 1):
 		#anchor = serves.center_point - Vector2(serves.size.x * 0.5, 0)
@@ -28,7 +28,7 @@ func _get_drag_data(at_position:Vector2):
 	super(at_position)
 
 func dragged(global_position:Vector2):
-	serves.width = Comic.book.snap(abs(global_position.x - serves.anchor.x)) * (2 if is_equal_approx(serves.anchor_to.x, 0.5) else 1)
+	serves.width = Comic.book.snap(global_position).distance_to(serves.anchor) * (2 if is_equal_approx(serves.anchor_to.x, 0.5) else 1)
 	serves.rebuild(true)
 	Comic.book.page.redraw()
 
