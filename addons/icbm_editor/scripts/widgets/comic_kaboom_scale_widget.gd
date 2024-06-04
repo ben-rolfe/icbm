@@ -47,3 +47,7 @@ func get_adjusted_anchor():
 		HORIZONTAL_ALIGNMENT_RIGHT:
 			return kaboom.anchor - kaboom.get_transform().x * kaboom.width
 
+func draw_connector(layer):
+	# Don't draw the connector for the scale widget, but do draw it for its children
+	if not serves is ComicKaboom:
+		super(layer)

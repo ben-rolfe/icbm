@@ -16,6 +16,16 @@ func _enter_tree():
 	if not DirAccess.dir_exists_absolute(Comic.DIR_IMAGES):
 		DirAccess.make_dir_absolute(Comic.DIR_IMAGES)
 
+	# Update all story/*.txt files to .dat files.
+	#TODO: Remove this in August 2024
+	for file in DirAccess.get_files_at(Comic.DIR_STORY):
+		if file.get_extension() == "txt":
+			DirAccess.rename_absolute(str(Comic.DIR_STORY, file), str(Comic.DIR_STORY, file.left(-3), Comic.STORY_EXT))
+	for dir in DirAccess.get_directories_at(Comic.DIR_STORY):
+		for file in DirAccess.get_files_at(str(Comic.DIR_STORY, dir)):
+			if file.get_extension() == "txt":
+				DirAccess.rename_absolute(str(Comic.DIR_STORY, dir, "/", file), str(Comic.DIR_STORY, dir, "/", file.left(-3), Comic.STORY_EXT))
+
 	config.load(Comic.CONFIG_FILE)
 	menu = PopupMenu.new()
 	get_editor_interface().get_base_control().add_child(menu)
@@ -71,7 +81,7 @@ func open_menu(edit_mode:bool):
 		if chapter != "start":
 			pages[chapter] = ["_"]
 		for page in natural_sort(DirAccess.get_files_at(str(Comic.DIR_STORY, chapter))):
-			if page.get_extension() == "txt" and page.get_basename().get_file() != "_":
+			if page.get_extension() == Comic.STORY_EXT and page.get_basename().get_file() != "_":
 				pages[chapter].push_back(page.get_basename().get_file())
 	for chapter in pages.keys():
 		menu.add_submenu_item(chapter, chapter)
@@ -94,7 +104,7 @@ func open_menu(edit_mode:bool):
 
 func run():
 	var bookmark:String = config.get_value("editor", "bookmark", "start")
-	var file_path = str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt")
+	var file_path = str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".", Comic.STORY_EXT)
 	# Ensure that the file exists, and contains the page
 	if FileAccess.file_exists(file_path):
 		EditorInterface.play_custom_scene("res://addons/icbm_editor/editor.tscn" if edit_mode else "res://base/ICBM.tscn")
@@ -114,14 +124,14 @@ func item_pressed(index:int, chapter:String = ""):
 		# Find an unused chapter name
 		bookmark = ComicEditor.get_unique_bookmark("chapter_1")
 		DirAccess.make_dir_absolute(str(Comic.DIR_STORY, bookmark))
-		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, "/_.txt"), FileAccess.WRITE)
+		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, "/_.", Comic.STORY_EXT), FileAccess.WRITE)
 		file.store_var({})
 		file.close()
 	elif index == pages[chapter].size():
 		# ADD PAGE
 		# Find an unused page name
 		bookmark = ComicEditor.get_unique_bookmark(str(chapter, "/page_1"))
-		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".txt"), FileAccess.WRITE)
+		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark, ".", Comic.STORY_EXT), FileAccess.WRITE)
 		file.store_var({})
 		file.close()
 	else:

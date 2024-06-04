@@ -322,7 +322,7 @@ func save(quit_after_saving:bool = false):
 			save_data.page_data.erase("new_chapter")
 
 	# Do the save.
-	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.WRITE)
+	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".", Comic.STORY_EXT), FileAccess.WRITE)
 	file.store_var(save_data)
 	file.close()
 	page.background.save()
@@ -373,7 +373,7 @@ static func rename_page(old_bookmark:String, new_bookmark:String):
 		old_bookmark = str(old_bookmark, "/_")
 	if not new_bookmark.contains("/"):
 		new_bookmark = str(new_bookmark, "/_")
-	dir.rename(str(old_bookmark, ".txt"), str(new_bookmark, ".txt"))
+	dir.rename(str(old_bookmark, ".", Comic.STORY_EXT), str(new_bookmark, ".", Comic.STORY_EXT))
 	for ext in Comic.IMAGE_EXT:
 		if dir.file_exists(str(old_bookmark, ".", ext)):
 			dir.rename(str(old_bookmark, ".", ext), str(new_bookmark, ".", ext))
@@ -383,7 +383,7 @@ static func rename_page(old_bookmark:String, new_bookmark:String):
 
 static func delete_page(bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
-	dir.remove(str(bookmark, ".txt"))
+	dir.remove(str(bookmark, ".", Comic.STORY_EXT))
 	for ext in Comic.IMAGE_EXT:
 		if dir.file_exists(str(bookmark, ".", ext)):
 			dir.remove(str(bookmark, ".", ext))
@@ -448,7 +448,7 @@ static func update_links(from_bookmark:String, to_bookmark:String, entire_chapte
 	#file.close()
 
 func save_presets_file():
-	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.WRITE)
+	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.", Comic.STORY_EXT), FileAccess.WRITE)
 	file.store_var(presets)
 	file.close()
 
@@ -462,8 +462,8 @@ static func create_start_chapter():
 	var dir:DirAccess = DirAccess.open("res://")
 	if not dir.dir_exists("story/start"):
 		assert(dir.make_dir_recursive("story/start") == OK)
-	if not FileAccess.file_exists(str(Comic.DIR_STORY, "start/_.txt")):
-		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.txt"), FileAccess.WRITE)
+	if not FileAccess.file_exists(str(Comic.DIR_STORY, "start/_.", Comic.STORY_EXT)):
+		var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, "start/_.", Comic.STORY_EXT), FileAccess.WRITE)
 		file.store_var({})
 		file.close()
 
@@ -471,7 +471,7 @@ static func get_unique_bookmark(bookmark:String) ->String:
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
 	if bookmark.contains("/"):
 		# page
-		if not dir.file_exists(str(bookmark, ".txt")):
+		if not dir.file_exists(str(bookmark, ".", Comic.STORY_EXT)):
 			return bookmark
 	else:
 		# chapter
@@ -489,7 +489,7 @@ static func get_unique_bookmark(bookmark:String) ->String:
 	bookmark = "_".join(elements)
 	if bookmark.contains("/"):
 		# page
-		while dir.file_exists(str(bookmark, i, ".txt")):
+		while dir.file_exists(str(bookmark, i, ".", Comic.STORY_EXT)):
 			i += 1
 	else:
 		# chapter

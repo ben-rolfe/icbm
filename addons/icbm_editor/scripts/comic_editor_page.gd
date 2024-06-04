@@ -97,8 +97,8 @@ func add_balloon(data:Dictionary = {}):
 	rebuild_lookups()
 	if data.get("with_tail"):
 		var tail_data:Dictionary = { "oid": Comic.book.page.make_oid() }
-		data.tails[tail_data.oid] = tail_data
-		data.erase("with_tail")
+		balloon.tail_data[tail_data.oid] = tail_data
+		balloon.clear_data("with_tail")
 	balloon.rebuild(true)
 
 	Comic.book.add_undo_step([ComicReversionParent.new(balloon, null)])

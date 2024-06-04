@@ -94,7 +94,9 @@ func rebuild(_rebuild_subobjects:bool = false):
 func after_reversion():
 	rebuild()
 
-func remove():
+func _remove():
+	#TODO: This is called _remove to avoid it being deleted by a backspace or delete press - find a better way. 
+	# Not sure why ComicEditor is getting an unhandled keypress for this codeedit, but not for textedits in panels.
 	Comic.book.add_undo_step([ComicReversionParent.new(self, get_parent())])
 	get_parent().remove_child(self)
 	Comic.book.selected_element = null
@@ -113,7 +115,7 @@ func _on_text_changed():
 			Comic.book.add_undo_step([ComicReversionData.new(self)])
 		content = text
 	_on_changed()
-		
+	
 func _on_changed():
 	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
 

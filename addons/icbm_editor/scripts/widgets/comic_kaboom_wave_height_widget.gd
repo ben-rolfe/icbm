@@ -1,8 +1,6 @@
 class_name ComicKaboomWaveHeightWidget
 extends ComicWidget
 
-const DISTANCE_MULTIPLIER:float = 0.006
-
 var kaboom:ComicEditorKaboom
 var property_name = "wave_height"
 
@@ -13,8 +11,7 @@ func _init(serves:ComicEditorKaboom):
 	kaboom = serves
 
 func reposition():
-	# Note that this 0.5, and the *2 in the dragged method, are arbitrary.
-	anchor = get_adjusted_anchor() - serves.get_transform().y * kaboom[property_name] * kaboom.font_size / DISTANCE_MULTIPLIER
+	anchor = get_adjusted_anchor() - kaboom.get_transform().y * kaboom[property_name] * kaboom.width
 
 func _get_drag_data(at_position:Vector2):
 	Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
@@ -28,11 +25,10 @@ func dragged(global_position:Vector2):
 	else:
 		set_by_distance(p.length())
 	
-#	set_by_distance(t.origin.distance_to(Geometry2D.get_closest_point_to_segment_uncapped(global_position, t.origin, t.origin - t.y)))
 	kaboom.rebuild(false)
 	
 func set_by_distance(distance:float):
-	kaboom[property_name] = distance / kaboom.font_size * DISTANCE_MULTIPLIER
+	kaboom[property_name] = distance / kaboom.width
 
 func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "undo.svg")), "Reset", ComicEditor.MenuCommand.DEFAULT)
@@ -57,4 +53,20 @@ func get_adjusted_anchor():
 			return serves.anchor + serves.get_transform().x * serves.width * (serves.wave_period * 0.25 - 0.5)
 		HORIZONTAL_ALIGNMENT_RIGHT:
 			return serves.anchor + serves.get_transform().x * serves.width * (serves.wave_period * 0.25 - 1)
-	
+
+func draw_connector(layer):
+	#TODO: Draw a sin wave from the wave period widget through this point instead.
+	if serves is ComicKaboom:
+		# Draw the connector to the left side of the kaboom, not its anchor.
+		var target_point:Vector2 = serves.anchor
+		match serves.align:
+			HORIZONTAL_ALIGNMENT_CENTER:
+				target_point = serves.anchor - serves.get_transform().x * (serves.width * 0.5)
+			HORIZONTAL_ALIGNMENT_RIGHT:
+				target_point =  serves.anchor - serves.get_transform().x * serves.width
+		layer.draw_line(anchor, target_point, HALO_COLOR, THIN + HALO_THICKNESS)
+		layer.draw_line(anchor, target_point, color, THIN)
+	else:
+		# Draw the connector to the left anchor of the served widget 
+		super(layer)
+

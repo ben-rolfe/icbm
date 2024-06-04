@@ -95,7 +95,8 @@ func _init(_bookmark: String):
 		layers.push_back(layer)
 		add_child(layer)
 
-	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".txt"), FileAccess.READ)
+	#print(">", bookmark)
+	var file:FileAccess = FileAccess.open(str(Comic.DIR_STORY, bookmark if bookmark.contains("/") else str(bookmark, "/_"), ".", Comic.STORY_EXT), FileAccess.READ)
 	var all_data = file.get_var()
 	#print(all_data)
 	if all_data == {}:

@@ -18,7 +18,8 @@ func get_adjusted_anchor():
 func reposition():
 	# Note that this 0.5, and the *2 in set_by_distance are arbitrary (and match and were chosen in the Comic)
 	anchor = get_adjusted_anchor() - kaboom.get_transform().y * (kaboom[property_name] * kaboom.font_size / DISTANCE_MULTIPLIER * ((1 + kaboom.grow) * 0.5))
+#	anchor = get_adjusted_anchor() - kaboom.get_transform().y * (kaboom[property_name] / DISTANCE_MULTIPLIER * ((1 + kaboom.grow) * 0.5))
 
 func set_by_distance(distance:float):
-	kaboom[property_name] = max(1, distance) * DISTANCE_MULTIPLIER / ((1 + kaboom.grow) * 0.5)
+	kaboom[property_name] = max(1, distance) * DISTANCE_MULTIPLIER / (kaboom.font_size * (1 + kaboom.grow) * 0.5)
 

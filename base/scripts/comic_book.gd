@@ -47,8 +47,8 @@ func _init():
 	Comic.book = self
 
 	#Load the presets
-	if FileAccess.file_exists(str(Comic.DIR_STORY, "presets.txt")):
-		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.txt"), FileAccess.READ)
+	if FileAccess.file_exists(str(Comic.DIR_STORY, "presets.", Comic.STORY_EXT)):
+		var file = FileAccess.open(str(Comic.DIR_STORY, "presets.", Comic.STORY_EXT), FileAccess.READ)
 		presets = file.get_var()
 		file.close()
 		# Make sure that the loaded presets are compatible with the presets defined in Comic
@@ -75,7 +75,7 @@ func _init():
 		if chapter != "start":
 			pages[chapter] = ["_"] # We begin each chapter with the title page, so that it will be at index 0.
 		for page_filename in Comic.natural_sort(DirAccess.get_files_at(str(Comic.DIR_STORY, chapter))):
-			if page_filename.get_extension() == "txt" and page_filename.get_basename().get_file() != "_":
+			if page_filename.get_extension() == Comic.STORY_EXT and page_filename.get_basename().get_file() != "_":
 				pages[chapter].push_back(page_filename.get_basename().get_file())
 	for chapter in pages:
 		for page_filename in pages[chapter]:

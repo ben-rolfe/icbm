@@ -18,6 +18,7 @@ const CONFIG_FILE:String = "user://config.cfg"
 
 const DEFAULT_BG:String = "res://theme/background.webp"
 const IMAGE_EXT:PackedStringArray = ["webp", "png", "jpg", "jpeg", "svg"]
+const STORY_EXT:String = "dat"
 
 # These are used by balloons and tails at this point, but I think they're generic enough to go here.
 const ROOT2:float = sqrt(2)

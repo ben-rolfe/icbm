@@ -40,7 +40,7 @@ func menu_command_pressed(id:int):
 		ComicEditor.MenuCommand.FRAGMENT_PROPERTIES:
 			Comic.book.open_properties = Comic.book.fragment_properties
 		ComicEditor.MenuCommand.DELETE:
-			serves.remove()
+			serves._remove()
 
 
 func menu_fragment_index_pressed(index:int):
