@@ -25,6 +25,13 @@ var file_name:String:
 	set(value):
 		_data_set("file_name", value)
 
+var flip:bool:
+	get:
+		return _data_get("flip")
+	set(value):
+		_data_set("flip", value)
+
+
 var fragment:String:
 	get:
 		return _data_get("fragment")
@@ -104,6 +111,7 @@ func apply_data():
 	
 	pivot_offset = anchor_to * size
 	rotation = rotate
+	flip_h = flip
 	
 func recalc_size():
 	var image_scale:float = float(width) / texture.get_width()

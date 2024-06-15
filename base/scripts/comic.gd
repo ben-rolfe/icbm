@@ -162,7 +162,7 @@ var preset_properties:Dictionary = {
 		"anchor": "vector2",
 		"anchor_to": ANCHOR_POINTS,
 		"file_name": "string",
-		"flip_h": "bool",
+		"flip": "bool",
 		"fragment": "string",
 		"layer": LAYERS,
 		"rotate": "degrees",
