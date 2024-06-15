@@ -48,7 +48,7 @@ func _process(delta):
 
 func _message_tag(params:Dictionary, contents:Array) ->String:
 	if params.has("t"):
-		add(contents[0], float(params.t))
+		add(Comic.execute_embedded_code(contents[0]), float(params.t))
 	else:
-		add(contents[0])
+		add(Comic.execute_embedded_code(contents[0]))
 	return ""

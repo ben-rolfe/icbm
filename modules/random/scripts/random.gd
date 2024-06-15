@@ -1,4 +1,4 @@
-# Singleton name is Messages
+# Singleton name is Random
 extends Node
 
 var seeded:bool = false
@@ -9,6 +9,7 @@ func _init():
 	Comic.add_code_tag("random", _random_tag)
 	Comic.add_code_tag("roll", _roll_tag)
 	Comic.before_save.connect(_before_save)
+	Comic.after_load.connect(_after_load)
 
 func _random_tag(params:Dictionary) -> String:
 	_handle_seed_params(params)
