@@ -36,41 +36,45 @@ func _ready():
 func _process(delta:float):
 	if _crossfading:
 		if _a_is_primary:
-			_crossfade -= delta / _crossfade_time
-			if _crossfade < 0:
+			if _crossfade <= 0 or _crossfade_time <= 0:
 				_crossfade = 0
 				_crossfading = false
+			else:
+				_crossfade -= delta / _crossfade_time
 		else:
-			_crossfade += delta / _crossfade_time
-			if _crossfade > 1:
+			if _crossfade >= 1 or _crossfade_time <= 0:
 				_crossfade = 1
 				_crossfading = false
+			else:
+				_crossfade += delta / _crossfade_time
 		_music_player_a.volume_db = linear_to_db(1 - _crossfade)
 		_music_player_b.volume_db = linear_to_db(_crossfade)
 
 
-func _sound_tag(params:Dictionary, contents:Array) -> String:
+func _sound_tag(_params:Dictionary, contents:Array) -> String:
 	play(Comic.execute_embedded_code(contents[0]))
 	return ""
 
 func _music_tag(params:Dictionary, contents:Array) -> String:
-	play_music(Comic.execute_embedded_code(contents[0]).strip_edges())
+	play_music(Comic.execute_embedded_code(contents[0]).strip_edges(), params.has("self_restart"), params.get("t", 0))
 	return ""
 
-func play_music(file_name:String, pos:float = 0):
-	music_file_name = file_name
-	var music_path:String = str(DIR_MUSIC, music_file_name)
-	if not ResourceLoader.exists(music_path):
-		music_file_name = ""
-	var music_player = _music_player_b if _a_is_primary else _music_player_a
-	_a_is_primary = not _a_is_primary
-	_crossfading = true
-	if music_file_name == "":
-		# We've been given no file (or one that doesn't exist. Stop the music.
-		music_player.stop()
-	else:
-		music_player.stream = load(music_path)
-		music_player.play()
+func play_music(file_name:String, self_restart:bool = false, t:float = 0):
+	if self_restart or music_file_name != file_name:
+		music_file_name = file_name
+		var music_path:String = str(DIR_MUSIC, music_file_name)
+		if not ResourceLoader.exists(music_path):
+			music_file_name = ""
+		var music_player = _music_player_b if _a_is_primary else _music_player_a
+		_a_is_primary = not _a_is_primary
+		_crossfading = true
+		if music_file_name == "":
+			# We've been given no file (or one that doesn't exist. Stop the music.
+			music_player.stop()
+		else:
+			music_player.stream = load(music_path)
+			music_player.seek(t)
+			music_player.play()
 		
 func play(file_name:String) -> int:
 	var sound_path:String = str(DIR_SOUND, file_name)
@@ -89,11 +93,10 @@ func _before_save():
 		Comic.vars.erase("_sound_music_pos")
 	
 func _after_load():
-	#TODO: If music is already playing, don't do this.
 	if Comic.vars.has("_sound_music"):
-		if Comic.vars.has("_sound_music_pos"):
-			play_music(Comic.vars._sound_music, Comic.vars._sound_music_pos)
-			Comic.vars.erase("_sound_music_pos")
+		if Comic.vars.has("_sound_music_t"):
+			play_music(Comic.vars._sound_music, false, Comic.vars._sound_music_t)
+			Comic.vars.erase("_sound_music_t")
 		else:
 			play_music(Comic.vars._sound_music)
 		Comic.vars.erase("_sound_music")

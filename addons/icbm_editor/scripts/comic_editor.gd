@@ -44,7 +44,6 @@ enum MenuCommand {
 
 	# Used in more than one widget
 	OPEN_PROPERTIES,
-	DELETE = 4194312, # DEL (Not backspace)
 	DEFAULT,
 	RANDOMIZE,
 	TOGGLE,
@@ -58,6 +57,11 @@ enum MenuCommand {
 	CLEAR_FRAGMENT,
 	CHANGE_BACKGROUND,
 
+	# General stuff
+	CUT,
+	COPY,
+	PASTE,
+	DELETE,
 	UNDO,
 	REDO,
 	SAVE,
@@ -198,6 +202,12 @@ func _unhandled_key_input(event):
 		# When escape is pressed, we bring up the right click menu for the background, which includes the quit option.
 		# This behaviour might also be useful in the event that the user buries the background under other elements.
 		right_clicked(page.background, null)
+	elif event.is_action_pressed("ui_cut"):
+		cut()
+	elif event.is_action_pressed("ui_copy"):
+		copy()
+	elif event.is_action_pressed("ui_paste"):
+		paste()
 	elif event.is_action_pressed("ui_redo"):
 		redo()
 	elif event.is_action_pressed("ui_undo"):
@@ -270,6 +280,34 @@ func last_undo_matched(o:Control, key:String) -> bool:
 	# Checks if the last undo step was a single reversion data change of the given control, and the data in the given key was changed
 	# Used to avoid adding multiple undo steps for small sequential changes, like every letter of a text change, or every step of a keyboard-bump move
 	return undo_steps.size() > 0 and undo_steps[-1].size() == 1 and undo_steps[-1][0] is ComicReversionData and undo_steps[-1][0].o == o and undo_steps[-1][0].data.get(key) != o._data.get(key)
+
+func cut() -> bool:
+	print("CUT CLICK")
+	if copy():
+		if selected_element.has_method("remove"):
+			selected_element.remove()
+		return true
+	return false
+
+func copy() -> bool:
+	if selected_element == null or not selected_element.has_method("get_save_data"):
+		return false
+	var o_data:Dictionary = selected_element.get_save_data()
+	o_data.erase("oid")
+	#TODO: Do better with tails.
+	o_data.erase("tails")
+	Comic.config.set_value("editor", "clipboard", o_data)
+	return true
+
+func paste() -> bool:
+	var o_data:Dictionary =	Comic.config.get_value("editor", "clipboard", {})
+	Comic.config.erase_section_key("editor", "clipboard")
+	if not o_data.has("otype"):
+		return false
+	var o:Variant = page.add_o(o_data)
+	page.rebuild(true)
+	selected_element = o
+	return true
 
 func undo():
 	if undo_steps.size() > 0:

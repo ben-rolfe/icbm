@@ -60,9 +60,11 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "redo.svg")), str("Redo (", ComicEditor.command_or_control , "+Y)"), ComicEditor.MenuCommand.REDO)
 	if Comic.book.redo_steps.size() == 0:
 		menu.set_item_disabled(-1, true)
-	menu.add_separator()
-	#menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Cut (", ComicEditor.command_or_control , "+X)"), ComicEditor.MenuCommand.SAVE)
 	#menu.add_separator()
+	#menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "cut.svg")), str("Cut (", ComicEditor.command_or_control , "+X)"), ComicEditor.MenuCommand.CUT)
+	#menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "copy.svg")), str("Copy (", ComicEditor.command_or_control , "+C)"), ComicEditor.MenuCommand.COPY)
+	#menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "paste.svg")), str("Paste (", ComicEditor.command_or_control , "+V)"), ComicEditor.MenuCommand.PASTE)
+	menu.add_separator()
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save (", ComicEditor.command_or_control , "+S)"), ComicEditor.MenuCommand.SAVE)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "save.svg")), str("Save and Quit (", ComicEditor.command_or_control , "+Shift+S)"), ComicEditor.MenuCommand.SAVE_AND_QUIT)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), str("Quit Without Saving (", ComicEditor.command_or_control , "+Q)"), ComicEditor.MenuCommand.QUIT_WITHOUT_SAVING)

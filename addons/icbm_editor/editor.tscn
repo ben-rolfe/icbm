@@ -438,12 +438,14 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("anchor_button", "flip_check_box")]
+[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("anchor_button", "flip_check_box", "tint_button", "tint_revert_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("13_jcyyd")
 anchor_button = NodePath("Anchor/Anchor OptionButton")
 flip_check_box = NodePath("Flip CheckBox")
+tint_button = NodePath("Tint/Tint ColorPickerButton")
+tint_revert_button = NodePath("Tint/Tint Revert Button")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/ImageProperties"]
 layout_mode = 2
@@ -467,6 +469,23 @@ layout_mode = 2
 layout_mode = 2
 button_pressed = true
 text = "Flip"
+
+[node name="Tint" type="HBoxContainer" parent="Properties/MarginContainer/ImageProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/ImageProperties/Tint"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Tint Color:"
+
+[node name="Tint ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/ImageProperties/Tint"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Tint Revert Button" type="Button" parent="Properties/MarginContainer/ImageProperties/Tint"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
 
 [node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit")]
 visible = false

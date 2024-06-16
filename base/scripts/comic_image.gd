@@ -31,7 +31,6 @@ var flip:bool:
 	set(value):
 		_data_set("flip", value)
 
-
 var fragment:String:
 	get:
 		return _data_get("fragment")
@@ -63,6 +62,12 @@ var rotate:float:
 		return _data_get("rotate")
 	set(value):
 		_data_set("rotate", value)
+
+var tint:Color:
+	get:
+		return _data_get("tint")
+	set(value):
+		_data_set("tint", value)
 
 var width:int:
 	get:
@@ -112,6 +117,7 @@ func apply_data():
 	pivot_offset = anchor_to * size
 	rotation = rotate
 	flip_h = flip
+	modulate = tint
 	
 func recalc_size():
 	var image_scale:float = float(width) / texture.get_width()

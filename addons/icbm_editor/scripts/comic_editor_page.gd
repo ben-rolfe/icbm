@@ -177,9 +177,12 @@ func rebuild_widgets():
 func get_o_at_point(global_position:Vector2, type:Variant = Node, ignore:Variant = null) -> Variant:
 	# We start at the top-most non-widget layer and work our way down until we find an object containing the point.
 	for i in range(Comic.book.page.layers.size() - 2, -1, -1):
-		for child in Comic.book.page.layers[i].get_children():
+		var children:Array = Comic.book.page.layers[i].get_children()
+		# When overlapping, we want more recently added objects to take priority, primarily so that when copy-pasting and moving an object, the newly added one gets moved.
+		children.reverse()
+		for child in children:
 			if is_instance_of(child, type) and child.is_visible() and child.has_method("has_point") and child != ignore and child.has_point(global_position):
-					return child
+				return child
 	return background
 
 func remove_o_from_fragment(o:Variant):

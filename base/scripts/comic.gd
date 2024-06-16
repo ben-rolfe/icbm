@@ -166,6 +166,7 @@ var preset_properties:Dictionary = {
 		"fragment": "string",
 		"layer": LAYERS,
 		"rotate": "degrees",
+		"tint": "color",
 		"width": "int",
 	},
 	"kaboom": {
@@ -283,6 +284,7 @@ var default_presets:Dictionary = {
 	},
 	"image": {
 		"": {
+			"tint": Color.WHITE,
 		},
 	},
 	"kaboom": {
