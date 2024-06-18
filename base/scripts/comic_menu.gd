@@ -47,7 +47,9 @@ func _on_home_pressed():
 	queue_free()
 
 func _on_quit_pressed():
+	hide()
 	Comic.request_quit()
+	queue_free()
 
 func _on_save_pressed():
 	hide()

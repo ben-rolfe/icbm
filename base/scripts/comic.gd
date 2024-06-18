@@ -66,6 +66,8 @@ var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
 
 signal before_save
+signal after_save
+signal before_load
 signal after_load
 
 ##These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
@@ -687,7 +689,7 @@ func get_seed_from_position(v:Vector2) -> int:
 func alert(title:String, text:String, callback:Callable = Callable()):
 	confirm(title, text, callback, "OK", "")
 
-func confirm(title:String, text:String, confirm_callback:Callable = Callable(), confirm_text:String = "Yes", cancel_text:String = "No", cancel_callback:Callable = Callable()):
+func confirm(title:String, text:String, confirm_callback:Callable = Callable(), confirm_text:String = "Yes", cancel_text:String = "No", cancel_callback:Variant = null):
 	var dialog = AcceptDialog.new()
 	dialog.title = title
 	dialog.dialog_text = text
@@ -697,7 +699,8 @@ func confirm(title:String, text:String, confirm_callback:Callable = Callable(), 
 	if cancel_text != "":
 		dialog.add_cancel_button(cancel_text)
 		dialog.canceled.connect(dialog.queue_free)
-		dialog.canceled.connect(cancel_callback)
+		if cancel_callback != null:
+			dialog.canceled.connect(cancel_callback)
 	add_child(dialog)
 	dialog.popup_centered()
 
@@ -929,15 +932,17 @@ func save_savefile(save_id:int):
 	var capture = Comic.book.page.get_texture().get_image()
 	capture.resize(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4)
 	capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
+	after_save.emit()
 
 
 func load_savefile(save_id:int):
 	var path = str(Comic.DIR_SAVES, "data_", save_id, ".sav")
 	if FileAccess.file_exists(path):
+		before_load.emit()
 		var file = FileAccess.open(path, FileAccess.READ)
 		Comic.vars = file.get_var()
 		Comic.book.change_page = true
-	after_load.emit()
+		after_load.emit()
 
 func save_exists(slot:int = -1) -> bool:
 	if slot > -1:
