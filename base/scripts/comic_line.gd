@@ -92,11 +92,11 @@ func apply_data():
 
 func draw_edge(draw_layer:ComicLayer):
 	if offset_points.size() > 1:
-		draw_layer.draw_polyline(offset_points, edge_color, fill_width + 2 * edge_width, true)
+		draw_layer.draw_polyline(offset_points, edge_color, fill_width + 2 * edge_width)
 
 func draw_fill(draw_layer:ComicLayer):
 	if offset_points.size() > 1:
-		draw_layer.draw_polyline(offset_points, fill_color, fill_width, true)
+		draw_layer.draw_polyline(offset_points, fill_color, fill_width)
 
 # ------------------------------------------------------------------------------
 

@@ -19,6 +19,30 @@ var anchor_to:Vector2:
 	set(value):
 		_data_set("anchor_to", value)
 
+var appear:int:
+	get:
+		return _data_get("appear")
+	set(value):
+		_data_set("appear", value)
+
+var appear_type:int:
+	get:
+		return _data_get("appear_type")
+	set(value):
+		_data_set("appear_type", value)
+		
+var disappear:int:
+	get:
+		return _data_get("disappear")
+	set(value):
+		_data_set("disappear", value)
+
+var disappear_type:int:
+	get:
+		return _data_get("disappear_type")
+	set(value):
+		_data_set("disappear_type", value)
+			
 var file_name:String:
 	get:
 		return _data_get("file_name")
@@ -63,6 +87,18 @@ var rotate:float:
 	set(value):
 		_data_set("rotate", value)
 
+var shown:bool:
+	get:
+		return _data_get("shown")
+	set(value):
+		_data_set("shown", value)
+		if not Comic.book is ComicEditor:
+			if value:
+				show()
+			else:
+				hide()
+			Comic.book.page.redraw()
+
 var tint:Color:
 	get:
 		return _data_get("tint")
@@ -91,6 +127,29 @@ func _init(data:Dictionary, page:ComicPage):
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 
+	if not self is ComicEditorImage:
+		if appear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": appear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+		elif appear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": appear,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+
+		if disappear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": disappear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+		elif disappear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": disappear,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+
 func apply_data():
 	# First, we recreate the _default_data dictionary, because it is affected by selected presets, which may have changed
 	_default_data = Comic.get_preset_data("image", presets)
@@ -118,6 +177,12 @@ func apply_data():
 	rotation = rotate
 	flip_h = flip
 	modulate = tint
+	
+	if shown:
+		show()
+	else:
+		hide()
+
 	
 func recalc_size():
 	var image_scale:float = float(width) / texture.get_width()

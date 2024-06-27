@@ -178,7 +178,6 @@ func add_o(o_data:Dictionary):
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.
-
 	# Clear out old tail_backlinks and remake them
 	for oid in os:
 		if os[oid] is ComicBalloon and os[oid].get_parent() != null:
@@ -201,6 +200,13 @@ func rebuild(rebuild_sub_objects:bool = true):
 		for oid in os:
 			if os[oid].has_method("rebuild") and os[oid].get_parent() != null:
 				os[oid].rebuild(true)
+
+func redraw(rebuild_lookups_first:bool = false):
+	if rebuild_lookups_first:
+		rebuild_lookups()
+	for layer in layers:
+		layer.queue_redraw()
+	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func make_oid() -> int:
 	#We use os as unique, immutable identifiers for objects that are unique within a view

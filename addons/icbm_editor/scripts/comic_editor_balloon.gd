@@ -18,6 +18,10 @@ func _init(data:Dictionary, page:ComicPage):
 	
 func apply_data():
 	super()
+	# Always show in editor (may be hidden later if the fragment it's in is hidden in the editor) 
+	#TODO: Is this right?
+	show()
+	
 	# If the balloon contains a link, the mouse_filter will have been set to receive inputs, which we don't want in the editor
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# We do some calculations now to speed up has_point

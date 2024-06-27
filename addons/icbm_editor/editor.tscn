@@ -86,10 +86,11 @@ theme = ExtResource("3_wlsv2")
 [node name="MarginContainer" type="MarginContainer" parent="Properties"]
 layout_mode = 2
 
-[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button", "align_button", "anchor_button")]
+[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("oid_label", "text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button", "align_button", "anchor_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nq2jk")
+oid_label = NodePath("oid/oid Label")
 text_edit = NodePath("BBTextEdit")
 edge_color_button = NodePath("Edge Color/Edge ColorPickerButton")
 edge_color_revert_button = NodePath("Edge Color/Edge Color Revert Button")
@@ -99,11 +100,26 @@ font_color_button = NodePath("Font Color/Font ColorPickerButton")
 font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 align_button = NodePath("Alignment/Align OptionButton")
 anchor_button = NodePath("Anchor/Anchor OptionButton")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
 text = "Balloon Properties"
+
+[node name="oid" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="oid Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/oid"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 0.4)
+text = "oid:"
 
 [node name="BBTextEdit" type="TextEdit" parent="Properties/MarginContainer/BalloonProperties"]
 custom_minimum_size = Vector2(0, 128)
@@ -187,6 +203,40 @@ layout_mode = 2
 layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
+
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
+layout_mode = 2
 
 [node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "promote_button", "delete_button")]
 visible = false
@@ -386,7 +436,7 @@ layout_mode = 2
 button_pressed = true
 text = "Auto Save Slot"
 
-[node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button")]
+[node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("7_mktfq")
@@ -395,6 +445,11 @@ font_color_button = NodePath("Font Color/Font ColorPickerButton")
 font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 outline_color_button = NodePath("Outline Color/Outline ColorPickerButton")
 outline_color_revert_button = NodePath("Outline Color/Outline Color Revert Button")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/KaboomProperties"]
 layout_mode = 2
@@ -438,7 +493,41 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("anchor_button", "flip_check_box", "tint_button", "tint_revert_button")]
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/KaboomProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/KaboomProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/KaboomProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/KaboomProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/KaboomProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/KaboomProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/KaboomProperties/Disappear"]
+layout_mode = 2
+
+[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("anchor_button", "flip_check_box", "tint_button", "tint_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("13_jcyyd")
@@ -446,6 +535,11 @@ anchor_button = NodePath("Anchor/Anchor OptionButton")
 flip_check_box = NodePath("Flip CheckBox")
 tint_button = NodePath("Tint/Tint ColorPickerButton")
 tint_revert_button = NodePath("Tint/Tint Revert Button")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/ImageProperties"]
 layout_mode = 2
@@ -487,7 +581,41 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit")]
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/ImageProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/ImageProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/ImageProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/ImageProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ImageProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/ImageProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/ImageProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/ImageProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ImageProperties/Disappear"]
+layout_mode = 2
+
+[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("8_lxpup")
@@ -495,6 +623,11 @@ text_edit = NodePath("Text/Text LineEdit")
 action_button = NodePath("Action/Action OptionButton")
 action_target_button = NodePath("Action Target OptionButton")
 action_commands_textedit = NodePath("Action Commands TextEdit")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/ButtonProperties"]
 layout_mode = 2
@@ -532,7 +665,41 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 placeholder_text = "Enter Commands..."
 
-[node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "change_cursor_checkbox")]
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/ButtonProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/ButtonProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/ButtonProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/ButtonProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties/Disappear"]
+layout_mode = 2
+
+[node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "change_cursor_checkbox", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("15_va7ba")
@@ -540,6 +707,11 @@ action_button = NodePath("Action/Action OptionButton")
 action_target_button = NodePath("Action Target OptionButton")
 action_commands_textedit = NodePath("Action Commands TextEdit")
 change_cursor_checkbox = NodePath("Cursor CheckBox")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/HotspotProperties"]
 layout_mode = 2
@@ -568,3 +740,37 @@ placeholder_text = "Enter Commands..."
 [node name="Cursor CheckBox" type="CheckBox" parent="Properties/MarginContainer/HotspotProperties"]
 layout_mode = 2
 text = "Change Cursor on Hover"
+
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/HotspotProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/HotspotProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/HotspotProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/HotspotProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/HotspotProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/HotspotProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/HotspotProperties/Disappear"]
+layout_mode = 2

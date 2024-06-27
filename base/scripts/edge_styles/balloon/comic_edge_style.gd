@@ -14,7 +14,7 @@ func calculate_offsets(balloon:ComicBalloon):
 	# We're dealing with a rounded shape. The basic idea goes like this:
 	# Step 1: Create a whole lot of points for a really high definition version of the shape.
 	# Step 2: Calculate the distance between each of those points, and the total difference around the shape.
-	# Step 3: Calculate the best length of each edge segment, based on the ideal edge length (as set in the root theme), the total edge length, and the multiple of edge segments we need (e.g. our edge style might need us to have a number of edge segments that is divisible by 8, or whatever)
+	# Step 3: Calculate the best length of each edge segment, based on the ideal edge length, the total edge length, and the multiple of edge segments we need (e.g. our edge style might need us to have a number of edge segments that is divisible by 4, or whatever)
 	# Step 4: Go around the high def shape, creating a low def shape with less points, with approximately the right length of edge segment between each pair of points.
 	# Note that, for ease, we create the whole shape around (0,0) and add the box_center to each point at the end.
 	# Also note that yes, I did try using Curve2D for this, but the inconsistencies in sampled points made for really ugly edge patterns, especially around the pointy ends of one-line balloons
@@ -65,7 +65,7 @@ func calculate_points(balloon:ComicBalloon):
 
 func draw_edge(balloon:ComicBalloon, layer:ComicLayer):
 	if balloon.edge_points.size() > 0:
-		layer.draw_polyline(balloon.edge_points, balloon.edge_color, balloon.edge_thickness * 2, true)
+		layer.draw_polyline(balloon.edge_points, balloon.edge_color, balloon.edge_thickness * 2)
 
 func draw_fill(balloon:ComicBalloon, layer:ComicLayer):
 	if balloon.edge_points.size() > 0:

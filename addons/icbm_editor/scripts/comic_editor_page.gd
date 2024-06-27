@@ -156,18 +156,6 @@ func add_image(data:Dictionary = {}):
 	Comic.book.add_undo_step([ComicReversionParent.new(image, null)])
 	redraw()
 
-func redraw(rebuild_lookups_first:bool = false):
-	if rebuild_lookups_first:
-		rebuild_lookups()
-	for oid in os:
-		if os[oid].fragment == "" or _data.fragments[os[oid].fragment].show_in_editor:
-			os[oid].show()
-		else:
-			os[oid].hide()
-	for layer in layers:
-		layer.queue_redraw()
-	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
-
 func rebuild_widgets():
 	if Comic.book.selected_element != null and Comic.book.selected_element.has_method("rebuild_widgets"):
 		Comic.book.selected_element.rebuild_widgets()
@@ -224,3 +212,16 @@ func delete_fragment(key:String):
 		if os[oid].fragment == key:
 			os[oid].fragment = ""
 	
+func redraw(rebuild_lookups_first:bool = false):
+	if rebuild_lookups_first:
+		rebuild_lookups()
+	# Since we're in the editor, we don't care about whether the object will be shown or hidden in the game, we want to see it here (it unless it's part of a fragment that we've elected not to show in the editor.)
+	for oid in os:
+		if os[oid].fragment == "" or _data.fragments[os[oid].fragment].show_in_editor:
+			os[oid].show()
+		else:
+			os[oid].hide()
+	for layer in layers:
+		layer.queue_redraw()
+	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
+

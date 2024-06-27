@@ -23,6 +23,30 @@ var anchor:Vector2:
 	set(value):
 		_data_set("anchor", value)
 
+var appear:int:
+	get:
+		return _data_get("appear")
+	set(value):
+		_data_set("appear", value)
+
+var appear_type:int:
+	get:
+		return _data_get("appear_type")
+	set(value):
+		_data_set("appear_type", value)
+		
+var disappear:int:
+	get:
+		return _data_get("disappear")
+	set(value):
+		_data_set("disappear", value)
+
+var disappear_type:int:
+	get:
+		return _data_get("disappear_type")
+	set(value):
+		_data_set("disappear_type", value)
+
 var bulge:float:
 	get:
 		return _data_get("bulge")
@@ -115,6 +139,18 @@ var rotate_chars:bool:
 	set(value):
 		_data_set("rotate_chars", value)
 
+var shown:bool:
+	get:
+		return _data_get("shown")
+	set(value):
+		_data_set("shown", value)
+		if not Comic.book is ComicEditor:
+			if value:
+				show()
+			else:
+				hide()
+			Comic.book.page.redraw()
+
 var spacing:float:
 	get:
 		return _data_get("spacing")
@@ -144,6 +180,29 @@ func _init(data:Dictionary, page:ComicPage):
 	page.os[oid] = self
 	if not _data.has("rng_seed"):
 		_data.rng_seed = Comic.get_seed_from_position(_data.anchor)
+
+	if not self is ComicEditorKaboom:
+		if appear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": appear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+		elif appear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": appear,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+
+		if disappear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": disappear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+		elif disappear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": disappear,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
 
 func apply_data():
 	_default_data = Comic.get_preset_data("kaboom", presets)
@@ -261,6 +320,12 @@ func apply_data():
 		char_obj[i].name = char_str[i]
 
 	name = str("Kaboom (", oid, ")")
+	
+	if shown:
+		show()
+	else:
+		hide()
+
 
 func rebuild(_rebuild_sub_objects:bool = false):
 	apply_data()

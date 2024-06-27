@@ -1,6 +1,8 @@
 class_name ComicBalloon
 extends RichTextLabel
 
+const otype:String = "balloon"
+
 var _final_scale_box:float
 var _final_scale_font:float
 var _final_scale_edge:Vector2
@@ -17,7 +19,6 @@ var frame_half_size:Vector2
 var rng:RandomNumberGenerator
 var tails:Dictionary = {}
 var tail_backlinks:Array = []
-
 
 # ------------------------------------------------------------------------------
 
@@ -38,6 +39,18 @@ var anchor_to:Vector2:
 		return _data_get("anchor_to")
 	set(value):
 		_data_set("anchor_to", value)
+
+var appear:int:
+	get:
+		return _data_get("appear")
+	set(value):
+		_data_set("appear", value)
+
+var appear_type:int:
+	get:
+		return _data_get("appear_type")
+	set(value):
+		_data_set("appear_type", value)
 
 var bold:bool:
 	get:
@@ -62,6 +75,18 @@ var content:String:
 		return _data_get("content")
 	set(value):
 		_data_set("content", value)
+
+var disappear:int:
+	get:
+		return _data_get("disappear")
+	set(value):
+		_data_set("disappear", value)
+
+var disappear_type:int:
+	get:
+		return _data_get("disappear_type")
+	set(value):
+		_data_set("disappear_type", value)
 
 var edge_color:Color:
 	get:
@@ -111,6 +136,19 @@ var height:int:
 		return _data_get("height")
 	set(value):
 		_data_set("height", value)
+
+var shown:bool:
+	get:
+		return _data_get("shown")
+	set(value):
+		_data_set("shown", value)
+		if not Comic.book is ComicEditor:
+			print("Visibility Changed to ", value, ": ", self)
+			if value:
+				show()
+			else:
+				hide()
+			Comic.book.page.redraw()
 
 var italic:bool:
 	get:
@@ -208,6 +246,7 @@ var width:int:
 
 # ------------------------------------------------------------------------------
 
+
 func _init(data:Dictionary, page:ComicPage):
 	_data = data
 	_default_data = Comic.get_preset_data("balloon", presets)
@@ -220,9 +259,30 @@ func _init(data:Dictionary, page:ComicPage):
 	if not _data.has("rng_seed"):
 		_data.rng_seed = Comic.get_seed_from_position(_data.anchor)
 
-	
-	if not Comic.book is ComicEditor:
+	if not self is ComicEditorBalloon:
 		content = Comic.execute_embedded_code(content)
+
+		if appear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": appear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+		elif appear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": appear,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+
+		if disappear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": disappear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+		elif disappear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": disappear,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
 
 	name = str("Balloon (", oid, ")")
 
@@ -399,6 +459,11 @@ func apply_data():
 	edge_style.calculate_offsets(self)
 	edge_style.calculate_offset_angles(self)
 	edge_style.calculate_points(self)
+	
+	if shown:
+		show()
+	else:
+		hide()
 	
 func draw_edge(draw_layer:ComicLayer):
 	edge_style.draw_edge(self, draw_layer)

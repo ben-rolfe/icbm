@@ -7,7 +7,6 @@ enum Overflow {
 	CLIP,
 }
 
-
 const DIR_STORY:String = "res://story/"
 const DIR_FONTS:String = "res://library/fonts/"
 const DIR_ICONS:String = "res://library/icons/"
@@ -57,6 +56,13 @@ const HORIZONTAL_ALIGNMENTS:Dictionary = {
 	"Center":HORIZONTAL_ALIGNMENT_CENTER,
 	"Right":HORIZONTAL_ALIGNMENT_RIGHT,
 }
+
+var DELAY_TYPES:Array[String] = [
+	"Never",
+	"Milliseconds",
+	"BG Clicks",
+]
+
 
 #Regular expressions
 #var _rex_bracketed_expressions:RegEx = RegEx.new()
@@ -110,10 +116,14 @@ var preset_properties:Dictionary = {
 		"align": HORIZONTAL_ALIGNMENTS,
 		"anchor": "vector2",
 		"anchor_to": ANCHOR_POINTS,
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
 		"bold": "bool",
 		"bold_is_italic": "bool",
 		"collapse": "bool",
 		"content": "string",
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
 		"edge_color": "color",
 		"edge_style": "edge_style",
 		"edge_thickness": "int",
@@ -131,6 +141,7 @@ var preset_properties:Dictionary = {
 		"scale_font": "percent",
 		"scroll": "bool",
 		"shape": "shape",
+		"shown": "bool",
 		"squirk": "percent",
 		"width": "int",
 	},
@@ -142,7 +153,11 @@ var preset_properties:Dictionary = {
 		"action": ComicButton.Action,
 		"action_bookmark": "bookmark",
 		"action_commands": "string",
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
 		"content": "string",
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
 		"fill_color": "color",
 		"fill_color_disabled": "color",
 		"fill_color_hovered": "color",
@@ -150,24 +165,36 @@ var preset_properties:Dictionary = {
 		"font_color_disabled": "color",
 		"font_color_hovered": "color",
 		"fragment": "string",
+		"shown": "bool",
 	},
 	"hotspot": {
 		"action": ComicButton.Action,
 		"action_bookmark": "bookmark",
 		"action_commands": "string",
 		"anchor": "vector2",
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
 		"change_cursor": "bool",
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
 		"fragment": "string",
 		"points": "array",
+		"shown": "bool",
+
 	},
 	"image": {
 		"anchor": "vector2",
 		"anchor_to": ANCHOR_POINTS,
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
 		"file_name": "string",
 		"flip": "bool",
 		"fragment": "string",
 		"layer": LAYERS,
 		"rotate": "degrees",
+		"shown": "bool",
 		"tint": "color",
 		"width": "int",
 	},
@@ -176,8 +203,10 @@ var preset_properties:Dictionary = {
 		"anchor": "vector2",
 		"bulge": "percent",
 		"content": "string",
-		"wave_period": "percent",
-		"wave_height": "percent",
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
 		"font": "font",
 		"font_size": "percent",
 		"font_color": "color",
@@ -188,7 +217,10 @@ var preset_properties:Dictionary = {
 		"outline_thickness": "int",
 		"rotate": "degrees",
 		"rotate_chars": "bool",
+		"shown": "bool",
 		"spacing": "percent",
+		"wave_period": "percent",
+		"wave_height": "percent",
 	},
 	"line": {
 		"anchor": "vector2",
@@ -232,6 +264,7 @@ var default_presets:Dictionary = {
 			"fill_color": Color.WHITE,
 			"layer": 2,
 			"anchor_to": Vector2(0.5, 0.5),
+			"shown": true,
 			"squirk": 0.5,
 			"width": 288,
 		},
@@ -274,6 +307,7 @@ var default_presets:Dictionary = {
 			"font_color": Color.WHITE,
 			"font_color_disabled": Color(0.6, 0.6, 0.6),
 			"font_color_hovered": Color.YELLOW,
+			"shown": true,
 		},
 	},
 	"hotspot": {
@@ -282,10 +316,12 @@ var default_presets:Dictionary = {
 			"action_bookmark": "",
 			"action_commands": "",
 			"change_cursor": true,
+			"shown": true,
 		}
 	},
 	"image": {
 		"": {
+			"shown": true,
 			"tint": Color.WHITE,
 		},
 	},
@@ -298,6 +334,7 @@ var default_presets:Dictionary = {
 			"outline_color": Color.BLACK,
 			"outline_thickness": 16,
 			"rotate_chars": true,
+			"shown": true,
 			"wave_period": 2.0,
 			"wave_height": 0.0,
 		},
@@ -775,69 +812,100 @@ func sort_dictionary(unsorted:Dictionary) -> Dictionary:
 	return sorted
 
 func _code_tag_store(params:Dictionary, contents:Array) -> String:
+	#print("Storing: ", params)
 	if params.has("var"):
 		var s = execute_embedded_code(contents[0])
 		#print(s)
-		var data_type:String = params["type"].to_lower() if params.has("type") else ""
+		
+		var o:Variant = null
+		if params.has("oid"):
+			o = Comic.book.page.os.get(int(params.oid))
+
+		var f:Callable = set_var if o == null else o._data_set
+		
+		var data_type:String = ""
+		if params.has("type"):
+			data_type = params["type"].to_lower()
+		elif o != null and "otype" in o and preset_properties.has(o.otype):
+			# Get the type from the preset properties of the object being altered
+			var variant_data_type:Variant = preset_properties[o.otype].get(params.var, "string")
+			if variant_data_type is Array:
+				data_type = "int"
+			elif variant_data_type is Dictionary:
+				data_type = "string"
+			else:
+				data_type = str(variant_data_type)
 		match data_type:
-			"string", "str":
-				set_var(params.var, s)
+			"string":
+				f.call(params.var, s)
 			"int":
-				set_var(params.var, int(s))
+				f.call(params.var, int(s))
 			"float":
-				set_var(params.var, float(s))
+				f.call(params.var, float(s))
 			"bool":
-				set_var(params.var, parse_bool_string(s))
+				f.call(params.var, parse_bool_string(s))
 			"color":
 				var parts = s.split(",")
 				match parts.size():
 					1:
 						# Hex code or standardized color name
-						set_var(params.var, Color(s))
+						f.call(params.var, Color(s))
 					3:
-						set_var(params.var, Color(float(s[0]), float(s[1]), float(s[2])))
+						f.call(params.var, Color(float(s[0]), float(s[1]), float(s[2])))
 					4:
-						set_var(params.var, Color(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
+						f.call(params.var, Color(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
 					_:
-						set_var(params.var, Color.BLACK)
+						f.call(params.var, Color.BLACK)
 			"vector2":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					set_var(params.var, Vector2(float(s[0]), float(s[1])))
+					f.call(params.var, Vector2(float(s[0]), float(s[1])))
 				else:
-					set_var(params.var, Vector2.ZERO)
+					f.call(params.var, Vector2.ZERO)
 			"vector3":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					set_var(params.var, Vector3(float(s[0]), float(s[1]), float(s[2])))
+					f.call(params.var, Vector3(float(s[0]), float(s[1]), float(s[2])))
 				else:
-					set_var(params.var, Vector3.ZERO)
+					f.call(params.var, Vector3.ZERO)
 			"vector4":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					set_var(params.var, Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
+					f.call(params.var, Vector4(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
 				else:
-					set_var(params.var, Vector4.ZERO)
+					f.call(params.var, Vector4.ZERO)
 			"vector2i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					set_var(params.var, Vector2i(int(s[0]), int(s[1])))
+					f.call(params.var, Vector2i(int(s[0]), int(s[1])))
 				else:
 					set_var(params.var, Vector2i.ZERO)
 			"vector3i":
 				var parts = s.split(",")
 				if parts.size() == 3:
-					set_var(params.var, Vector3i(int(s[0]), int(s[1]), int(s[2])))
+					f.call(params.var, Vector3i(int(s[0]), int(s[1]), int(s[2])))
 				else:
-					set_var(params.var, Vector3i.ZERO)
+					f.call(params.var, Vector3i.ZERO)
 			"vector4i":
 				var parts = s.split(",")
 				if parts.size() == 2:
-					set_var(params.var, Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3])))
+					f.call(params.var, Vector4i(int(s[0]), int(s[1]), int(s[2]), int(s[3])))
 				else:
-					set_var(params.var, Vector4i.ZERO)
+					f.call(params.var, Vector4i.ZERO)
 			_: # Default to code, which gets executed
-				set_var(params.var, execute(s))
+				f.call(params.var, execute(s))
+		if o != null:
+			# After changing the value of an object, we need to rebuild the page.
+			if params.var == "shown":
+				# Unless we're just changing visibility, in which case we can get away with just changing the visibility of this object and redrawing the page.
+				if o.shown:
+					o.show()
+				else:
+					o.hide()
+				book.page.redraw(false)
+			else:
+				book.page.rebuild(true)
+
 	else:
 		return "<store error - no var given>"
 	return ""
@@ -912,17 +980,25 @@ func _code_tag_menu(_params:Dictionary) -> String:
 	return ""
 
 func _code_tag_wait(params:Dictionary, contents:Array) -> String:
-	var timer:Dictionary = {
-		"t": 1,
-		"s": contents[0],
-	}
-	if params.has("t"):
-		timer.t = float(params.t)
-	if params.has("persist"):
-		timer.persist = null
-	Comic.book.timers.push_back(timer)
+	if params.has("clicks"):
+		var click_counter:Dictionary = {
+			"clicks": int(params.clicks),
+			"s": contents[0],
+		}
+		if params.has("persist"):
+			click_counter.persist = null
+		Comic.book.click_counters.push_back(click_counter)
+	else:
+		var timer:Dictionary = {
+			"t": 1,
+			"s": contents[0],
+		}
+		if params.has("t"):
+			timer.t = float(params.t)
+		if params.has("persist"):
+			timer.persist = null
+		Comic.book.timers.push_back(timer)
 	return ""
-
 
 func save_savefile(save_id:int):
 	before_save.emit()

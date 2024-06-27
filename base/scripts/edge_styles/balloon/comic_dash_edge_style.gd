@@ -11,5 +11,5 @@ func _init():
 func draw_edge(balloon:ComicBalloon, layer:ComicLayer):
 	if balloon.edge_points.size() > 0:
 		for i in range(0, balloon.edge_points.size(), 4):
-			layer.draw_line(balloon.edge_points[i], balloon.edge_points[i - 1], balloon.edge_color, balloon.edge_thickness * 2.0, true)
-			layer.draw_line(balloon.edge_points[i - 1], balloon.edge_points[i - 2], balloon.edge_color, balloon.edge_thickness * 2.0, true)
+			layer.draw_line(balloon.edge_points[i], balloon.edge_points[i - 1], balloon.edge_color, balloon.edge_thickness * 2.0)
+			layer.draw_line(balloon.edge_points[i - 1], balloon.edge_points[i - 2], balloon.edge_color, balloon.edge_thickness * 2.0)

@@ -12,5 +12,5 @@ func draw_edge(tail:ComicTail, layer:ComicLayer):
 	for i in range(0, n, 4):
 		if tail.edge_color_start != tail.edge_color_end:
 			color = tail.edge_color_start.lerp(tail.edge_color_end, abs(n - i * 2) / float(n - 1))
-		layer.draw_line(tail.edge_points[i], tail.edge_points[i - 1], color, tail.edge_thickness * 2.0, true)
-		layer.draw_line(tail.edge_points[i - 1], tail.edge_points[i - 2], color, tail.edge_thickness * 2.0, true)
+		layer.draw_line(tail.edge_points[i], tail.edge_points[i - 1], color, tail.edge_thickness * 2.0)
+		layer.draw_line(tail.edge_points[i - 1], tail.edge_points[i - 2], color, tail.edge_thickness * 2.0)

@@ -9,6 +9,12 @@ extends ComicEditorProperties
 var hotspot:ComicEditorHotspot
 var commands_before_changes:String
 
+@export var shown_check_box:CheckBox
+@export var appear_spin_box:SpinBox
+@export var appear_button:OptionButton
+@export var disappear_spin_box:SpinBox
+@export var disappear_button:OptionButton
+
 func _ready():
 	for action in ComicButton.Action:
 		action_button.add_item(action.capitalize(), ComicButton.Action[action])
@@ -24,6 +30,16 @@ func _ready():
 
 	change_cursor_checkbox.toggled.connect(_on_change_cursor_checkbox_toggled)
 
+	shown_check_box.toggled.connect(_on_shown_check_box_toggled)
+	for i in Comic.DELAY_TYPES.size():
+		appear_button.add_item(Comic.DELAY_TYPES[i])
+		appear_button.set_item_metadata(-1, i)
+		disappear_button.add_item(Comic.DELAY_TYPES[i])
+		disappear_button.set_item_metadata(-1, i)
+	appear_button.item_selected.connect(_on_appear_button_item_selected)
+	appear_spin_box.value_changed.connect(_on_appear_spin_box_value_changed)
+	disappear_button.item_selected.connect(_on_disappear_button_item_selected)
+	disappear_spin_box.value_changed.connect(_on_disappear_spin_box_value_changed)
 
 func prepare():
 	super()
@@ -33,6 +49,21 @@ func prepare():
 	after_action_changed()
 	
 	change_cursor_checkbox.button_pressed = hotspot.change_cursor
+
+	shown_check_box.button_pressed = hotspot.shown
+	appear_spin_box.value = hotspot.appear
+	appear_button.select(hotspot.appear_type)
+	if hotspot.appear_type == 0:
+		appear_spin_box.hide()
+	else:
+		appear_spin_box.show()
+		
+	disappear_spin_box.value = hotspot.disappear
+	disappear_button.select(hotspot.disappear_type)
+	if hotspot.disappear_type == 0:
+		disappear_spin_box.hide()
+	else:
+		disappear_spin_box.show()
 
 func after_action_changed():
 	match hotspot.action:
@@ -84,3 +115,35 @@ func _on_change_cursor_checkbox_toggled(toggled_on:bool):
 	hotspot.change_cursor = toggled_on
 	hotspot.rebuild(true)
 
+func _on_shown_check_box_toggled(toggled_on:bool):
+	Comic.book.add_undo_step([ComicReversionData.new(hotspot)])
+	hotspot.shown = toggled_on
+
+func _on_appear_button_item_selected(index:int):
+	if index == 0:
+		# We don't have an undo step here, because the next line will trigger one
+		appear_spin_box.value = 0
+		appear_spin_box.hide()
+	else:
+		Comic.book.add_undo_step([ComicReversionData.new(hotspot)])
+		appear_spin_box.show()
+	hotspot.appear_type = appear_button.get_item_metadata(index)
+
+func _on_disappear_button_item_selected(index:int):
+	if index == 0:
+		# We don't have an undo step here, because the next line will trigger one
+		disappear_spin_box.value = 0
+		disappear_spin_box.hide()
+	else:
+		Comic.book.add_undo_step([ComicReversionData.new(hotspot)])
+		disappear_spin_box.show()
+	hotspot.disappear_type = disappear_button.get_item_metadata(index)
+		
+func _on_appear_spin_box_value_changed(value:int):
+	Comic.book.add_undo_step([ComicReversionData.new(hotspot)])
+	hotspot.appear = value
+
+func _on_disappear_spin_box_value_changed(value:int):
+	Comic.book.add_undo_step([ComicReversionData.new(hotspot)])
+	hotspot.disappear = value
+	

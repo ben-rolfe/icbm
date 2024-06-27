@@ -40,6 +40,30 @@ var action_commands:String:
 	set(value):
 		_data_set("action_commands", value)
 
+var appear:int:
+	get:
+		return _data_get("appear")
+	set(value):
+		_data_set("appear", value)
+
+var appear_type:int:
+	get:
+		return _data_get("appear_type")
+	set(value):
+		_data_set("appear_type", value)
+		
+var disappear:int:
+	get:
+		return _data_get("disappear")
+	set(value):
+		_data_set("disappear", value)
+
+var disappear_type:int:
+	get:
+		return _data_get("disappear_type")
+	set(value):
+		_data_set("disappear_type", value)
+			
 var content:String:
 	get:
 		return _data_get("content")
@@ -118,6 +142,17 @@ var presets:Array:
 	set(value):
 		_data.presets = value
 
+var shown:bool:
+	get:
+		return _data_get("shown")
+	set(value):
+		_data_set("shown", value)
+		if not Comic.book is ComicEditor:
+			if value:
+				show()
+			else:
+				hide()
+			
 #-------------------------------------------------------------------------------
 
 func _init(data:Dictionary, page:ComicPage):
@@ -138,13 +173,44 @@ func _init(data:Dictionary, page:ComicPage):
 	mouse_exited.connect(_on_mouse_exited)
 	bbcode_enabled = true
 	fit_content = true
+
+	if not self is ComicEditorButton:
+		if appear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": appear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+		elif appear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": appear,
+				"s": str("[store oid=", oid, " var=shown]true[/store]")
+			})
+
+		if disappear_type == 1: # Milliseconds delay
+			Comic.book.timers.push_back({
+				"t": disappear / 1000.0,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+		elif disappear_type == 2: # Clicks delay
+			Comic.book.click_counters.push_back({
+				"clicks": disappear,
+				"s": str("[store oid=", oid, " var=shown]false[/store]")
+			})
+
 	# Buttons are in their own object so, unlike for elements in the page, there's no reason not to immediately apply the data.
 	apply_data()
+
+
 
 func apply_data():
 	_default_data = Comic.get_preset_data("button", presets)
 	text = str("[center]", Comic.parse_rich_text_string(content), "[/center]")
 	set_theme_override()
+
+	if shown:
+		show()
+	else:
+		hide()
 
 func _gui_input(event):
 	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and hovered:

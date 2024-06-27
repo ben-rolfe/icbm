@@ -17,6 +17,7 @@ var bookmarks:PackedStringArray
 var presets:Dictionary
 
 var timers:Array = []
+var click_counters:Array = []
 
 var _data:Dictionary
 # ------------------------------------------------------------------------------
@@ -66,7 +67,7 @@ func _init():
 	
 	# We store data relating to the book as a whole in default book preset.
 	_data = Comic.get_preset_data("book", [])
-	print(_data)
+#	print(_data)
 
 	_history_size = Comic.theme.get_constant("history_size", "Settings")
 	default_balloon_layer = Comic.theme.get_constant("default_layer", "Balloon")
@@ -120,19 +121,25 @@ func _process(delta:float):
 		_show_page()
 	for i in range(timers.size() - 1, -1, -1):
 		timers[i].t -= delta
-		if timers[i].t < 0: # We don't execute timers while changing pages
+		if timers[i].t < 0: 
 			Comic.execute_embedded_code(timers[i].s)
 			timers.remove_at(i)
-
 
 func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
 	change_page = true
 
 func left_clicked(target:CanvasItem, _event:InputEvent):
-	print(target)
+#	print(target)
 	if target is ComicBackground:
-		page.activate()
+		if click_counters.size() > 0:
+			for i in range(click_counters.size() - 1, -1, -1):
+				click_counters[i].clicks -= 1
+				if click_counters[i].clicks <= 0: 
+					Comic.execute_embedded_code(click_counters[i].s)
+					click_counters.remove_at(i)
+		else:
+			page.activate()
 	elif target is ComicHotspot:
 		target.activate()
 
@@ -154,10 +161,13 @@ func back_if_allowed():
 func _show_page():
 	change_page = false
 	
-	#Clear all non-persistent timers on page change
+	#Clear all non-persistent timers and counters on page change
 	for i in range(timers.size() - 1, -1, -1):
 		if not timers[i].has("persist"):
 			timers.remove_at(i)
+	for i in range(click_counters.size() - 1, -1, -1):
+		if not click_counters[i].has("persist"):
+			click_counters.remove_at(i)
 			
 	print("--- NEW PAGE ---")
 	history.push_back(Comic.vars.duplicate(true))

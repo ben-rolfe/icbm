@@ -1,6 +1,8 @@
 class_name ComicEditorBalloonProperties
 extends ComicEditorProperties
 
+@export var oid_label:Label
+
 @export var text_edit:TextEdit
 var balloon:ComicEditorBalloon
 var text_before_changes:String
@@ -19,6 +21,12 @@ var font_color_before_changes:Color
 
 @export var align_button:OptionButton
 @export var anchor_button:OptionButton
+
+@export var shown_check_box:CheckBox
+@export var appear_spin_box:SpinBox
+@export var appear_button:OptionButton
+@export var disappear_spin_box:SpinBox
+@export var disappear_button:OptionButton
 
 func _ready():
 	text_edit.text_changed.connect(_on_text_changed)
@@ -53,10 +61,23 @@ func _ready():
 		anchor_button.add_icon_item(load(str(ComicEditor.DIR_ICONS, "anchor_", key.to_lower(), ".svg")), key)
 		anchor_button.set_item_metadata(-1, Comic.ANCHOR_POINTS[key])
 	anchor_button.item_selected.connect(_on_anchor_button_item_selected)
+
+	shown_check_box.toggled.connect(_on_shown_check_box_toggled)
+	for i in Comic.DELAY_TYPES.size():
+		appear_button.add_item(Comic.DELAY_TYPES[i])
+		appear_button.set_item_metadata(-1, i)
+		disappear_button.add_item(Comic.DELAY_TYPES[i])
+		disappear_button.set_item_metadata(-1, i)
+	appear_button.item_selected.connect(_on_appear_button_item_selected)
+	appear_spin_box.value_changed.connect(_on_appear_spin_box_value_changed)
+	disappear_button.item_selected.connect(_on_disappear_button_item_selected)
+	disappear_spin_box.value_changed.connect(_on_disappear_spin_box_value_changed)
+
 	
 func prepare():
 	super()
 	balloon = Comic.book.selected_element
+	oid_label.text = str("oid: ", balloon.oid)
 	text_edit.text = ComicEditor.parse_text_edit(balloon.content)
 	text_edit.grab_focus()
 	if text_edit.text == Comic.default_presets.balloon[""].content:
@@ -76,10 +97,31 @@ func prepare():
 	font_color_button.color = balloon.font_color
 	_after_font_color_change()
 
+	for i in Comic.HORIZONTAL_ALIGNMENTS.values().size():
+		if Comic.HORIZONTAL_ALIGNMENTS.values()[i] == balloon.align:
+			align_button.select(i)
+
 	for i in Comic.ANCHOR_POINTS.size():
 		if Comic.ANCHOR_POINTS.values()[i] == balloon.anchor_to:
 			anchor_button.select(i)
 			break
+	
+	shown_check_box.button_pressed = balloon.shown
+	appear_spin_box.value = balloon.appear
+	appear_button.select(balloon.appear_type)
+	if balloon.appear_type == 0:
+		appear_spin_box.hide()
+	else:
+		appear_spin_box.show()
+		
+	disappear_spin_box.value = balloon.disappear
+	disappear_button.select(balloon.disappear_type)
+	if balloon.disappear_type == 0:
+		disappear_spin_box.hide()
+	else:
+		disappear_spin_box.show()
+
+
 
 func _on_text_changed():
 	balloon.content = ComicEditor.unparse_text_edit(text_edit.text)
@@ -176,9 +218,46 @@ func _after_font_color_change():
 		font_color_revert_button.show()
 	
 func _on_align_button_item_selected(index:int):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
 	balloon.align = align_button.get_item_metadata(index)
 	balloon.rebuild(true)
 
 func _on_anchor_button_item_selected(index:int):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
 	balloon.anchor_to = anchor_button.get_item_metadata(index)
 	balloon.rebuild(true)
+
+func _on_shown_check_box_toggled(toggled_on:bool):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+	balloon.shown = toggled_on
+
+func _on_appear_button_item_selected(index:int):
+	if index == 0:
+		# We don't have an undo step here, because the next line will trigger one
+		appear_spin_box.value = 0
+		appear_spin_box.hide()
+	else:
+		Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+		appear_spin_box.show()
+	balloon.appear_type = appear_button.get_item_metadata(index)
+
+func _on_disappear_button_item_selected(index:int):
+	if index == 0:
+		# We don't have an undo step here, because the next line will trigger one
+		disappear_spin_box.value = 0
+		disappear_spin_box.hide()
+	else:
+		Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+		disappear_spin_box.show()
+	balloon.disappear_type = disappear_button.get_item_metadata(index)
+		
+func _on_appear_spin_box_value_changed(value:int):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+	balloon.appear = value
+
+func _on_disappear_spin_box_value_changed(value:int):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+	balloon.disappear = value
+	
+
+
