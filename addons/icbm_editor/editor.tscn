@@ -86,18 +86,22 @@ theme = ExtResource("3_wlsv2")
 [node name="MarginContainer" type="MarginContainer" parent="Properties"]
 layout_mode = 2
 
-[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("oid_label", "text_edit", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "font_color_button", "font_color_revert_button", "align_button", "anchor_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
+[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("oid_label", "text_edit", "font_color_button", "font_color_revert_button", "shape_button", "edge_style_row", "edge_style_button", "edge_color_row", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "align_button", "anchor_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button", "padding_l_spin_box", "padding_t_spin_box", "padding_r_spin_box", "padding_b_spin_box", "image_row", "image_button", "nine_slice_row", "nine_slice_l_spin_box", "nine_slice_t_spin_box", "nine_slice_r_spin_box", "nine_slice_b_spin_box")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nq2jk")
 oid_label = NodePath("oid/oid Label")
 text_edit = NodePath("BBTextEdit")
+font_color_button = NodePath("Font Color/Font ColorPickerButton")
+font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
+shape_button = NodePath("Shape/Shape OptionButton")
+edge_style_row = NodePath("Edge Style")
+edge_style_button = NodePath("Edge Style/Edge Style OptionButton")
+edge_color_row = NodePath("Edge Color")
 edge_color_button = NodePath("Edge Color/Edge ColorPickerButton")
 edge_color_revert_button = NodePath("Edge Color/Edge Color Revert Button")
 fill_color_button = NodePath("Fill Color/Fill ColorPickerButton")
 fill_color_revert_button = NodePath("Fill Color/Fill Color Revert Button")
-font_color_button = NodePath("Font Color/Font ColorPickerButton")
-font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 align_button = NodePath("Alignment/Align OptionButton")
 anchor_button = NodePath("Anchor/Anchor OptionButton")
 shown_check_box = NodePath("Shown CheckBox")
@@ -105,6 +109,17 @@ appear_spin_box = NodePath("Appear/Appear SpinBox")
 appear_button = NodePath("Appear/Appear OptionButton")
 disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
 disappear_button = NodePath("Disappear/Disappear OptionButton")
+padding_l_spin_box = NodePath("Padding/Left Padding SpinBox")
+padding_t_spin_box = NodePath("Padding/VBoxContainer/Top Padding SpinBox")
+padding_r_spin_box = NodePath("Padding/Right Padding SpinBox")
+padding_b_spin_box = NodePath("Padding/VBoxContainer/Bottom Padding SpinBox")
+image_row = NodePath("Image")
+image_button = NodePath("Image/Image OptionButton")
+nine_slice_row = NodePath("9-Slice")
+nine_slice_l_spin_box = NodePath("9-Slice/Left Slice SpinBox")
+nine_slice_t_spin_box = NodePath("9-Slice/VBoxContainer/Top Slice SpinBox")
+nine_slice_r_spin_box = NodePath("9-Slice/Right Slice SpinBox")
+nine_slice_b_spin_box = NodePath("9-Slice/VBoxContainer/Bottom Slice SpinBox")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
@@ -134,22 +149,39 @@ size_flags_horizontal = 0
 [node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-text = "Align Text:"
+text = "Text Align:"
 
 [node name="Align OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
 custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
-[node name="Anchor" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text Color:"
+
+[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
+
+[node name="Shape" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Shape"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-text = "Anchor:"
+text = "Shape:"
 
-[node name="Anchor OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
+[node name="Shape OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Shape"]
 custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
@@ -170,6 +202,19 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
+[node name="Edge Style" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Edge Style"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Edge Style:"
+
+[node name="Edge Style OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Edge Style"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
+
 [node name="Edge Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
 
@@ -187,22 +232,103 @@ layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
 
-[node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+[node name="Image" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
+size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Image"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-text = "Text Color:"
+text = "Image:"
 
-[node name="Font ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
-custom_minimum_size = Vector2(24, 0)
+[node name="Image OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Image"]
+custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
-[node name="Font Color Revert Button" type="Button" parent="Properties/MarginContainer/BalloonProperties/Font Color"]
+[node name="9-Slice" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
-icon = ExtResource("7_bibqs")
-flat = true
+size_flags_horizontal = 0
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/9-Slice"]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "9-Slice:"
+
+[node name="Left Slice SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/9-Slice"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+allow_greater = true
+allow_lesser = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Properties/MarginContainer/BalloonProperties/9-Slice"]
+layout_mode = 2
+
+[node name="Top Slice SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/9-Slice/VBoxContainer"]
+layout_mode = 2
+allow_greater = true
+allow_lesser = true
+
+[node name="Bottom Slice SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/9-Slice/VBoxContainer"]
+layout_mode = 2
+allow_greater = true
+allow_lesser = true
+
+[node name="Right Slice SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/9-Slice"]
+layout_mode = 2
+size_flags_vertical = 4
+allow_greater = true
+allow_lesser = true
+
+[node name="Anchor" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Anchor:"
+
+[node name="Anchor OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Anchor"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
+
+[node name="Padding" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Padding"]
+custom_minimum_size = Vector2(135, 0)
+layout_mode = 2
+text = "Padding:"
+
+[node name="Left Padding SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Padding"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+allow_greater = true
+allow_lesser = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Properties/MarginContainer/BalloonProperties/Padding"]
+layout_mode = 2
+
+[node name="Top Padding SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Padding/VBoxContainer"]
+layout_mode = 2
+allow_greater = true
+allow_lesser = true
+
+[node name="Bottom Padding SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Padding/VBoxContainer"]
+layout_mode = 2
+allow_greater = true
+allow_lesser = true
+
+[node name="Right Padding SpinBox" type="SpinBox" parent="Properties/MarginContainer/BalloonProperties/Padding"]
+layout_mode = 2
+size_flags_vertical = 4
+allow_greater = true
+allow_lesser = true
 
 [node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
@@ -212,7 +338,7 @@ text = "Shown"
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Appear"]
-custom_minimum_size = Vector2(210, 0)
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 text = "Appear after:"
 
@@ -227,7 +353,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
-custom_minimum_size = Vector2(210, 0)
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 text = "Disappear after:"
 

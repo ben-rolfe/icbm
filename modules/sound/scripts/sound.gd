@@ -84,9 +84,6 @@ func _sound_tag(params:Dictionary, contents:Array) -> String:
 		play(Comic.execute_embedded_code(contents[0]).strip_edges())
 	return ""
 
-func _music_tag(params:Dictionary, contents:Array) -> String:
-	return ""
-
 func play_music(file_name:String = "", self_restart:bool = false, t:float = 0):
 	if self_restart or music_file_name != file_name:
 		music_file_name = file_name

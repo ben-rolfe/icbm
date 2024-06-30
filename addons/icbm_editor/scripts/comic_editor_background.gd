@@ -83,10 +83,9 @@ func add_menu_items(menu:PopupMenu):
 	menu.add_child(menu_image)
 	menu_image.index_pressed.connect(menu_image_index_pressed.bind(menu_image))
 	menu_image.name = "image"
-	for file_name in DirAccess.get_files_at(Comic.DIR_IMAGES):
-		if Comic.IMAGE_EXT.has(file_name.get_extension().to_lower()):
-			menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
-			menu_image.set_item_metadata(-1, file_name)
+	for file_name in Comic.get_images_file_names():
+		menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
+		menu_image.set_item_metadata(-1, file_name)
 	menu_image.add_separator()
 	menu_image.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add.svg")), "Import image")
 

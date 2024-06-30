@@ -59,8 +59,8 @@ const HORIZONTAL_ALIGNMENTS:Dictionary = {
 
 var DELAY_TYPES:Array[String] = [
 	"Never",
-	"Milliseconds",
-	"BG Clicks",
+	"ms",
+	"Clicks",
 ]
 
 
@@ -75,14 +75,6 @@ signal before_save
 signal after_save
 signal before_load
 signal after_load
-
-##These values are set in the root theme, under the Settings type. We store them on _init, for efficiency.
-#TODO: Set them differently
-#var _image_px_per_unit:float
-#var _units_in_width:float
-var tail_width:float
-
-var default_bg_path:String = ""
 
 var config:ConfigFile = ConfigFile.new()
 var book:ComicBook
@@ -132,8 +124,11 @@ var preset_properties:Dictionary = {
 		"fill_color": "color",
 		"fragment": "string",
 		"height": "int",
+		"image": "image",
 		"italic": "bool",
 		"layer": LAYERS,
+		"nine_slice": "vector4i",
+		"padding": "vector4i",
 		"scale_all": "percent",
 		"scale_box": "percent",
 		"scale_edge_h": "percent",
@@ -143,6 +138,7 @@ var preset_properties:Dictionary = {
 		"shape": "shape",
 		"shown": "bool",
 		"squirk": "percent",
+		"tail_width": "int",
 		"width": "int",
 	},
 	"book": {
@@ -189,7 +185,7 @@ var preset_properties:Dictionary = {
 		"appear_type": DELAY_TYPES,
 		"disappear": "int",
 		"disappear_type": DELAY_TYPES,
-		"file_name": "string",
+		"file_name": "image",
 		"flip": "bool",
 		"fragment": "string",
 		"layer": LAYERS,
@@ -266,6 +262,7 @@ var default_presets:Dictionary = {
 			"anchor_to": Vector2(0.5, 0.5),
 			"shown": true,
 			"squirk": 0.5,
+			"tail_width": 8,
 			"width": 288,
 		},
 		"caption": {
@@ -273,6 +270,7 @@ var default_presets:Dictionary = {
 			"anchor_to": Vector2.ZERO,
 			"fill_color": Color(1,1,0.6),
 			"italic": true,
+			"padding": Vector4i(16,4,16,4),
 			"shape": "box",
 		},
 		"thought": {
@@ -371,6 +369,7 @@ var default_presets:Dictionary = {
 var get_preset_options:Dictionary = {
 	"shape": get_preset_options_shape,
 	"edge_style": get_preset_options_edge_style,
+	"image": get_images_file_names,
 }
 
 # ------------------------------------------------------------------------------
@@ -396,7 +395,6 @@ func _init():
 	#px_per_unit = float(size.x) / _units_in_width
 	#_image_px_per_unit = theme.get_constant("image_px_per_unit", "Settings")
 	
-	tail_width = theme.get_constant("tail_width", "Balloon")
 	#Set up regular expressions
 	recompile_rex_code_tags()
 	# This regex, which is used for separating a tag's parameters, needs testing and, if possible, optimisation. (But it's broken my brain enough for now.) 
@@ -405,16 +403,15 @@ func _init():
 	_rex_escape_chars.compile("[\\\\\\.\\^\\$\\*\\+\\?\\(\\)\\[\\]\\{\\}\\|]")
 	_rex_sanitize_varname.compile("[^a-zA-Z0-9_\\ ]")
 
-	for ext in IMAGE_EXT:
-		var path: String = str("res://theme/background.", ext)
-		if ResourceLoader.exists(path):
-			default_bg_path = path
-			var bg_texture:Texture2D = load(path)
-			image_scale = size.x / bg_texture.get_width()
-			var image_scale_h = size.y / bg_texture.get_height()
-			assert(image_scale == image_scale_h, "The background image must be the same ratio as the viewport width set in the project settings")
-			break
-	assert(default_bg_path != "", "A default background must be supplied at res://theme/background.webp (or other valid image file extension)")
+	#for ext in IMAGE_EXT:
+		#var path: String = str("res://theme/background.", ext)
+		#if ResourceLoader.exists(path):
+			#default_bg_path = path
+			#var bg_texture:Texture2D = load(path)
+			#image_scale = size.x / bg_texture.get_width()
+			#var image_scale_h = size.y / bg_texture.get_height()
+			#assert(image_scale == image_scale_h, "The background image must be the same ratio as the viewport width set in the project settings")
+			#break
 
 func _ready():
 	#We want to manually handle quit requests via the quit() method, which does things like save the config file.
@@ -433,6 +430,8 @@ func _ready():
 	add_edge_style(ComicDashBoxEdgeStyle.new())
 	add_edge_style(ComicRoughBoxEdgeStyle.new())
 	add_edge_style(ComicWobbleBoxEdgeStyle.new())
+
+	add_shape(ComicImageShape.new(), ComicImageEdgeStyle.new())
 
 	add_tail_tip(ComicTailTip.new())
 	add_tail_tip(ComicOpenTailTip.new())
@@ -712,7 +711,7 @@ func validate_name(s:String) -> String:
 	
 func request_quit():
 	if book.has_unsaved_changes:
-		confirm("Really quit?", "Any unsaved progress will be lost.\n\nAre you sure you want to quit?", quit)
+		confirm("Really quit?", str("Any unsaved ", "changes" if book is ComicEditor else "progress", " will be lost.\n\nAre you sure you want to quit?"), quit)
 	else:
 		quit()
 
@@ -776,6 +775,8 @@ func _get_preset_default(category:String, key:Variant) -> Variant:
 				return Color.BLACK
 			"degrees", "int":
 				return 0
+			"image":
+				return ""
 			"font":
 				return "default"
 			"percent":
@@ -784,6 +785,16 @@ func _get_preset_default(category:String, key:Variant) -> Variant:
 				return ""
 			"vector2":
 				return Vector2.ZERO
+			"vector2i":
+				return Vector2i.ZERO
+			"vector3":
+				return Vector3.ZERO
+			"vector3i":
+				return Vector3i.ZERO
+			"vector4":
+				return Vector4.ZERO
+			"vector4i":
+				return Vector4i.ZERO
 	return null
 	
 func get_preset_options_shape() -> Array:
@@ -796,6 +807,13 @@ func get_preset_options_edge_style() -> Array:
 			if not r.has(edge_style):
 				r.push_back(edge_style)
 	return r
+
+func get_images_file_names() -> Array:
+	var a = []
+	for file_name in DirAccess.get_files_at(DIR_IMAGES):
+		if IMAGE_EXT.has(file_name.get_extension().to_lower()):
+			a.push_back(file_name)
+	return a
 
 #NOTE: This function modifies the passed array! The array is then also returned so that it can be conveniently used in-line.
 func natural_sort(array:Array) -> Array:

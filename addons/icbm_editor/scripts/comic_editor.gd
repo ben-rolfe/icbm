@@ -144,7 +144,6 @@ func _init():
 	add_child(menu)
 	menu.size = Vector2.ZERO
 	menu.id_pressed.connect(_on_menu_item_pressed)
-#	menu.mouse_passthrough = true
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	if OS.get_name() == "macOS":
 		command_or_control = "Command"

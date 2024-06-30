@@ -33,6 +33,10 @@ var balloon:ComicBalloon:
 var data:Dictionary:
 	get:
 		return balloon.tail_data[oid]
+		
+var width:int:
+	get:
+		return balloon.tail_width
 
 func _init(_oid: int, _balloon:ComicBalloon):
 	oid = _oid
@@ -62,13 +66,13 @@ func apply_data():
 	# Calculate start and end points
 	var t_start:Transform2D = balloon.shape.get_edge_transform(balloon, data.start_placement_angle)
 	# We inset the balloon by half the tail width, and by a chunk more for burst and cloud balloons, whose edges can randomly push into the balloon quite a lot.
-	inset_start = -t_start.y * (Comic.tail_width * 0.5 + Comic.EDGE_SEGMENT_LENGTH * data.get("inset_start_multiplier", balloon.edge_style.tail_inset_multiplier))
+	inset_start = -t_start.y * (width * 0.5 + Comic.EDGE_SEGMENT_LENGTH * data.get("inset_start_multiplier", balloon.edge_style.tail_inset_multiplier))
 	p_start = t_start.origin + balloon.center_point
 	var t_end:Transform2D
 	if data.linked:
 		end_balloon = Comic.book.page.os[data.end_oid]
 		t_end = end_balloon.shape.get_edge_transform(end_balloon, data.end_placement_angle)
-		inset_end = -t_end.y * (Comic.tail_width * 0.5 + Comic.EDGE_SEGMENT_LENGTH * data.get("inset_end_multiplier", end_balloon.edge_style.tail_inset_multiplier))
+		inset_end = -t_end.y * (width * 0.5 + Comic.EDGE_SEGMENT_LENGTH * data.get("inset_end_multiplier", end_balloon.edge_style.tail_inset_multiplier))
 		p_end = t_end.origin + end_balloon.center_point
 		edge_color_end = end_balloon.edge_color
 		fill_color_end = end_balloon.fill_color

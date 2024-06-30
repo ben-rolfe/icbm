@@ -183,6 +183,11 @@ func _add_property_row(property:String, preset:String = "_none"):
 			control = LineEdit.new()
 			if not new_property:
 				control.text = Comic.book.presets[category][preset][property]
+		"vector2", "vector2i", "vector3", "vector3i", "vector4", "vector4i":
+			control = LineEdit.new()
+			var dimensions:int = int(Comic.preset_properties[category][property].right(-6).left(1))
+			for i in dimensions:
+				control.text = str(control.text, "," if i > 0 else "", "0" if new_property else Comic.book.presets[category][preset][property][i])
 		_:
 #			print(Comic.preset_properties[category][property] is enum)
 			if Comic.preset_properties[category][property] is Dictionary:
@@ -200,6 +205,7 @@ func _add_property_row(property:String, preset:String = "_none"):
 					control.set_item_metadata(control.item_count - 1, option)
 					if not new_property and Comic.book.presets[category][preset][property] == option:
 						control.select(control.item_count - 1)
+
 	if control != null:
 		var row:HBoxContainer = HBoxContainer.new()
 		list.get_child(-3).add_sibling(row)
@@ -245,6 +251,32 @@ func _on_save_pressed():
 				"string":
 					var line_edit:LineEdit = row.get_child(2)
 					dict[property] = line_edit.text
+				"vector2", "vector2i", "vector3", "vector3i", "vector4", "vector4i":
+					var dimensions:int = int(Comic.preset_properties[category][property].right(-6).left(1))
+					var is_int:bool = Comic.preset_properties[category][property].right(1) == "i"
+					var v:Variant
+					match Comic.preset_properties[category][property]:
+						"vector2":
+							v = Vector2()
+						"vector2i":
+							v = Vector2i()
+						"vector3":
+							v = Vector3()
+						"vector3i":
+							v = Vector3i()
+						"vector4":
+							v = Vector4()
+						"vector4i":
+							v = Vector4i()
+					var line_edit:LineEdit = row.get_child(2)
+					var a:Array = line_edit.text.split(",")
+					for j in a.size():
+						if j < dimensions:
+							if is_int:
+								v[j] = int(a[j])
+							else:
+								v[j] = float(a[j])
+					dict[property] = v
 				_:
 					var option_button:OptionButton = row.get_child(2)
 					dict[property] = option_button.get_selected_metadata()

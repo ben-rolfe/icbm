@@ -12,7 +12,7 @@ func calculate_points(tail:ComicTail, transforms:Array[Transform2D]):
 		#Squeeze the width in the middle
 		var squeeze = 0.5 - i / float(transforms.size() - 1)
 		squeeze = squeeze * squeeze + 0.75
-		var w:float = Comic.tail_width * 0.5 * squeeze
+		var w:float = tail.width * 0.5 * squeeze
 		points.push_front(transforms[i].origin + transforms[i].y * w)
 		points.push_back(transforms[i].origin - transforms[i].y * w)
 	tail.edge_points = points

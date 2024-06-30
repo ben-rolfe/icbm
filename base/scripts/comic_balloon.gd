@@ -3,6 +3,7 @@ extends RichTextLabel
 
 const otype:String = "balloon"
 
+var bounds_rect:Rect2i
 var _final_scale_box:float
 var _final_scale_font:float
 var _final_scale_edge:Vector2
@@ -15,7 +16,7 @@ var edge_offset_angles:PackedFloat32Array
 var edge_points:PackedVector2Array
 var edge_segment_length:float
 var frame_half_size:Vector2
-#var _margins:Vector4
+var panel:Control
 var rng:RandomNumberGenerator
 var tails:Dictionary = {}
 var tail_backlinks:Array = []
@@ -150,6 +151,12 @@ var shown:bool:
 				hide()
 			Comic.book.page.redraw()
 
+var image:String:
+	get:
+		return _data_get("image")
+	set(value):
+		_data_set("image", value)
+
 var italic:bool:
 	get:
 		return _data_get("italic")
@@ -162,11 +169,23 @@ var layer:int:
 	set(value):
 		_data_set("layer", value)
 
+var nine_slice:Vector4i:
+	get:
+		return _data_get("nine_slice")
+	set(value):
+		_data_set("nine_slice", value)
+
 var oid:int:
 	get:
 		return _data.oid
 	set(value):
 		_data.oid = value
+
+var padding:Vector4i:
+	get:
+		return _data_get("padding")
+	set(value):
+		_data_set("padding", value)
 
 var presets:Array:
 	get:
@@ -243,6 +262,12 @@ var width:int:
 		return _data_get("width")
 	set(value):
 		_data_set("width", value)
+
+var tail_width:int:
+	get:
+		return _data_get("tail_width")
+	set(value):
+		_data_set("tail_width", value)
 
 # ------------------------------------------------------------------------------
 
@@ -448,6 +473,9 @@ func apply_data():
 	# We adjust the frame size according to the scale_edge
 	frame_half_size *= scale_edge
 
+	bounds_rect = Rect2i(center_point - frame_half_size, frame_half_size * 2)
+
+
 	# ----------------------------------------------------------------------------------------------
 	# EDGE POINTS
 	# ----------------------------------------------------------------------------------------------
@@ -464,6 +492,8 @@ func apply_data():
 		show()
 	else:
 		hide()
+		
+	shape.manage_panel(self)
 	
 func draw_edge(draw_layer:ComicLayer):
 	edge_style.draw_edge(self, draw_layer)

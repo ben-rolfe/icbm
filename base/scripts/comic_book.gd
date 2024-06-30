@@ -115,7 +115,6 @@ func screen_shot():
 	get_viewport().get_texture().get_image().save_webp(Comic.DIR_SCREENSHOTS + Comic.vars._bookmarks[-1].replace("/","_") + ".webp")
 	OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
 
-
 func _process(delta:float):
 	if change_page:
 		_show_page()

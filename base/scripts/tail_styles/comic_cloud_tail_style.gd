@@ -40,6 +40,6 @@ func draw_fill(tail:ComicTail, draw_layer:ComicLayer):
 	for i in range(tail.edge_points.size() - 1, -1, -1):
 		var t = i / float(tail.edge_points.size() - 1)
 		color = tail.edge_color_start.lerp(tail.edge_color_end, t)
-		draw_layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5) + tail.edge_thickness * EDGE_THICKNESS_CORRECTION, color)
+		draw_layer.draw_circle(tail.edge_points[i], tail.width * (1 - t * 0.5) + tail.edge_thickness * EDGE_THICKNESS_CORRECTION, color)
 		color = tail.fill_color_start.lerp(tail.fill_color_end, t)
-		draw_layer.draw_circle(tail.edge_points[i], Comic.tail_width * (1 - t * 0.5), color)
+		draw_layer.draw_circle(tail.edge_points[i], tail.width * (1 - t * 0.5), color)

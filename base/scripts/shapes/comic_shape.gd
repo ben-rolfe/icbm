@@ -5,11 +5,12 @@ extends RefCounted
 var id:String = "balloon"
 var editor_name:String = "Balloon"
 var editor_icon:Texture2D = load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg"))
-var center_adjustment:Vector2
+var editor_show_edge_options:bool = true
+var editor_show_image_options:bool = false
 
 func adjust_frame_half_size(balloon:ComicBalloon):
 	# For round balloons, we unsquish the corner points a bit (while leaving their contents untouched)
-	# This won't have much effect unless the balloon is very squished 
+	# This won't have much effect unless the balloon is very squished, such as a long single line.
 	var long_side:float
 	var short_side:float
 	var adjustment_direction
@@ -48,3 +49,8 @@ func get_edge_offset(balloon:ComicBalloon, circle_angle:float) -> Vector2:
 
 func has_point(balloon:ComicBalloon, global_point:Vector2) -> bool:
 	return balloon.center_point.distance_squared_to(global_point) < get_edge_transform(balloon, (global_point - balloon.center_point).angle()).origin.length_squared()
+
+func manage_panel(balloon:ComicBalloon):
+	if balloon.panel != null:
+		balloon.panel.hide()
+		balloon.panel.queue_free()

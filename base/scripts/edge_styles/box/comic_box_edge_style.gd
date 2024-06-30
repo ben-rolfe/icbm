@@ -7,8 +7,8 @@ func _init():
 
 func calculate_offsets(balloon:ComicBalloon):
 	balloon.edge_offsets = PackedVector2Array()
-	balloon.edge_offsets.push_back(-balloon.frame_half_size)
-	balloon.edge_offsets.push_back(Vector2(balloon.frame_half_size.x, -balloon.frame_half_size.y))
-	balloon.edge_offsets.push_back(balloon.frame_half_size)
-	balloon.edge_offsets.push_back(Vector2(-balloon.frame_half_size.x, balloon.frame_half_size.y))
+	balloon.edge_offsets.push_back(Vector2(-balloon.frame_half_size.x - balloon.padding.x, -balloon.frame_half_size.y - balloon.padding.y))
+	balloon.edge_offsets.push_back(Vector2(balloon.frame_half_size.x + balloon.padding.z, -balloon.frame_half_size.y - balloon.padding.y))
+	balloon.edge_offsets.push_back(Vector2(balloon.frame_half_size.x + balloon.padding.z, balloon.frame_half_size.y + balloon.padding.w))
+	balloon.edge_offsets.push_back(Vector2(-balloon.frame_half_size.x - balloon.padding.x, balloon.frame_half_size.y + balloon.padding.w))
 	balloon.edge_offsets.push_back(balloon.edge_offsets[0])

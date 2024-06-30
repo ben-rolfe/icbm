@@ -146,7 +146,6 @@ func apply_data():
 	position = anchor
 	polygon.polygon = points
 
-	print("WOOT", shown)
 	if shown:
 		show()
 	else:
