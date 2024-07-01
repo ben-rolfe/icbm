@@ -555,3 +555,89 @@ func open_presets_manager(category:String):
 	var popup = ComicEditorPresetsManager.new(category)
 	Comic.add_child(popup)
 
+
+
+static func menu_open_page_properties():
+	Comic.book.open_properties = Comic.book.page_properties
+
+static func menu_open_book_properties():
+	Comic.book.open_properties = Comic.book.book_properties
+
+static func menu_open_settings_properties():
+	Comic.book.open_properties = Comic.book.settings_properties
+
+static func menu_add_balloon():
+	Comic.book.page.add_balloon({"with_tail":true})
+
+static func menu_add_caption():
+	Comic.book.page.add_balloon({"presets":["caption"]})
+
+static func menu_add_kaboom():
+	Comic.book.page.add_kaboom()
+
+static func menu_add_button():
+	Comic.book.page.add_button()
+	
+static func menu_add_hotspot():
+	Comic.book.page.add_hotspot()	
+
+static func menu_change_background():
+	ComicEditorImageExplorer.open(Comic.book.page.background.import_new_bg)
+
+static func menu_add_line():
+	Comic.book.page.add_line()	
+
+static func menu_add_note():
+	Comic.book.page.add_note()	
+
+static func build_submenu_fragment_properties(id:String, subitem_pressed:Callable) -> bool:
+	var submenu:PopupMenu = PopupMenu.new()
+	Comic.book.menu.add_child(submenu)
+	submenu.index_pressed.connect(subitem_pressed.bind(submenu))
+	submenu.name = id
+	var r = false
+	for key in Comic.book.page.fragments:
+		if key != "":
+			submenu.add_item(key.capitalize())
+			r = true
+	return r
+
+static func submenu_fragment_index_pressed(index:int, submenu:PopupMenu):
+	Comic.book.fragment_properties.key = Comic.book.page.fragments.keys()[index]
+	Comic.book.open_properties = Comic.book.fragment_properties
+
+static func build_submenu_add_image(id:String, subitem_pressed:Callable) -> bool:
+	var submenu:PopupMenu = PopupMenu.new()
+	Comic.book.menu.add_child(submenu)
+	submenu.index_pressed.connect(subitem_pressed.bind(submenu))
+	submenu.name = id
+	for file_name in Comic.get_images_file_names():
+		submenu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "image.svg")), file_name)
+		submenu.set_item_metadata(-1, file_name)
+	submenu.add_separator()
+	submenu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add.svg")), "Import image")
+	return true
+
+static func submenu_image_index_pressed(index:int, submenu:PopupMenu):
+	if index < submenu.item_count - 1:
+		Comic.book.page.add_image({"file_name":submenu.get_item_metadata(index)})
+	else:
+		# Add new image pressed.
+		ComicEditorImageExplorer.open(Comic.book.page.background.import_new_image)
+
+static func menu_undo():
+	Comic.book.undo()
+
+static func menu_redo():
+	Comic.book.redo()
+
+static func menu_save():
+	Comic.book.save()
+
+static func menu_save_and_quit():
+	Comic.book.save(true)
+
+static func menu_quit():
+	Comic.request_quit()
+
+

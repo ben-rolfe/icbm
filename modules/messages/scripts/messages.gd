@@ -12,6 +12,7 @@ var messages:Array = []
 func _init():
 	assert(Comic, "Comic must be autoloaded before Messages")
 	Comic.add_code_tag("message", _message_tag, true)
+	layer = 100
 
 func add(text:String, duration:float = DURATION):
 	var message:ComicTextBlock = ComicTextBlock.new()

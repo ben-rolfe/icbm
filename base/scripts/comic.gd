@@ -102,6 +102,7 @@ var tail_styles:Dictionary = {}
 #var _replacer_keys_ordered:Array[String] = []
 var replacers:Dictionary = {}
 var _code_tags:Dictionary = {}
+var editor_menu_items:Array = []
 
 var preset_properties:Dictionary = {
 	"balloon": {
@@ -459,6 +460,31 @@ func _ready():
 	add_code_tag("menu", _code_tag_menu)
 	add_code_tag("wait", _code_tag_wait, true)
 
+	add_editor_menu_item(0, "Page/Chapter Properties", str(ComicEditor.DIR_ICONS, "properties.svg"), ComicEditor.menu_open_page_properties)
+	add_editor_menu_item(0, "Book Properties", str(ComicEditor.DIR_ICONS, "properties.svg"), ComicEditor.menu_open_book_properties)
+	add_editor_menu_item(0, "Editor Properties", str(ComicEditor.DIR_ICONS, "properties.svg"), ComicEditor.menu_open_settings_properties)
+	add_editor_submenu(0, "Fragment Properties", "fragment", ComicEditor.build_submenu_fragment_properties, ComicEditor.submenu_fragment_index_pressed)
+
+	add_editor_menu_item(1, "Add Balloon", str(ComicEditor.DIR_ICONS, "shape_balloon.svg"), ComicEditor.menu_add_balloon)
+	add_editor_menu_item(1, "Add Caption", str(ComicEditor.DIR_ICONS, "shape_box.svg"), ComicEditor.menu_add_caption)
+	add_editor_menu_item(1, "Add Kaboom", str(ComicEditor.DIR_ICONS, "kaboom.svg"), ComicEditor.menu_add_kaboom)
+
+	add_editor_menu_item(2, "Add Button", str(ComicEditor.DIR_ICONS, "button.svg"), ComicEditor.menu_add_button)
+	add_editor_menu_item(2, "Add Hotspot", str(ComicEditor.DIR_ICONS, "hotspot.svg"), ComicEditor.menu_add_hotspot)
+
+	add_editor_menu_item(3, "Change Background", str(ComicEditor.DIR_ICONS, "background.svg"), ComicEditor.menu_change_background)
+	add_editor_submenu(3, "Add Image", "image", ComicEditor.build_submenu_add_image, ComicEditor.submenu_image_index_pressed)
+	add_editor_menu_item(3, "Add Border Line", str(ComicEditor.DIR_ICONS, "frame_border.svg"), ComicEditor.menu_add_line)
+
+	add_editor_menu_item(4, "Add Note", str(ComicEditor.DIR_ICONS, "note.svg"), ComicEditor.menu_add_note)
+
+	add_editor_menu_item(5, str("Undo (", ComicEditor.command_or_control , "+Z)"), str(ComicEditor.DIR_ICONS, "undo.svg"), ComicEditor.menu_undo)
+	add_editor_menu_item(5, str("Redo (", ComicEditor.command_or_control , "+Y)"), str(ComicEditor.DIR_ICONS, "redo.svg"), ComicEditor.menu_redo)
+
+	add_editor_menu_item(6, str("Save (", ComicEditor.command_or_control , "+S)"), str(ComicEditor.DIR_ICONS, "save.svg"), ComicEditor.menu_save)
+	add_editor_menu_item(6, str("Save and Quit (", ComicEditor.command_or_control , "+S)"), str(ComicEditor.DIR_ICONS, "save.svg"), ComicEditor.menu_save_and_quit)
+	add_editor_menu_item(6, str("Quit Without Saving (", ComicEditor.command_or_control , "+Shift+S)"), str(ComicEditor.DIR_ICONS, "delete.svg"), ComicEditor.menu_quit)
+
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
 	#TODO: Make some of these font features instead? Or allow them to be somehow toggled off for other fonts?
@@ -547,6 +573,17 @@ func add_code_tag(key:String, f:Callable, has_closing_tag:bool = false, separato
 func remove_code_tag(key:String):
 	_code_tags.erase(key)
 	recompile_rex_code_tags()
+
+func add_editor_menu_item(section_pos:int, text:String, icon_path:String, callable:Callable):
+	while editor_menu_items.size() < section_pos + 1:
+		editor_menu_items.push_back([])
+	editor_menu_items[section_pos].push_back({"text":text, "icon_path":icon_path, "callable":callable})
+
+func add_editor_submenu(section_pos:int, text:String, submenu_id:String, submenu_build:Callable, submenu_click:Callable):
+	while editor_menu_items.size() < section_pos + 1:
+		editor_menu_items.push_back([])
+	editor_menu_items[section_pos].push_back({"text":text, "submenu_id":submenu_id, "submenu_build":submenu_build, "submenu_click":submenu_click})
+
 
 func recompile_rex_code_tags():
 	if _code_tags.size() == 0: # just [[raw code]]

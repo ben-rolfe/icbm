@@ -119,13 +119,13 @@ func add_line(data:Dictionary = {}):
 	Comic.book.add_undo_step([ComicReversionParent.new(line, null)])
 	redraw()
 
-func add_label(data:Dictionary = {}):
+func add_kaboom(data:Dictionary = {}):
 	data.otype = "label"
 	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
-	var label:ComicKaboom = add_o(data)
-	label.rebuild(true)
+	var kaboom:ComicKaboom = add_o(data)
+	kaboom.rebuild(true)
 
-	Comic.book.add_undo_step([ComicReversionParent.new(label, null)])
+	Comic.book.add_undo_step([ComicReversionParent.new(kaboom, null)])
 	redraw()
 
 func add_note(data:Dictionary = {}):
