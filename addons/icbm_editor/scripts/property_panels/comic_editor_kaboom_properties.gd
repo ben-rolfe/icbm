@@ -5,6 +5,8 @@ extends ComicEditorProperties
 var kaboom:ComicEditorKaboom
 var text_before_changes:String
 
+@export var font_button:OptionButton
+
 @export var font_color_button:ColorPickerButton
 @export var font_color_revert_button:Button
 var font_color_before_changes:Color
@@ -24,6 +26,11 @@ func _ready():
 	line_edit.caret_blink = true
 	line_edit.focus_entered.connect(_on_text_focused)
 	line_edit.focus_exited.connect(_on_text_unfocused)
+
+	for file_name in DirAccess.get_files_at(str(Comic.DIR_FONTS, "kaboom")):
+		font_button.add_item(file_name.get_basename().capitalize())
+		font_button.set_item_metadata(font_button.item_count - 1, file_name.get_basename())
+	font_button.item_selected.connect(_on_font_button_item_selected)
 
 	font_color_button.pressed.connect(_on_font_color_opened)
 	font_color_button.color_changed.connect(_on_font_color_changed)
@@ -58,6 +65,11 @@ func prepare():
 		line_edit.select_all()
 	else:
 		line_edit.caret_column = line_edit.text.length()
+
+	for i in font_button.item_count:
+		if font_button.get_item_metadata(i) == kaboom.font:
+			font_button.select(i)
+			break
 
 	font_color_button.color = kaboom.font_color
 	_after_font_color_change()
@@ -180,3 +192,7 @@ func _on_disappear_spin_box_value_changed(value:int):
 	Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
 	kaboom.disappear = value
 	
+func _on_font_button_item_selected(index:int):
+	Comic.book.add_undo_step([ComicReversionData.new(kaboom)])
+	kaboom.font = font_button.get_item_metadata(index)
+	kaboom.rebuild(true)

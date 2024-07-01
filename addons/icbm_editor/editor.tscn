@@ -86,7 +86,7 @@ theme = ExtResource("3_wlsv2")
 [node name="MarginContainer" type="MarginContainer" parent="Properties"]
 layout_mode = 2
 
-[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("oid_label", "text_edit", "font_color_button", "font_color_revert_button", "shape_button", "edge_style_row", "edge_style_button", "edge_color_row", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "align_button", "anchor_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button", "padding_l_spin_box", "padding_t_spin_box", "padding_r_spin_box", "padding_b_spin_box", "image_row", "image_button", "nine_slice_row", "nine_slice_l_spin_box", "nine_slice_t_spin_box", "nine_slice_r_spin_box", "nine_slice_b_spin_box")]
+[node name="BalloonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("oid_label", "text_edit", "font_color_button", "font_color_revert_button", "font_button", "shape_button", "edge_style_row", "edge_style_button", "edge_color_row", "edge_color_button", "edge_color_revert_button", "fill_color_button", "fill_color_revert_button", "align_button", "anchor_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button", "padding_l_spin_box", "padding_t_spin_box", "padding_r_spin_box", "padding_b_spin_box", "image_row", "image_button", "nine_slice_row", "nine_slice_l_spin_box", "nine_slice_t_spin_box", "nine_slice_r_spin_box", "nine_slice_b_spin_box")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nq2jk")
@@ -94,6 +94,7 @@ oid_label = NodePath("oid/oid Label")
 text_edit = NodePath("BBTextEdit")
 font_color_button = NodePath("Font Color/Font ColorPickerButton")
 font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
+font_button = NodePath("Font Face/Font OptionButton")
 shape_button = NodePath("Shape/Shape OptionButton")
 edge_style_row = NodePath("Edge Style")
 edge_style_button = NodePath("Edge Style/Edge Style OptionButton")
@@ -142,16 +143,16 @@ layout_mode = 2
 wrap_mode = 1
 script = ExtResource("5_cheip")
 
-[node name="Alignment" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+[node name="Font Face" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Font Face"]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-text = "Text Align:"
+text = "Font:"
 
-[node name="Align OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
+[node name="Font OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Font Face"]
 custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
@@ -171,6 +172,19 @@ layout_mode = 2
 layout_mode = 2
 icon = ExtResource("7_bibqs")
 flat = true
+
+[node name="Alignment" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Text Align:"
+
+[node name="Align OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Alignment"]
+custom_minimum_size = Vector2(304, 0)
+layout_mode = 2
 
 [node name="Shape" type="HBoxContainer" parent="Properties/MarginContainer/BalloonProperties"]
 layout_mode = 2
@@ -562,11 +576,12 @@ layout_mode = 2
 button_pressed = true
 text = "Auto Save Slot"
 
-[node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
+[node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_button", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("7_mktfq")
 line_edit = NodePath("LineEdit")
+font_button = NodePath("Font Face/Font OptionButton")
 font_color_button = NodePath("Font Color/Font ColorPickerButton")
 font_color_revert_button = NodePath("Font Color/Font Color Revert Button")
 outline_color_button = NodePath("Outline Color/Outline ColorPickerButton")
@@ -583,6 +598,19 @@ theme_type_variation = &"HeaderLarge"
 text = "Kaboom Properties"
 
 [node name="LineEdit" type="LineEdit" parent="Properties/MarginContainer/KaboomProperties"]
+layout_mode = 2
+
+[node name="Font Face" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/KaboomProperties/Font Face"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Font:"
+
+[node name="Font OptionButton" type="OptionButton" parent="Properties/MarginContainer/KaboomProperties/Font Face"]
+custom_minimum_size = Vector2(304, 0)
 layout_mode = 2
 
 [node name="Font Color" type="HBoxContainer" parent="Properties/MarginContainer/KaboomProperties"]

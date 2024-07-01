@@ -11,6 +11,8 @@ var text_before_changes:String
 @export var font_color_revert_button:Button
 var font_color_before_changes:Color
 
+@export var font_button:OptionButton
+
 @export var shape_button:OptionButton
 
 @export var edge_style_row:HBoxContainer
@@ -71,6 +73,14 @@ func _ready():
 	font_color_revert_button.pressed.connect(_on_font_color_revert)
 	font_color_revert_button.modulate = Color.BLACK
 
+	for file_name in DirAccess.get_files_at(str(Comic.DIR_FONTS, "balloon")):
+		font_button.add_item(file_name.get_basename().capitalize())
+		font_button.set_item_metadata(font_button.item_count - 1, file_name.get_basename())
+	font_button.item_selected.connect(_on_font_button_item_selected)
+
+	for key in Comic.HORIZONTAL_ALIGNMENTS:
+		align_button.add_item(key)
+		align_button.set_item_metadata(-1, Comic.HORIZONTAL_ALIGNMENTS[key])
 	for key in Comic.shapes:
 		shape_button.add_icon_item(Comic.shapes[key].editor_icon, key)
 		
@@ -136,9 +146,15 @@ func prepare():
 	font_color_button.color = balloon.font_color
 	_after_font_color_change()
 
+	for i in font_button.item_count:
+		if font_button.get_item_metadata(i) == balloon.font:
+			font_button.select(i)
+			break
+
 	for i in shape_button.item_count:
 		if shape_button.get_item_text(i) == balloon.shape.id:
 			shape_button.select(i)
+			break
 	_after_set_shape()
 
 	for i in Comic.HORIZONTAL_ALIGNMENTS.values().size():
@@ -373,4 +389,9 @@ func _on_edge_style_button_item_selected(index:int):
 func _on_image_button_item_selected(index:int):
 	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
 	balloon.image = image_button.get_item_text(index)
+	balloon.rebuild(true)
+
+func _on_font_button_item_selected(index:int):
+	Comic.book.add_undo_step([ComicReversionData.new(balloon)])
+	balloon.font = font_button.get_item_metadata(index)
 	balloon.rebuild(true)
