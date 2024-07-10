@@ -28,9 +28,9 @@ func _init():
 	add_child(_music_player_b)
 
 	Comic.add_code_tag("sound", _sound_tag, true)
-	Comic.before_save.connect(_before_save)
-	Comic.before_load.connect(_before_load)
-	Comic.after_load.connect(_after_load)
+	Comic.before_saved.connect(_before_saved)
+	Comic.before_loaded.connect(_before_loaded)
+	Comic.after_loaded.connect(_after_loaded)
 
 func _ready():
 	_sound_player.stream = AudioStreamPolyphonic.new()
@@ -132,7 +132,7 @@ func stop_ambience(file_name:String = ""):
 			_ambience_players_fading_out.push_back(ambience_player)
 
 
-func _before_save():
+func _before_saved():
 	#TODO: Save position
 	var music_player:AudioStreamPlayer = _music_player_a if _a_is_primary else _music_player_b
 	if music_player.playing:
@@ -146,11 +146,11 @@ func _before_save():
 	else:
 		Comic.vars.erase("_sound_ambient")
 	
-func _before_load():
+func _before_loaded():
 	stop_ambience()
 	play_music()
 
-func _after_load():
+func _after_loaded():
 	if Comic.vars.has("_sound_music"):
 		if Comic.vars.has("_sound_music_t"):
 			play_music(Comic.vars._sound_music, false, Comic.vars._sound_music_t)

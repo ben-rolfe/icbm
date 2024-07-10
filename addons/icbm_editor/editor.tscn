@@ -75,7 +75,7 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -483.0
+offset_left = -503.0
 offset_top = 21.0
 offset_right = -21.0
 offset_bottom = -21.0
@@ -378,7 +378,7 @@ max_value = 999999.0
 [node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
 layout_mode = 2
 
-[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "promote_button", "delete_button")]
+[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "bg_color_button", "bg_color_revert_button", "promote_button", "delete_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nx1jt")
@@ -392,6 +392,8 @@ new_name_lineedit = NodePath("Page Name/New Name LineEdit")
 allow_back_check_box = NodePath("AllowBack CheckBox")
 allow_save_check_box = NodePath("AllowSave CheckBox")
 auto_save_check_box = NodePath("AutoSave CheckBox")
+bg_color_button = NodePath("BG Color/BG ColorPickerButton")
+bg_color_revert_button = NodePath("BG Color/BG Color Revert Button")
 promote_button = NodePath("Promote Button")
 delete_button = NodePath("Delete Button")
 
@@ -457,6 +459,23 @@ text = "Allow save  (if manual slots exist)"
 layout_mode = 2
 button_pressed = true
 text = "Auto-save (if auto slot exists)"
+
+[node name="BG Color" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/PageProperties/BG Color"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "BG Color:"
+
+[node name="BG ColorPickerButton" type="ColorPickerButton" parent="Properties/MarginContainer/PageProperties/BG Color"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="BG Color Revert Button" type="Button" parent="Properties/MarginContainer/PageProperties/BG Color"]
+layout_mode = 2
+icon = ExtResource("7_bibqs")
+flat = true
 
 [node name="Promote Button" type="Button" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2

@@ -65,6 +65,13 @@ var auto_save:bool:
 	set(value):
 		_data_set("auto_save", value)
 
+var bg_color:Color:
+	get:
+		return _data_get("bg_color")
+	set(value):
+		_data_set("bg_color", value)
+		RenderingServer.set_default_clear_color(value)
+
 var fragments:Dictionary:
 	get:
 		return _data.fragments
@@ -120,6 +127,7 @@ func _init(_bookmark: String):
 	# --------------------------------------------------------------------------
 
 	_data = all_data.page_data
+	RenderingServer.set_default_clear_color(bg_color)
 
 	for key in all_data.fragments:
 		add_fragment(key, all_data.fragments[key])
@@ -251,6 +259,12 @@ func exit_hotspot(hotspot:ComicHotspot):
 
 # ------------------------------------------------------------------------------
 
+func is_default(key:Variant) -> bool:
+	return _data_get(key) == _default_data[key]
+
+func clear_data(key:Variant):
+	_data.erase(key)
+
 func _data_get(key:Variant):
 	return _data.get(key, _default_data[key])
 
@@ -259,4 +273,3 @@ func _data_set(key:Variant, value:Variant):
 		_data.erase(key)
 	else:
 		_data[key] = value
-

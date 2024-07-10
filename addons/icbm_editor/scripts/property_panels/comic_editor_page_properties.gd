@@ -23,6 +23,10 @@ var original_page_name:String = ""
 @export var allow_save_check_box:CheckBox
 @export var auto_save_check_box:CheckBox
 
+@export var bg_color_button:ColorPickerButton
+@export var bg_color_revert_button:Button
+var bg_color_before_changes:Color
+
 @export var promote_button:Button
 @export var delete_button:Button
 
@@ -47,6 +51,12 @@ func _ready():
 	allow_back_check_box.toggled.connect(_on_allow_back_check_box_toggled)
 	allow_save_check_box.toggled.connect(_on_allow_save_check_box_toggled)
 	auto_save_check_box.toggled.connect(_on_auto_save_check_box_toggled)
+
+	bg_color_button.pressed.connect(_on_bg_color_opened)
+	bg_color_button.color_changed.connect(_on_bg_color_changed)
+	bg_color_button.popup_closed.connect(_on_bg_color_closed)
+	bg_color_revert_button.pressed.connect(_on_bg_color_revert)
+	bg_color_revert_button.modulate = Color.BLACK
 
 	promote_button.pressed.connect(_on_promote_pressed)
 	delete_button.pressed.connect(_on_delete_pressed)
@@ -86,6 +96,9 @@ func prepare():
 	allow_back_check_box.button_pressed = page.allow_back
 	allow_save_check_box.button_pressed = page.allow_save
 	auto_save_check_box.button_pressed = page.auto_save
+
+	bg_color_button.color = page.bg_color
+	_after_bg_color_change()
 
 	action_button.select(page.action)
 	after_action_changed()
@@ -185,3 +198,32 @@ func _on_promote_pressed():
 		Comic.confirm("Promote Page?", "You are about to promote this page to the title page of the chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old title page will be renamed to \"old_title_page\".\n\nAre you sure you want to promote the page?", Comic.book.promote)
 	else:
 		Comic.confirm("Promote Chapter?", "You are about to promote this chapter to be the \"start\" chapter.\n\nAny changes you have made WILL BE SAVED and the editor will be closed.\nThe old start chapter will be renamed to \"old_start_chapter\".\n\nAre you sure you want to promote the chapter?", Comic.book.promote)
+
+
+func _on_bg_color_opened():
+	bg_color_before_changes = page.bg_color
+
+func _on_bg_color_changed(color:Color):
+	page.bg_color = color
+	_after_bg_color_change()
+
+func _on_bg_color_closed():
+	if page.bg_color != bg_color_before_changes:
+		var reversion:ComicReversionData = ComicReversionData.new(page)
+		reversion.data.bg_color = bg_color_before_changes
+		Comic.book.add_undo_step([reversion])
+
+func _on_bg_color_revert():
+	if not page.is_default("bg_color"):
+		Comic.book.add_undo_step([ComicReversionData.new(page)])
+		page.clear_data("bg_color")
+		page.bg_color = page.bg_color #Trigger the setter to apply the data.
+		_after_bg_color_change()
+		bg_color_button.color = page.bg_color
+
+func _after_bg_color_change():
+	page.rebuild(true)
+	if page.is_default("bg_color"):
+		bg_color_revert_button.hide()
+	else:
+		bg_color_revert_button.show()

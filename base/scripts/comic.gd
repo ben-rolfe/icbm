@@ -71,10 +71,18 @@ var _rex_tag_params:RegEx = RegEx.new()
 var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
 
-signal before_save
-signal after_save
-signal before_load
-signal after_load
+#NOTE: That these events are emitted by the player saving and loading their game file, and NOT by the author saving a page (that emits editor_save) or by any page being loaded
+signal before_saved
+signal after_saved
+signal before_loaded
+signal after_loaded
+
+signal editor_saved
+signal editor_renamed
+signal editor_deleted
+
+signal page_changed
+signal quitted
 
 var config:ConfigFile = ConfigFile.new()
 var book:ComicBook
@@ -242,6 +250,7 @@ var preset_properties:Dictionary = {
 		"allow_back": "bool",
 		"allow_save": "bool",
 		"auto_save": "bool",
+		"bg_color": "color",
 	}
 }
 var preset_property_misc_defaults = {
@@ -754,6 +763,7 @@ func request_quit():
 
 func quit():
 	config.save(CONFIG_FILE)
+	quitted.emit()
 	get_tree().quit()
 
 func get_seed_from_position(v:Vector2) -> int:
@@ -1056,24 +1066,24 @@ func _code_tag_wait(params:Dictionary, contents:Array) -> String:
 	return ""
 
 func save_savefile(save_id:int):
-	before_save.emit()
+	before_saved.emit()
 	book.has_unsaved_changes = false
 	var file = FileAccess.open(str(DIR_SAVES, "data_", save_id, ".sav"), FileAccess.WRITE)
 	file.store_var(Comic.vars)
 	var capture = Comic.book.page.get_texture().get_image()
 	capture.resize(ProjectSettings.get_setting("display/window/size/viewport_width") / 4, ProjectSettings.get_setting("display/window/size/viewport_height") / 4)
 	capture.save_webp(str(DIR_SAVES, "thumb_", save_id, ".webp"))
-	after_save.emit()
+	after_saved.emit()
 
 
 func load_savefile(save_id:int):
 	var path = str(Comic.DIR_SAVES, "data_", save_id, ".sav")
 	if FileAccess.file_exists(path):
-		before_load.emit()
+		before_loaded.emit()
 		var file = FileAccess.open(path, FileAccess.READ)
 		Comic.vars = file.get_var()
 		Comic.book.change_page = true
-		after_load.emit()
+		after_loaded.emit()
 
 func save_exists(slot:int = -1) -> bool:
 	if slot > -1:

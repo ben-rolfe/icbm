@@ -190,6 +190,7 @@ func _show_page():
 		_show_page()
 	else:
 		page.rebuild()
+		Comic.page_changed.emit(bookmark)
 
 func page_back():
 	if history.size() > 1:
@@ -233,10 +234,4 @@ func get_relative_bookmark_index(from_key:String, offset:int) -> int:
 
 func get_relative_bookmark(from_key:String, offset:int) -> String:
 	return bookmarks[get_relative_bookmark_index(from_key, offset)]
-
-#func save(quit_after_saving:bool = false):
-	#print("TODO: Save")
-	#has_unsaved_changes = false
-	#if quit_after_saving:
-		#Comic.quit()
 

@@ -8,8 +8,8 @@ func _init():
 	assert(Comic, "Comic must be autoloaded before Random")
 	Comic.add_code_tag("random", _random_tag)
 	Comic.add_code_tag("roll", _roll_tag)
-	Comic.before_save.connect(_before_save)
-	Comic.after_load.connect(_after_load)
+	Comic.before_saved.connect(_before_saved)
+	Comic.after_loaded.connect(_after_loaded)
 
 func _random_tag(params:Dictionary) -> String:
 	_handle_seed_params(params)
@@ -53,13 +53,13 @@ func _handle_seed_params(params:Dictionary):
 		rng.randomize()
 
 	
-func _before_save():
+func _before_saved():
 	if seeded:
 		Comic.vars._random_seed = rng.seed
 	else:
 		Comic.vars.erase("_random_seed")
 
-func _after_load():
+func _after_loaded():
 	if Comic.vars.has("_random_seed"):
 		seeded = true
 		rng.seed = int(Comic.vars._random_seed)

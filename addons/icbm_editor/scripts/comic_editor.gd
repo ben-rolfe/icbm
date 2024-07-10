@@ -183,7 +183,9 @@ func left_clicked(target:CanvasItem, _event:InputEvent):
 	selected_element = target
 
 func double_clicked(target:CanvasItem, _event:InputEvent):
-	if target.has_method("menu_command_pressed"):
+	if target is ComicEditorBackground:
+		menu_open_page_properties()
+	elif target.has_method("menu_command_pressed"):
 		target.menu_command_pressed(MenuCommand.OPEN_PROPERTIES)
 
 func right_clicked(target:CanvasItem, event:InputEvent):
@@ -281,7 +283,6 @@ func last_undo_matched(o:Control, key:String) -> bool:
 	return undo_steps.size() > 0 and undo_steps[-1].size() == 1 and undo_steps[-1][0] is ComicReversionData and undo_steps[-1][0].o == o and undo_steps[-1][0].data.get(key) != o._data.get(key)
 
 func cut() -> bool:
-	print("CUT CLICK")
 	if copy():
 		if selected_element.has_method("remove"):
 			selected_element.remove()
@@ -379,6 +380,9 @@ func save(quit_after_saving:bool = false):
 	# Update the last_bookmark editor setting, in case we changed the bookmark
 	Comic.config.set_value("editor", "last_bookmark", page.bookmark)
 	
+	# Note that this is called before we set has_unsaved_changes to false 
+	Comic.editor_saved.emit(page.bookmark)
+
 	has_unsaved_changes = false
 	if quit_after_saving:
 		Comic.quit()
@@ -402,7 +406,7 @@ static func rename_chapter(old_bookmark:String, new_bookmark:String):
 	update_links(old_bookmark, new_bookmark)
 
 static func rename_page(old_bookmark:String, new_bookmark:String):
-	#NOTE: This method doesn't test new_bnookmark is unique. That should be done before calling this method.
+	#NOTE: This method doesn't test new_bookmark is unique. That should be done before calling this method.
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
 	update_links(old_bookmark, new_bookmark, false)
 	# If either page is a title page, we add "/_" to it to get the file name
@@ -417,6 +421,7 @@ static func rename_page(old_bookmark:String, new_bookmark:String):
 			# Remove Godot's import file - image will be reimported at new location. (Doing this because I'm not sure if it's safe to move a .import)
 			dir.remove(str(old_bookmark, ".", ext, ".import"))
 			break
+	Comic.editor_renamed.emit(old_bookmark, new_bookmark)
 
 static func delete_page(bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
@@ -427,6 +432,7 @@ static func delete_page(bookmark:String):
 			dir.remove(str(bookmark, ".", ext, ".import"))
 			break
 	update_links(bookmark, "")
+	Comic.editor_deleted.emit(bookmark)
 
 static func delete_chapter(bookmark:String):
 	var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
@@ -455,34 +461,6 @@ static func update_links(from_bookmark:String, to_bookmark:String, entire_chapte
 		print("TODO: Update links to whole chapter")
 	else:
 		print("TODO: Update links")
-
-#static func load_setting(key:String, default_value:Variant = null) -> Variant:
-	#var settings = _load_settings_file()
-	#return settings.get(key, default_value)
-#
-#static func save_setting(key:String, value:Variant):
-	#var settings = _load_settings_file()
-	#settings[key] = value
-	#_save_settings_file(settings)
-#
-#static func save_settings(dict:Dictionary):
-	#var settings = _load_settings_file()
-	#for key in dict:
-		#settings[key] = dict[key]
-	#_save_settings_file(settings)
-#
-#static func _load_settings_file() -> Dictionary:
-	#if FileAccess.file_exists(SETTINGS_PATH):
-		#var file = FileAccess.open(SETTINGS_PATH, FileAccess.READ)
-		#var settings:Dictionary = file.get_var()
-		#file.close()
-		#return settings
-	#return {}
-	#
-#static func _save_settings_file(settings:Dictionary):
-	#var file = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
-	#file.store_var(settings)
-	#file.close()
 
 func save_presets_file():
 	var file = FileAccess.open(str(Comic.DIR_STORY, "presets.", Comic.STORY_EXT), FileAccess.WRITE)
