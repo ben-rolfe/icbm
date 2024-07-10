@@ -111,7 +111,21 @@ func get_save_data() -> Dictionary:
 	if r.has("new_path"):
 		# Save new image
 		r.file_name = r.new_path.get_file().to_lower().replace(" ", "_").replace("-", "_")
-		DirAccess.copy_absolute(r.new_path, str(Comic.DIR_IMAGES, r.file_name))
+		if Comic.book.image_quality < 0:
+			# Image quality of -1 means keep the original image format
+			if FileAccess.file_exists(str(Comic.DIR_IMAGES, r.file_name)):
+				DirAccess.remove_absolute(str(Comic.DIR_IMAGES, r.file_name))
+			DirAccess.copy_absolute(r.new_path, str(Comic.DIR_IMAGES, r.file_name))
+		else:
+			r.file_name = str(r.file_name.get_basename(), ".webp")
+			if FileAccess.file_exists(str(Comic.DIR_IMAGES, r.file_name)):
+				DirAccess.remove_absolute(str(Comic.DIR_IMAGES, r.file_name))
+			if Comic.book.image_quality >= 100:
+				# Image quality of 100 (or greater) means lossless webp
+				Image.load_from_file(r.new_path).save_webp(str(Comic.DIR_IMAGES, r.file_name))
+			else:
+				# Image quality of 0-99 means lossy webp
+				Image.load_from_file(r.new_path).save_webp(str(Comic.DIR_IMAGES, r.file_name), true, Comic.book.image_quality / 100.0)
 		r.erase("new_path")
 	return r
 	

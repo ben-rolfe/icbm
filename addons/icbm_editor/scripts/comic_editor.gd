@@ -136,6 +136,11 @@ var selected_element:CanvasItem:
 			page.redraw()
 			page.rebuild_widgets()
 
+var image_quality:int:
+	get:
+		return Comic.config.get_value("editor", "image_quality", 90)
+	set(value):
+		Comic.config.set_value("editor", "image_quality", value)
 # ------------------------------------------------------------------------------
 
 func _init():
@@ -601,7 +606,7 @@ static func submenu_image_index_pressed(index:int, submenu:PopupMenu):
 		Comic.book.page.add_image({"file_name":submenu.get_item_metadata(index)})
 	else:
 		# Add new image pressed.
-		ComicEditorImageExplorer.open(Comic.book.page.background.import_new_image)
+		ComicEditorImageExplorer.open(Comic.book.page.import_new_image)
 
 static func menu_undo():
 	Comic.book.undo()

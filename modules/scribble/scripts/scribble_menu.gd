@@ -51,13 +51,14 @@ func _ready():
 	clear_button.pressed.connect(_on_clear_pressed)
 
 func _input(event:InputEvent):
-	if event is InputEventKey and event.pressed:
-		# Pass keypresses to the scribble_rect for processing
-		Scribble.scribble_rect._input(event)
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-		# On a right click, we close the scribble and manually pass the click event to the background.
-		Scribble.close()
-		Comic.book.page.background._gui_input(event)
+	if Comic.book is ComicEditor:
+		if event is InputEventKey and event.pressed:
+			# Pass keypresses to the scribble_rect for processing
+			Scribble.scribble_rect._input(event)
+		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+			# On a right click, we close the scribble and manually pass the click event to the background.
+			Scribble.close()
+			Comic.book.page.background._gui_input(event)
 
 func _on_color_changed(new_color:Color):
 	Scribble.scribble_rect.pencil_color = new_color

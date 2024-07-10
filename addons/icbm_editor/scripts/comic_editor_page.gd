@@ -225,3 +225,6 @@ func redraw(rebuild_lookups_first:bool = false):
 		layer.queue_redraw()
 	Comic.book.page.render_target_update_mode = SubViewport.UPDATE_ONCE
 
+func import_new_image(path:String):
+	add_image({"new_path":path})
+

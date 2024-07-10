@@ -10,6 +10,7 @@ extends ComicBackground
 var _data:Dictionary = {}
 var undo_refcount:int
 
+
 func _get_drag_data(at_position:Vector2):
 	if Comic.book.selected_element != self and Comic.book.selected_element.has_method("_get_drag_data"):
 		Comic.book.selected_element._get_drag_data(at_position)
@@ -58,13 +59,23 @@ func import_new_bg(path:String):
 	rebuild()
 	Comic.book.page.redraw()
 
-func import_new_image(path:String):
-	Comic.book.page.add_image({"new_path":path})
-
 func rebuild():
 	if _data.has("new_bg_path"):
 		# Using an image that isn't in the resources, yet - load it from the filesystem 
-		texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_bg_path))
+		if Comic.book.image_quality < 0:
+			# Image quality of -1 means keep the original image format
+			texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_bg_path))
+		else:
+			var webp_buffer:PackedByteArray
+			if Comic.book.image_quality >= 100:
+				# Image quality of 100 (or greater) means lossless webp
+				webp_buffer = Image.load_from_file(_data.new_bg_path).save_webp_to_buffer()
+			else:
+				# Image quality of 0-99 means lossy webp
+				webp_buffer = Image.load_from_file(_data.new_bg_path).save_webp_to_buffer(true, Comic.book.image_quality / 100.0)
+			var webp_image = texture.get_image()
+			webp_image.load_webp_from_buffer(webp_buffer)
+			texture = ImageTexture.create_from_image(webp_image)
 	else:
 		super()
 
@@ -111,9 +122,13 @@ func save():
 			dir.remove(str(path_base, ext, ".import"))
 
 		# Save new image
-		var save_path:String = str(Comic.DIR_STORY, path_base, _data.new_bg_path.get_extension().to_lower())
 		if dir != null:
-			dir.copy(_data.new_bg_path, save_path)
-
-
-
+			if Comic.book.image_quality < 0:
+				# Image quality of -1 means keep the original image format
+				dir.copy(_data.new_bg_path, str(Comic.DIR_STORY, path_base, _data.new_bg_path.get_extension().to_lower()))
+			elif Comic.book.image_quality >= 100:
+				# Image quality of 100 (or greater) means lossless webp
+				Image.load_from_file(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"))
+			else:
+				# Image quality of 0-99 means lossy webp
+				Image.load_from_file(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"), true, Comic.book.image_quality / 100.0)

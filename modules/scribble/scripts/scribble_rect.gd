@@ -60,34 +60,36 @@ func _init():
 	apply_eraser_properties()
 
 func _input(event:InputEvent):
-	if Comic.book is ComicEditor and event is InputEventKey and event.pressed and active:
-		if event.is_action_pressed("ui_cancel"):
-			get_viewport().set_input_as_handled()
-		elif event.is_action_pressed("ui_undo"):
-			undo()
-			get_viewport().set_input_as_handled()
-		elif event.is_action_pressed("ui_redo"):
-			redo()
-			get_viewport().set_input_as_handled()
-		else:
-			# We're not handling it - pass it to the ComicEditor
-			Comic.book._unhandled_key_input(event)
+	if Comic.book is ComicEditor:
+		if event is InputEventKey and event.pressed and active:
+			if event.is_action_pressed("ui_cancel"):
+				get_viewport().set_input_as_handled()
+			elif event.is_action_pressed("ui_undo"):
+				undo()
+				get_viewport().set_input_as_handled()
+			elif event.is_action_pressed("ui_redo"):
+				redo()
+				get_viewport().set_input_as_handled()
+			else:
+				# We're not handling it - pass it to the ComicEditor
+				Comic.book._unhandled_key_input(event)
 
 func _gui_input(event:InputEvent):
-	if event is InputEventMouseMotion:
-		if not is_zero_approx(event.pressure): 
-			paint_to(event.position)
-			last_pos = event.position
-	elif event is InputEventMouseButton and event.pressed:
-		match event.button_index:
-			MOUSE_BUTTON_LEFT:
-				create_undo_step()
-				last_pos = event.position
+	if Comic.book is ComicEditor:
+		if event is InputEventMouseMotion:
+			if not is_zero_approx(event.pressure): 
 				paint_to(event.position)
-			MOUSE_BUTTON_RIGHT:
-				# On a right click, we close the scribble and manually pass the click event to the background.
-				Scribble.close()
-				Comic.book.page.background._gui_input(event)
+				last_pos = event.position
+		elif event is InputEventMouseButton and event.pressed:
+			match event.button_index:
+				MOUSE_BUTTON_LEFT:
+					create_undo_step()
+					last_pos = event.position
+					paint_to(event.position)
+				MOUSE_BUTTON_RIGHT:
+					# On a right click, we close the scribble and manually pass the click event to the background.
+					Scribble.close()
+					Comic.book.page.background._gui_input(event)
 
 func paint_to(next_pos:Vector2):
 	var steps:int = floor(next_pos.distance_to(last_pos) / STEP_DISTANCE)

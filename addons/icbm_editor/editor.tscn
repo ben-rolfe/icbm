@@ -522,7 +522,7 @@ text = "Show in editor"
 layout_mode = 2
 text = "Remove fragment (keep contents)"
 
-[node name="EditorSettings" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("snap_to_grid_check_box", "show_grid_check_box", "grid_x_spin_box", "grid_y_spin_box")]
+[node name="EditorSettings" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("snap_to_grid_check_box", "show_grid_check_box", "grid_x_spin_box", "grid_y_spin_box", "image_quality_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("10_2xp14")
@@ -530,6 +530,7 @@ snap_to_grid_check_box = NodePath("Snap to Grid CheckBox")
 show_grid_check_box = NodePath("Grid Size/Show Grid CheckBox")
 grid_x_spin_box = NodePath("Grid Size/grid_x")
 grid_y_spin_box = NodePath("Grid Size/grid_y")
+image_quality_button = NodePath("Image Quality/Image Quality OptionButton")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/EditorSettings"]
 layout_mode = 2
@@ -572,6 +573,22 @@ text = "px"
 layout_mode = 2
 button_pressed = true
 text = "Snap to Grid (Shift for opposite)"
+
+[node name="Image Quality" type="HBoxContainer" parent="Properties/MarginContainer/EditorSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/EditorSettings/Image Quality"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Image Quality:"
+
+[node name="Image Quality OptionButton" type="OptionButton" parent="Properties/MarginContainer/EditorSettings/Image Quality"]
+layout_mode = 2
+
+[node name="Image Compression Description" type="Label" parent="Properties/MarginContainer/EditorSettings"]
+layout_mode = 2
+text = "(applied on import of
+images and backgrounds)"
 
 [node name="BookProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("auto_save_slot_check_box", "manual_save_slots_check_box")]
 visible = false
