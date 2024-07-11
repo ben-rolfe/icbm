@@ -51,10 +51,9 @@ var active:bool:
 		return mouse_filter == Control.MOUSE_FILTER_STOP
 	set(value):
 		mouse_filter = Control.MOUSE_FILTER_STOP if value else Control.MOUSE_FILTER_IGNORE
-		if value:
-			pass
 
 func _init():
+	active = false
 	clear_image()
 	apply_pencil_properties()
 	apply_eraser_properties()
