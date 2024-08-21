@@ -290,7 +290,7 @@ var default_presets:Dictionary = {
 		"whisper": {
 			"edge_style": "dash",
 			"italic": true,
-			"text_scale": 0.75,
+			"scale_box": 0.75,
 		},
 		"yell": {
 			"edge_style": "burst",

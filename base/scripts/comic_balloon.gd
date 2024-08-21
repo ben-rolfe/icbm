@@ -378,7 +378,7 @@ func apply_data():
 	# @width
 	autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if width > 0:
-		size.x = width
+		size.x = width * _final_scale_box
 	else:
 		# The width has been explicitly set to 0, which means we want unlimited width with no wrapping
 		autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -471,7 +471,7 @@ func apply_data():
 	shape.adjust_frame_half_size(self)
 
 	# We adjust the frame size according to the scale_edge
-	frame_half_size *= scale_edge
+	frame_half_size *= _final_scale_edge
 
 	bounds_rect = Rect2i(center_point - frame_half_size, frame_half_size * 2)
 
