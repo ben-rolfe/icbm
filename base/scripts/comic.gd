@@ -491,8 +491,8 @@ func _ready():
 	add_editor_menu_item(5, str("Redo (", ComicEditor.command_or_control , "+Y)"), str(ComicEditor.DIR_ICONS, "redo.svg"), ComicEditor.menu_redo)
 
 	add_editor_menu_item(6, str("Save (", ComicEditor.command_or_control , "+S)"), str(ComicEditor.DIR_ICONS, "save.svg"), ComicEditor.menu_save)
-	add_editor_menu_item(6, str("Save and Quit (", ComicEditor.command_or_control , "+S)"), str(ComicEditor.DIR_ICONS, "save.svg"), ComicEditor.menu_save_and_quit)
-	add_editor_menu_item(6, str("Quit Without Saving (", ComicEditor.command_or_control , "+Shift+S)"), str(ComicEditor.DIR_ICONS, "delete.svg"), ComicEditor.menu_quit)
+	add_editor_menu_item(6, str("Save and Quit (", ComicEditor.command_or_control , "+Shift+S)"), str(ComicEditor.DIR_ICONS, "save.svg"), ComicEditor.menu_save_and_quit)
+	add_editor_menu_item(6, str("Quit Without Saving (", ComicEditor.command_or_control , "+Q)"), str(ComicEditor.DIR_ICONS, "delete.svg"), ComicEditor.menu_quit)
 
 	replacers["[b]"] = "[b][i]"
 	replacers["[/b]"] = "[/i][/b]"
