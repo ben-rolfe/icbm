@@ -300,6 +300,7 @@ var default_presets:Dictionary = {
 	"book": {
 		"": {
 			"auto_save_slot": true,
+			"init_commands": "",
 			"manual_save_slots": true,
 		}
 	},

@@ -590,12 +590,13 @@ layout_mode = 2
 text = "(applied on import of
 images and backgrounds)"
 
-[node name="BookProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("auto_save_slot_check_box", "manual_save_slots_check_box")]
+[node name="BookProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("auto_save_slot_check_box", "manual_save_slots_check_box", "init_commands_text_edit")]
 visible = false
 layout_mode = 2
 script = ExtResource("11_npbar")
 auto_save_slot_check_box = NodePath("AutoSaveSlot CheckBox")
 manual_save_slots_check_box = NodePath("ManualSaveSlots CheckBox")
+init_commands_text_edit = NodePath("Initialization Commands TextEdit")
 
 [node name="Header" type="Label" parent="Properties/MarginContainer/BookProperties"]
 layout_mode = 2
@@ -611,6 +612,16 @@ text = "Manual Save Slots"
 layout_mode = 2
 button_pressed = true
 text = "Auto Save Slot"
+
+[node name="Initialization Label" type="Label" parent="Properties/MarginContainer/BookProperties"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Initialization:"
+
+[node name="Initialization Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/BookProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+placeholder_text = "Enter Commands..."
 
 [node name="KaboomProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("line_edit", "font_button", "font_color_button", "font_color_revert_button", "outline_color_button", "outline_color_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
