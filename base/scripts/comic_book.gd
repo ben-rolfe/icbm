@@ -173,9 +173,11 @@ func _show_page():
 	#print(history)
 	while history.size() > _history_size:
 		history.pop_front()
-	# Buttons are not part of the page itself, so we need to clear them separately:
+	# Buttons and hotspots are not part of the page itself, so we need to clear them separately:
 	for button in buttons_container.get_children():
 		button.queue_free()
+	for hotspot in hotspots_container.get_children():
+		hotspot.queue_free()
 	if page != null:
 		#TODO: Transitions?
 		page.queue_free()
