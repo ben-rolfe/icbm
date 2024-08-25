@@ -92,9 +92,6 @@ func _init():
 				bookmarks.push_back(str(chapter, "/", page_filename))
 
 func _ready():
-	if not self is ComicEditor:
-		# If we're in play mode (whether actually playing or testing) then we run the init_commands before we open the game.
-		Comic.parse_hidden_string(init_commands)
 	if OS.is_debug_build():
 		start(Comic.config.get_value("editor", "bookmark", "start"))
 		# We reset the bookmark to start, so that that will be open next time the game is run (unless changed by ComicEditorPlugin, in the meantime
@@ -134,6 +131,9 @@ func _process(delta:float):
 
 func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
+	if not self is ComicEditor:
+		# If we're in play mode (whether actually playing or testing) then we run the init_commands before we open the game.
+		Comic.parse_hidden_string(init_commands)
 	change_page = true
 
 func left_clicked(target:CanvasItem, _event:InputEvent):
