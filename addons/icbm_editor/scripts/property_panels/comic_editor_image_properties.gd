@@ -2,6 +2,9 @@ class_name ComicEditorImageProperties
 extends ComicEditorProperties
 
 var image:ComicEditorImage
+
+@export var file_name_line_edit:LineEdit
+
 @export var anchor_button:OptionButton
 @export var flip_check_box:CheckBox
 
@@ -16,6 +19,9 @@ var tint_before_changes:Color
 @export var disappear_button:OptionButton
 
 func _ready():
+	file_name_line_edit.text_submitted.connect(_on_file_name_submitted)
+	file_name_line_edit.focus_exited.connect(_on_file_name_unfocused)
+
 	for key in Comic.ANCHOR_POINTS:
 		anchor_button.add_icon_item(load(str(ComicEditor.DIR_ICONS, "anchor_", key.to_lower(), ".svg")), key)
 		anchor_button.set_item_metadata(-1, Comic.ANCHOR_POINTS[key])
@@ -47,7 +53,9 @@ func prepare():
 		if Comic.ANCHOR_POINTS.values()[i] == image.anchor_to:
 			anchor_button.select(i)
 			break
-			
+
+	file_name_line_edit.text = image.file_name
+
 	flip_check_box.button_pressed = image.flip
 
 	tint_button.color = image.tint
@@ -136,3 +144,11 @@ func _on_disappear_spin_box_value_changed(value:int):
 	Comic.book.add_undo_step([ComicReversionData.new(image)])
 	image.disappear = value
 	
+func _on_file_name_submitted(new_text:String):
+	file_name_line_edit.release_focus()
+
+func _on_file_name_unfocused():
+	if file_name_line_edit.text != image.file_name:
+		Comic.book.add_undo_step([ComicReversionData.new(image)])
+	image.file_name = file_name_line_edit.text
+	image.rebuild()

@@ -728,10 +728,11 @@ max_value = 999999.0
 [node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/KaboomProperties/Disappear"]
 layout_mode = 2
 
-[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("anchor_button", "flip_check_box", "tint_button", "tint_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
+[node name="ImageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("file_name_line_edit", "anchor_button", "flip_check_box", "tint_button", "tint_revert_button", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("13_jcyyd")
+file_name_line_edit = NodePath("File Name/File Name LineEdit")
 anchor_button = NodePath("Anchor/Anchor OptionButton")
 flip_check_box = NodePath("Flip CheckBox")
 tint_button = NodePath("Tint/Tint ColorPickerButton")
@@ -746,6 +747,18 @@ disappear_button = NodePath("Disappear/Disappear OptionButton")
 layout_mode = 2
 theme_type_variation = &"HeaderLarge"
 text = "Image Properties"
+
+[node name="File Name" type="HBoxContainer" parent="Properties/MarginContainer/ImageProperties"]
+layout_mode = 2
+
+[node name="File Name Label" type="Label" parent="Properties/MarginContainer/ImageProperties/File Name"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "images/"
+
+[node name="File Name LineEdit" type="LineEdit" parent="Properties/MarginContainer/ImageProperties/File Name"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Anchor" type="HBoxContainer" parent="Properties/MarginContainer/ImageProperties"]
 layout_mode = 2

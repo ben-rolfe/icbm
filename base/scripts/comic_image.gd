@@ -166,11 +166,18 @@ func apply_data():
 		# Using an image that isn't in the resources, yet - load it from the filesystem 
 		texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_path))
 	else:
+		var final_file_name:String = str(Comic.DIR_IMAGES, file_name if Comic.book is ComicEditor else Comic.execute_embedded_code(file_name))
 		#NOTE: We don't use Comic.load_texture to load from the library, because file_name includes the extension
-		texture = ResourceLoader.load(str(Comic.DIR_IMAGES, file_name))
+		if ResourceLoader.exists(final_file_name):
+			texture = ResourceLoader.load(final_file_name)
+		elif Comic.book is ComicEditor:
+			# We can't find the image - Use a placeholder.
+			# This isn't necessarily an error - the problem may be because it includes code, but we're in the editor, so we can't check that.
+			texture = ResourceLoader.load("res://addons/icbm_editor/theme/broken_image_placeholder.svg")
+
 	if texture == null:
-		# No background - use black background instead.
-		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
+		# No image - use a transparent image.
+		texture = ImageTexture.create_from_image(Image.create(1, 1, false, Image.FORMAT_RGBA8))
 	recalc_size()
 	
 	pivot_offset = anchor_to * size
