@@ -131,6 +131,7 @@ func _process(delta:float):
 
 func start(start_page:String = "start"):
 	Comic.vars = { "_bookmarks": [start_page] }
+	Comic.started.emit()
 	if not self is ComicEditor:
 		# If we're in play mode (whether actually playing or testing) then we run the init_commands before we open the game.
 		Comic.parse_hidden_string(init_commands)

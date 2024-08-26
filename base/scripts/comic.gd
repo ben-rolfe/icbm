@@ -71,6 +71,7 @@ var _rex_tag_params:RegEx = RegEx.new()
 var _rex_escape_chars:RegEx = RegEx.new()
 var _rex_sanitize_varname:RegEx = RegEx.new()
 
+
 #NOTE: That these events are emitted by the player saving and loading their game file, and NOT by the author saving a page (that emits editor_save) or by any page being loaded
 signal before_saved
 signal after_saved
@@ -81,6 +82,7 @@ signal editor_saved
 signal editor_renamed
 signal editor_deleted
 
+signal started
 signal page_changed
 signal quitted
 
