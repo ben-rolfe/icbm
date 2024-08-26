@@ -75,6 +75,12 @@ var enabled:bool = true:
 		enabled = value
 		set_theme_override()
 
+var enabled_test:String:
+	get:
+		return _data_get("enabled_test")
+	set(value):
+		_data_set("enabled_test", value)
+
 var fill_color:Color:
 	get:
 		return _data_get("fill_color")
@@ -200,12 +206,12 @@ func _init(data:Dictionary, page:ComicPage):
 	# Buttons are in their own object so, unlike for elements in the page, there's no reason not to immediately apply the data.
 	apply_data()
 
-
-
 func apply_data():
 	_default_data = Comic.get_preset_data("button", presets)
 	text = str("[center]", Comic.parse_rich_text_string(content), "[/center]")
 	set_theme_override()
+
+	enabled = Comic.book is ComicEditor or Comic.parse_bool_string(enabled_test)
 
 	if shown:
 		show()

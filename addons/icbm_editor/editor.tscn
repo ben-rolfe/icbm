@@ -829,7 +829,7 @@ max_value = 999999.0
 [node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ImageProperties/Disappear"]
 layout_mode = 2
 
-[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
+[node name="ButtonProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("text_edit", "action_button", "action_target_button", "action_commands_textedit", "enabled_text_edit", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("8_lxpup")
@@ -837,6 +837,7 @@ text_edit = NodePath("Text/Text LineEdit")
 action_button = NodePath("Action/Action OptionButton")
 action_target_button = NodePath("Action Target OptionButton")
 action_commands_textedit = NodePath("Action Commands TextEdit")
+enabled_text_edit = NodePath("Enabled TextEdit")
 shown_check_box = NodePath("Shown CheckBox")
 appear_spin_box = NodePath("Appear/Appear SpinBox")
 appear_button = NodePath("Appear/Appear OptionButton")
@@ -877,6 +878,16 @@ layout_mode = 2
 [node name="Action Commands TextEdit" type="TextEdit" parent="Properties/MarginContainer/ButtonProperties"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
+placeholder_text = "Enter Commands..."
+
+[node name="Enabled label" type="Label" parent="Properties/MarginContainer/ButtonProperties"]
+layout_mode = 2
+text = "Enabled? (true/yes/1)"
+
+[node name="Enabled TextEdit" type="TextEdit" parent="Properties/MarginContainer/ButtonProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "true"
 placeholder_text = "Enter Commands..."
 
 [node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/ButtonProperties"]

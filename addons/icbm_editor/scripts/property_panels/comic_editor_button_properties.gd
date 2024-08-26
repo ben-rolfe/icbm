@@ -5,10 +5,13 @@ extends ComicEditorProperties
 @export var action_button:OptionButton
 @export var action_target_button:OptionButton
 @export var action_commands_textedit:TextEdit
+@export var enabled_text_edit:TextEdit
 
 var button:ComicEditorButton
 var text_before_changes:String
 var commands_before_changes:String
+var enabled_before_changes:String
+
 
 @export var shown_check_box:CheckBox
 @export var appear_spin_box:SpinBox
@@ -32,6 +35,11 @@ func _ready():
 	action_commands_textedit.caret_blink = true
 	action_commands_textedit.focus_entered.connect(_on_commands_textedit_focused)
 	action_commands_textedit.focus_exited.connect(_on_commands_textedit_unfocused)
+
+	enabled_text_edit.text_changed.connect(_on_enabled_text_edit_changed)
+	enabled_text_edit.caret_blink = true
+	enabled_text_edit.focus_entered.connect(_on_enabled_text_edit_focused)
+	enabled_text_edit.focus_exited.connect(_on_enabled_text_edit_unfocused)
 
 	shown_check_box.toggled.connect(_on_shown_check_box_toggled)
 	for i in Comic.DELAY_TYPES.size():
@@ -59,6 +67,8 @@ func prepare():
 		text_edit.select_all()
 	else:
 		text_edit.caret_column = text_edit.text.length()
+
+	enabled_text_edit.text = button.enabled_test
 
 	shown_check_box.button_pressed = button.shown
 	appear_spin_box.value = button.appear
@@ -122,6 +132,18 @@ func _on_commands_textedit_unfocused():
 		reversion.data.action_commands = ComicEditor.unparse_text_edit(commands_before_changes)
 		Comic.book.add_undo_step([reversion])
 
+func _on_enabled_text_edit_changed():
+	button.enabled_test = ComicEditor.unparse_text_edit(enabled_text_edit.text)
+	button.rebuild(true)
+
+func _on_enabled_text_edit_focused():
+	enabled_before_changes = enabled_text_edit.text
+	
+func _on_enabled_text_edit_unfocused():
+	if enabled_text_edit.text != enabled_before_changes:
+		var reversion:ComicReversionData = ComicReversionData.new(button)
+		reversion.data.enabled_test = ComicEditor.unparse_text_edit(enabled_before_changes)
+		Comic.book.add_undo_step([reversion])
 
 func _on_action_item_selected(index:int):
 	if button.action != index:
