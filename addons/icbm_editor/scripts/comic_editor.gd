@@ -538,8 +538,6 @@ func open_presets_manager(category:String):
 	var popup = ComicEditorPresetsManager.new(category)
 	Comic.add_child(popup)
 
-
-
 static func menu_open_page_properties():
 	Comic.book.open_properties = Comic.book.page_properties
 
@@ -566,6 +564,9 @@ static func menu_add_hotspot():
 
 static func menu_change_background():
 	ComicEditorImageExplorer.open(Comic.book.page.background.import_new_bg)
+
+static func menu_clear_background():
+	Comic.book.page.background.clear()
 
 static func menu_add_line():
 	Comic.book.page.add_line()	

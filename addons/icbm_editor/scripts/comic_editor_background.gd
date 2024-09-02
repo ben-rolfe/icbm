@@ -62,20 +62,8 @@ func import_new_bg(path:String):
 func rebuild():
 	if _data.has("new_bg_path"):
 		# Using an image that isn't in the resources, yet - load it from the filesystem 
-		if Comic.book.image_quality < 0:
-			# Image quality of -1 means keep the original image format
-			texture = ImageTexture.create_from_image(Image.load_from_file(_data.new_bg_path))
-		else:
-			var webp_buffer:PackedByteArray
-			if Comic.book.image_quality >= 100:
-				# Image quality of 100 (or greater) means lossless webp
-				webp_buffer = Image.load_from_file(_data.new_bg_path).save_webp_to_buffer()
-			else:
-				# Image quality of 0-99 means lossy webp
-				webp_buffer = Image.load_from_file(_data.new_bg_path).save_webp_to_buffer(true, Comic.book.image_quality / 100.0)
-			var webp_image = texture.get_image()
-			webp_image.load_webp_from_buffer(webp_buffer)
-			texture = ImageTexture.create_from_image(webp_image)
+		texture = ImageTexture.create_from_image(get_fullscreen_image(_data.new_bg_path))
+		Comic.book.page.redraw()
 	else:
 		super()
 
@@ -112,7 +100,7 @@ func after_reversion():
 	rebuild()
 
 func save():
-	if _data.get("new_bg_path", "") != "":
+	if _data.has("new_bg_path"):
 		print("Save background")
 		# Delete old images and .import files
 		var dir:DirAccess = DirAccess.open(Comic.DIR_STORY)
@@ -124,11 +112,44 @@ func save():
 		# Save new image
 		if dir != null:
 			if Comic.book.image_quality < 0:
-				# Image quality of -1 means keep the original image format
-				dir.copy(_data.new_bg_path, str(Comic.DIR_STORY, path_base, _data.new_bg_path.get_extension().to_lower()))
-			elif Comic.book.image_quality >= 100:
+				# Image quality of -1 means keep the original image format, but we still need to make it fullscreen.
+				var ext:String = _data.new_bg_path.get_extension().to_lower()
+				match ext:
+					"jpg", "jpeg":
+						get_fullscreen_image(_data.new_bg_path).save_jpg(str(Comic.DIR_STORY, path_base, "jpg"))
+					"png":
+						get_fullscreen_image(_data.new_bg_path).save_png(str(Comic.DIR_STORY, path_base, "png"))
+					"webp", "svg":
+						get_fullscreen_image(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"))
+			else:
+				# Image quality of 0+ means we convert to webp - quality is already handled in the get_fullscreen_image method, so we don't apply compression with the save.
+				get_fullscreen_image(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"))
+
+
+func get_fullscreen_image(path) -> Image:
+	var loaded_image:Image
+	var image_format:Image.Format = Image.FORMAT_RGB8
+	if path != "":
+		loaded_image = Image.load_from_file(path)
+		if Comic.book.image_quality >= 0:
+			#Image requires conversion
+			var webp_buffer:PackedByteArray
+			loaded_image = Image.load_from_file(path)
+			if Comic.book.image_quality >= 100:
 				# Image quality of 100 (or greater) means lossless webp
-				Image.load_from_file(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"))
+				webp_buffer = loaded_image.save_webp_to_buffer()
 			else:
 				# Image quality of 0-99 means lossy webp
-				Image.load_from_file(_data.new_bg_path).save_webp(str(Comic.DIR_STORY, path_base, "webp"), true, Comic.book.image_quality / 100.0)
+				webp_buffer = loaded_image.save_webp_to_buffer(true, Comic.book.image_quality / 100.0)
+			loaded_image.load_webp_from_buffer(webp_buffer)
+		if loaded_image != null:
+			image_format = loaded_image.get_format()
+
+	var fullscreen_image:Image = Image.create(int(Comic.size.x), int(Comic.size.y), false, image_format)
+	if loaded_image != null:
+		fullscreen_image.blit_rect(loaded_image, Rect2i(0, 0, min(int(Comic.size.x), loaded_image.get_width()), min(int(Comic.size.y), loaded_image.get_height())), Vector2i.ZERO)
+	return fullscreen_image
+
+func clear():
+	_data.new_bg_path = ""
+	rebuild()

@@ -17,10 +17,8 @@ func _gui_input(event:InputEvent):
 			Comic.book.right_clicked(o, event)
 
 func rebuild():
-	# Setting null seems necessary to change the bg after updating the file.
-	texture = null
-	texture = Comic.load_texture(str(Comic.book.page.bookmark, "" if Comic.book.page.bookmark.contains("/") else "/_"))
-	if texture == null:
-		# No background - use transparent background instead.
-		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGBA8))
-
+	var new_texture:Texture2D = Comic.load_texture(str(Comic.book.page.bookmark, "" if Comic.book.page.bookmark.contains("/") else "/_"))
+	if new_texture != null:
+		texture = new_texture
+	else:
+		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))

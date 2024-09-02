@@ -487,6 +487,7 @@ func _ready():
 	add_editor_menu_item(2, "Add Hotspot", str(ComicEditor.DIR_ICONS, "hotspot.svg"), ComicEditor.menu_add_hotspot)
 
 	add_editor_menu_item(3, "Change Background", str(ComicEditor.DIR_ICONS, "background.svg"), ComicEditor.menu_change_background)
+	add_editor_menu_item(3, "Clear Background", str(ComicEditor.DIR_ICONS, "no_background.svg"), ComicEditor.menu_clear_background)
 	add_editor_submenu(3, "Add Image", "image", ComicEditor.build_submenu_add_image, ComicEditor.submenu_image_index_pressed)
 	add_editor_menu_item(3, "Add Border Line", str(ComicEditor.DIR_ICONS, "frame_border.svg"), ComicEditor.menu_add_line)
 
@@ -633,23 +634,13 @@ func execute(command: String) -> Variant:
 	#print("Returning ", result)
 	return result
 
-func load_texture(path:String, dir:String = DIR_STORY) -> Texture2D:
+func load_texture(path:String, dir:String = DIR_STORY, cache_mode:ResourceLoader.CacheMode = ResourceLoader.CacheMode.CACHE_MODE_REUSE) -> Texture2D:
 	for ext in IMAGE_EXT:
 		var full_path: String = str(dir, path, ".", ext)
 		if ResourceLoader.exists(full_path):
 			return ResourceLoader.load(full_path)
 #	push_warning("Image failed to load from path: ", path)
 	return null
-
-#func execute_embedded_code(s:String) -> String:
-	#var r:String
-	#var last_end:int = 0
-	#for result in _rex_bracketed_expressions.search_all(s):
-		## Add the preceding unprocessed part to the return value, then the processed text between the brackets
-		#r = str(r, s.substr(last_end, result.get_start() - last_end), execute(result.get_string().substr(2, result.get_string().length() - 4)))
-		#last_end = result.get_end()
-	#r = str(r, s.substr(last_end))
-	#return r
 
 func execute_embedded_code(s:String, depth:int = 0) -> String:
 	#print("Executing embedded code: ", s)

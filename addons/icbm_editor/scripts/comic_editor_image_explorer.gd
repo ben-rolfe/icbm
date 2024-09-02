@@ -14,13 +14,12 @@ static func open(callable:Callable):
 		parent.add_child(singleton)
 		singleton.title = "Select an Image"
 		singleton.ok_button_text = "Cancel"
-		singleton.size = Vector2i(480, parent.get_viewport().size.y * 0.8)
-		singleton.position = Vector2i((parent.get_viewport().size.x - singleton.size.x) * 0.5, parent.get_viewport().size.y * 0.1)
+		singleton.size = Vector2i(480, Comic.size.y * 0.8)
+		singleton.position = Vector2i((Comic.size.x - singleton.size.x) * 0.5, Comic.size.y * 0.1)
 
 		var v_box = VBoxContainer.new()
 		singleton.add_child(v_box)
 		v_box.size = singleton.size
-
 
 		var address_bar = HBoxContainer.new()
 		v_box.add_child(address_bar)
@@ -42,7 +41,6 @@ static func open(callable:Callable):
 		favorite_button.icon = load(str(ComicEditor.DIR_ICONS, str("favorite.svg")))
 #		favorite_button.focus_mode = Control.FOCUS_NONE
 		favorite_button.pressed.connect(singleton._on_favorite_pressed)
-
 
 		var scroll_container = ScrollContainer.new()
 		v_box.add_child(scroll_container)

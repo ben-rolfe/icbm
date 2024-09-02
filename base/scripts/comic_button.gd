@@ -211,7 +211,7 @@ func apply_data():
 	text = str("[center]", Comic.parse_rich_text_string(content), "[/center]")
 	set_theme_override()
 
-	enabled = Comic.book is ComicEditor or Comic.parse_bool_string(enabled_test)
+	enabled = Comic.book is ComicEditor or Comic.parse_bool_string(Comic.execute_embedded_code(enabled_test))
 
 	if shown:
 		show()
