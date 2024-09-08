@@ -1,6 +1,6 @@
 [gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://f0xti67u7ix2"]
 
-[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://theme/fonts/ICBMComic-Regular.ttf" id="1_w24pr"]
+[ext_resource type="FontFile" uid="uid://bxubneop2tyks" path="res://library/fonts/ICBMComic-Regular.ttf" id="1_w24pr"]
 
 [resource]
 base_font = ExtResource("1_w24pr")
