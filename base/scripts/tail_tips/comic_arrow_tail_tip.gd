@@ -34,8 +34,8 @@ func calculate_points(tail:ComicTail, transforms:Array[Transform2D]):
 		if i > 0:
 			d += center.distance_to(last_center)
 			# Widen (or narrow) the points
-			tail.edge_points[i] = center + (tail.edge_points[i] - center).normalized() * WIDTH * Comic.tail_width * 0.5 * d / old_length
-			tail.edge_points[j] = center + (tail.edge_points[j] - center).normalized() * WIDTH * Comic.tail_width * 0.5 * d / old_length
+			tail.edge_points[i] = center + (tail.edge_points[i] - center).normalized() * WIDTH * tail.balloon.tail_width * 0.5 * d / old_length
+			tail.edge_points[j] = center + (tail.edge_points[j] - center).normalized() * WIDTH * tail.balloon.tail_width * 0.5 * d / old_length
 			# Elongate the points
 			tail.edge_points[i] += (tail.edge_points[0] - tail.edge_points[i]) * (1 - new_length / old_length)
 			tail.edge_points[j] += (tail.edge_points[0] - tail.edge_points[j]) * (1 - new_length / old_length)
