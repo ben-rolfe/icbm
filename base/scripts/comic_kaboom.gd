@@ -182,6 +182,8 @@ func _init(data:Dictionary, page:ComicPage):
 		_data.rng_seed = Comic.get_seed_from_position(_data.anchor)
 
 	if not self is ComicEditorKaboom:
+		content = Comic.execute_embedded_code(content)
+
 		if appear_type == 1: # Milliseconds delay
 			Comic.book.timers.push_back({
 				"t": appear / 1000.0,

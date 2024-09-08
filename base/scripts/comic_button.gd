@@ -181,6 +181,8 @@ func _init(data:Dictionary, page:ComicPage):
 	fit_content = true
 
 	if not self is ComicEditorButton:
+		content = Comic.execute_embedded_code(content)
+
 		if appear_type == 1: # Milliseconds delay
 			Comic.book.timers.push_back({
 				"t": appear / 1000.0,
