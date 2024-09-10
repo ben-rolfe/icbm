@@ -734,7 +734,7 @@ func parse_bool_string(s: String) -> bool:
 func parse_bookmark_string(s:String) -> String:
 	if s.left(1) == "/":
 		# A relative bookmark - we prepend the current chapter
-		s = str(Comic.book.bookmark, s)
+		s = str(Comic.book.bookmark.split("/")[0], s)
 	#TODO: Consider just not doing this check. It's going to bug out anyway - is it worth slowing things down with these lookups just to make it bug out more elegantly?
 	var a:Array = s.split("/")
 	if a.size() > 2:
