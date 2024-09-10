@@ -378,7 +378,7 @@ max_value = 999999.0
 [node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/BalloonProperties/Disappear"]
 layout_mode = 2
 
-[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "bg_color_button", "bg_color_revert_button", "promote_button", "delete_button")]
+[node name="PageProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "chapter_row", "chapter_button", "new_name_label", "new_name_lineedit", "allow_back_check_box", "allow_save_check_box", "auto_save_check_box", "bg_share_button", "bg_buttons_row", "bg_change_button", "bg_clear_button", "bg_color_button", "bg_color_revert_button", "promote_button", "delete_button")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_nx1jt")
@@ -392,6 +392,10 @@ new_name_lineedit = NodePath("Page Name/New Name LineEdit")
 allow_back_check_box = NodePath("AllowBack CheckBox")
 allow_save_check_box = NodePath("AllowSave CheckBox")
 auto_save_check_box = NodePath("AutoSave CheckBox")
+bg_share_button = NodePath("Background OptionButton")
+bg_buttons_row = NodePath("BG Image Buttons")
+bg_change_button = NodePath("BG Image Buttons/Set Background Button")
+bg_clear_button = NodePath("BG Image Buttons/Clear Background Button")
 bg_color_button = NodePath("BG Color/BG ColorPickerButton")
 bg_color_revert_button = NodePath("BG Color/BG Color Revert Button")
 promote_button = NodePath("Promote Button")
@@ -459,6 +463,29 @@ text = "Allow save  (if manual slots exist)"
 layout_mode = 2
 button_pressed = true
 text = "Auto-save (if auto slot exists)"
+
+[node name="Background" type="Label" parent="Properties/MarginContainer/PageProperties"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Background Image:"
+
+[node name="Background OptionButton" type="OptionButton" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "(Use own background image)"
+popup/item_0/id = 0
+
+[node name="BG Image Buttons" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
+layout_mode = 2
+
+[node name="Set Background Button" type="Button" parent="Properties/MarginContainer/PageProperties/BG Image Buttons"]
+layout_mode = 2
+text = "Set BG Image"
+
+[node name="Clear Background Button" type="Button" parent="Properties/MarginContainer/PageProperties/BG Image Buttons"]
+layout_mode = 2
+text = "Clear BG Image"
 
 [node name="BG Color" type="HBoxContainer" parent="Properties/MarginContainer/PageProperties"]
 layout_mode = 2

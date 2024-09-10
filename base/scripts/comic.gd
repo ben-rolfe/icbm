@@ -154,6 +154,7 @@ var preset_properties:Dictionary = {
 	},
 	"book": {
 		"auto_save_slot": "bool",
+		"init_commands": "string",
 		"manual_save_slots": "bool",
 	},
 	"button": {
@@ -188,7 +189,6 @@ var preset_properties:Dictionary = {
 		"fragment": "string",
 		"points": "array",
 		"shown": "bool",
-
 	},
 	"image": {
 		"anchor": "vector2",
@@ -254,6 +254,7 @@ var preset_properties:Dictionary = {
 		"allow_save": "bool",
 		"auto_save": "bool",
 		"bg_color": "color",
+		"bg_share": "string",
 	}
 }
 var preset_property_misc_defaults = {
@@ -302,16 +303,11 @@ var default_presets:Dictionary = {
 	},
 	"book": {
 		"": {
-			"auto_save_slot": true,
-			"init_commands": "",
-			"manual_save_slots": true,
 		}
 	},
 	"button": {
 		"": {
 			"action": ComicButton.Action.NEXT,
-			"action_bookmark": "",
-			"action_commands": "",
 			"content": "New Button",
 			"enabled_test": "true",
 			"fill_color": Color.BLACK,
@@ -326,8 +322,6 @@ var default_presets:Dictionary = {
 	"hotspot": {
 		"": {
 			"action": ComicButton.Action.NEXT,
-			"action_bookmark": "",
-			"action_commands": "",
 			"change_cursor": true,
 			"shown": true,
 		}
@@ -373,11 +367,8 @@ var default_presets:Dictionary = {
 	"page": {
 		"": {
 			"action": ComicButton.Action.NEXT,
-			"action_bookmark": "",
-			"action_commands": "",
 			"allow_back": true,
 			"allow_save": true,
-			"auto_save": false,
 		}
 	}
 }
@@ -486,8 +477,8 @@ func _ready():
 	add_editor_menu_item(2, "Add Button", str(ComicEditor.DIR_ICONS, "button.svg"), ComicEditor.menu_add_button)
 	add_editor_menu_item(2, "Add Hotspot", str(ComicEditor.DIR_ICONS, "hotspot.svg"), ComicEditor.menu_add_hotspot)
 
-	add_editor_menu_item(3, "Change Background", str(ComicEditor.DIR_ICONS, "background.svg"), ComicEditor.menu_change_background)
-	add_editor_menu_item(3, "Clear Background", str(ComicEditor.DIR_ICONS, "no_background.svg"), ComicEditor.menu_clear_background)
+	#add_editor_menu_item(3, "Change Background", str(ComicEditor.DIR_ICONS, "background.svg"), ComicEditor.menu_change_background)
+	#add_editor_menu_item(3, "Clear Background", str(ComicEditor.DIR_ICONS, "no_background.svg"), ComicEditor.menu_clear_background)
 	add_editor_submenu(3, "Add Image", "image", ComicEditor.build_submenu_add_image, ComicEditor.submenu_image_index_pressed)
 	add_editor_menu_item(3, "Add Border Line", str(ComicEditor.DIR_ICONS, "frame_border.svg"), ComicEditor.menu_add_line)
 
@@ -635,10 +626,11 @@ func execute(command: String) -> Variant:
 	return result
 
 func load_texture(path:String, dir:String = DIR_STORY, cache_mode:ResourceLoader.CacheMode = ResourceLoader.CacheMode.CACHE_MODE_REUSE) -> Texture2D:
+	#TODO: Use _cache_mode or remove it.
 	for ext in IMAGE_EXT:
 		var full_path: String = str(dir, path, ".", ext)
 		if ResourceLoader.exists(full_path):
-			return ResourceLoader.load(full_path)
+			return ResourceLoader.load(full_path, "", cache_mode)
 #	push_warning("Image failed to load from path: ", path)
 	return null
 

@@ -23,6 +23,11 @@ var original_page_name:String = ""
 @export var allow_save_check_box:CheckBox
 @export var auto_save_check_box:CheckBox
 
+@export var bg_share_button:OptionButton
+@export var bg_buttons_row:HBoxContainer
+@export var bg_change_button:Button
+@export var bg_clear_button:Button
+
 @export var bg_color_button:ColorPickerButton
 @export var bg_color_revert_button:Button
 var bg_color_before_changes:Color
@@ -38,7 +43,11 @@ func _ready():
 	action_button.item_selected.connect(_on_action_item_selected)
 	for bookmark in Comic.book.bookmarks:
 		action_target_button.add_item(bookmark)
+		bg_share_button.add_item(bookmark)
 	action_target_button.item_selected.connect(_on_action_target_item_selected)
+	bg_share_button.item_selected.connect(_on_bg_share_item_selected)
+	bg_change_button.pressed.connect(ComicEditor.menu_change_background)
+	bg_clear_button.pressed.connect(ComicEditor.menu_clear_background)
 
 	action_commands_textedit.text_changed.connect(_on_commands_textedit_changed)	
 	action_commands_textedit.caret_blink = true
@@ -97,6 +106,11 @@ func prepare():
 	allow_save_check_box.button_pressed = page.allow_save
 	auto_save_check_box.button_pressed = page.auto_save
 
+	bg_share_button.select(0 if page.bg_share == "" else (Comic.book.bookmarks.find(page.bg_share) + 1))
+	if page.bg_share == "":
+		bg_buttons_row.show()
+	else:
+		bg_buttons_row.hide()
 	bg_color_button.color = page.bg_color
 	_after_bg_color_change()
 
@@ -158,7 +172,17 @@ func _on_action_item_selected(index:int):
 func _on_action_target_item_selected(index:int):
 	Comic.book.add_undo_step([ComicReversionData.new(page)])
 	page.action_bookmark = Comic.book.bookmarks[index]
+	#NOTE: No page rebuild necessary
+
+func _on_bg_share_item_selected(index:int):
+	Comic.book.add_undo_step([ComicReversionData.new(page)])
+	page.bg_share = "" if index == 0 else Comic.book.bookmarks[index - 1]
+	if page.bg_share == "":
+		bg_buttons_row.show()
+	else:
+		bg_buttons_row.hide()
 	page.rebuild(true)
+
 
 func _on_chapter_item_selected(index:int):
 	page.new_chapter = chapter_button.get_item_text(index)
@@ -227,3 +251,4 @@ func _after_bg_color_change():
 		bg_color_revert_button.hide()
 	else:
 		bg_color_revert_button.show()
+

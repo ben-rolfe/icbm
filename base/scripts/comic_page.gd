@@ -65,6 +65,12 @@ var auto_save:bool:
 	set(value):
 		_data_set("auto_save", value)
 
+var bg_share:String:
+	get:
+		return _data_get("bg_share")
+	set(value):
+		_data_set("bg_share", value)
+
 var bg_color:Color:
 	get:
 		return _data_get("bg_color")

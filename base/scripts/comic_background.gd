@@ -17,7 +17,8 @@ func _gui_input(event:InputEvent):
 			Comic.book.right_clicked(o, event)
 
 func rebuild():
-	var new_texture:Texture2D = Comic.load_texture(str(Comic.book.page.bookmark, "" if Comic.book.page.bookmark.contains("/") else "/_"))
+	var bg_bookmark = Comic.book.page.bookmark if Comic.book.page.bg_share == "" else Comic.book.page.bg_share
+	var new_texture:Texture2D = Comic.load_texture(str(bg_bookmark, "" if bg_bookmark.contains("/") else "/_"), Comic.DIR_STORY, ResourceLoader.CACHE_MODE_REPLACE)
 	if new_texture != null:
 		texture = new_texture
 	else:
