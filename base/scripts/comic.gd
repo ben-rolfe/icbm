@@ -731,6 +731,24 @@ func parse_bool_string(s: String) -> bool:
 	s = s.strip_edges().to_lower()
 	return s == "true" or s == "yes" or s == "1"
 
+func parse_bookmark_string(s:String) -> String:
+	if s.left(1) == "/":
+		# A relative bookmark - we prepend the current chapter
+		s = str(Comic.book.bookmark, s)
+	#TODO: Consider just not doing this check. It's going to bug out anyway - is it worth slowing things down with these lookups just to make it bug out more elegantly?
+	var a:Array = s.split("/")
+	if a.size() > 2:
+		push_error(str("Attempted to parse malformed bookmark - too many slashes: ", "/".join(a), " - returning start"))
+		return str("start")
+	else:
+		if not Comic.book.pages.has(a[0]):
+			push_error(str("Bookmarked chapter doesn't exist: ", a[0], " - returning start"))
+			return "start"
+		if a.size() > 1 and not Comic.book.pages[a[0]].has(a[1]):
+			push_error(str("Bookmarked page doesn't exist: ", a[0], "/", a[1], " - returning ", a[0]))
+			return a[0]
+	return s
+
 func split_tag_params(s:String) -> Dictionary:
 	var r:Dictionary = {}
 	for match in _rex_tag_params.search_all(s):
@@ -972,11 +990,11 @@ func _code_tag_if(params:Dictionary, contents:Array) -> String:
 	return ""
 
 func _code_tag_go(_params:Dictionary, contents:Array) -> String:
-	book.page_go(execute_embedded_code(contents[0]))
+	book.page_go(parse_bookmark_string(execute_embedded_code(contents[0])))
 	return ""
 
 func _code_tag_visit(_params:Dictionary, contents:Array) -> String:
-	book.page_visit(execute_embedded_code(contents[0]))
+	book.page_visit(parse_bookmark_string(execute_embedded_code(contents[0])))
 	return ""
 
 func _code_tag_back(_params:Dictionary) -> String:
