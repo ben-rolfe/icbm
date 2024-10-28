@@ -251,4 +251,3 @@ func _after_bg_color_change():
 		bg_color_revert_button.hide()
 	else:
 		bg_color_revert_button.show()
-

@@ -42,15 +42,7 @@ func dragged(global_position:Vector2):
 	serves.balloon.rebuild_tail(serves.oid)
 	Comic.book.page.redraw()
 
-func add_menu_items(menu:PopupMenu):	
-	menu.add_submenu_item("Tail Style", "style")
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Tail", ComicEditor.MenuCommand.RANDOMIZE)
-	if not serves.style.is_randomized and not serves.tip.is_randomized:
-		menu.set_item_disabled(-1, true)
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "handle.svg")), "Remove Handle" if has_custom_vector else "Add Handle", ComicEditor.MenuCommand.TOGGLE)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Tail", ComicEditor.MenuCommand.DELETE)
-
+func add_menu_items(menu:PopupMenu):
 	# Style and Tip Submenu
 	var menu_style:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_style)
@@ -67,6 +59,14 @@ func add_menu_items(menu:PopupMenu):
 			if key == serves.tip.id:
 				menu_style.set_item_disabled(-1, true)
 
+	# Main Tail Widget
+	menu.add_submenu_item("Tail Style", "style")
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Tail", ComicEditor.MenuCommand.RANDOMIZE)
+	if not serves.style.is_randomized and not serves.tip.is_randomized:
+		menu.set_item_disabled(-1, true)
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "handle.svg")), "Remove Handle" if has_custom_vector else "Add Handle", ComicEditor.MenuCommand.TOGGLE)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Tail", ComicEditor.MenuCommand.DELETE)
 
 func menu_command_pressed(id:int):
 	match id:

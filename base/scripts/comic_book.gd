@@ -245,4 +245,3 @@ func get_relative_bookmark_index(from_key:String, offset:int) -> int:
 
 func get_relative_bookmark(from_key:String, offset:int) -> String:
 	return bookmarks[get_relative_bookmark_index(from_key, offset)]
-

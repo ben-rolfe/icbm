@@ -66,5 +66,3 @@ func _on_image_quality_button_item_selected(index:int):
 	Comic.book.image_quality = image_quality_button.get_item_metadata(index)
 	Comic.book.page.background.rebuild()
 	Comic.book.page.redraw()
-
-

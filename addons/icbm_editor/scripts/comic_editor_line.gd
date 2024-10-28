@@ -41,19 +41,6 @@ func after_reversion():
 	rebuild()
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Line Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
-	menu.add_separator()
-	menu.add_submenu_item("Presets", "preset")
-	menu.add_separator()
-	if fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
-	else:
-		menu.add_submenu_item("Add to Fragment", "fragment")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add_line_point.svg")), "Add Point", ComicEditor.MenuCommand.ADD_PART)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Line", ComicEditor.MenuCommand.DELETE)
-
 	# Fragment Submenu
 	var menu_fragment:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_fragment)
@@ -77,6 +64,22 @@ func add_menu_items(menu:PopupMenu):
 			menu_preset.set_item_checked(-1, presets.has(key))
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
+	
+	# Main Line Menu
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Line Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_separator()
+	menu.add_submenu_item("Presets", "preset")
+	menu.add_separator()
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "add_line_point.svg")), "Add Point", ComicEditor.MenuCommand.ADD_PART)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Line", ComicEditor.MenuCommand.DELETE)
+
+
 
 func menu_fragment_index_pressed(index:int):
 	if index < Comic.book.page.fragments.keys().size():

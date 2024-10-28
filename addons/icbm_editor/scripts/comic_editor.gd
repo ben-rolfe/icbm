@@ -623,5 +623,3 @@ static func menu_save_and_quit():
 
 static func menu_quit():
 	Comic.request_quit()
-
-

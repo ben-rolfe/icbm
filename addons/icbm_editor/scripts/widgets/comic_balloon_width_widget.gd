@@ -12,4 +12,3 @@ func add_menu_items(menu:PopupMenu):
 	super(menu)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "collapse.svg")), "Uncollapse Width" if serves.collapse else "Collapse Width", ComicEditor.MenuCommand.TOGGLE_COLLAPSE)
 	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Clear Fixed Width", ComicEditor.MenuCommand.DELETE)
-

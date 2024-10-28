@@ -64,6 +64,7 @@ func _exit_tree():
 	play_button.queue_free()
 
 func open_menu(edit_mode:bool):
+	print("boop open menu")
 	self.edit_mode = edit_mode
 
 	# Ensure that the basic content files and directories exist
@@ -84,7 +85,6 @@ func open_menu(edit_mode:bool):
 			if page.get_extension() == Comic.STORY_EXT and page.get_basename().get_file() != "_":
 				pages[chapter].push_back(page.get_basename().get_file())
 	for chapter in pages.keys():
-		menu.add_submenu_item(chapter, chapter)
 		var submenu = PopupMenu.new()
 		menu.add_child(submenu)
 		submenu.name = chapter
@@ -96,6 +96,7 @@ func open_menu(edit_mode:bool):
 				submenu.add_icon_item(icon_page, page)
 		if edit_mode:
 			submenu.add_icon_item(icon_add, "New Page")
+		menu.add_submenu_item(chapter, chapter)
 	if edit_mode:
 		menu.add_icon_item(icon_add, "New Chapter")
 	menu.position = get_window().position + Vector2i(button.global_position.x + button.size.x - menu.size.x, button.global_position.y + button.size.y)

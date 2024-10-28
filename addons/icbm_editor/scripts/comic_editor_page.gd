@@ -227,4 +227,3 @@ func redraw(rebuild_lookups_first:bool = false):
 
 func import_new_image(path:String):
 	add_image({"new_path":path})
-

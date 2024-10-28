@@ -23,25 +23,6 @@ func after_reversion():
 	rebuild()
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Button Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
-	menu.add_separator()
-	menu.add_submenu_item("Presets", "preset")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("order_up.svg"))), "Move Up", ComicEditor.MenuCommand.MOVE_UP)
-	if get_index() == 0:
-		menu.set_item_disabled(-1, true)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("order_down.svg"))), "Move Down", ComicEditor.MenuCommand.MOVE_DOWN)	
-	if get_index() == get_parent().get_child_count() - 1:
-		menu.set_item_disabled(-1, true)
-	menu.add_separator()
-	if fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
-	else:
-		menu.add_submenu_item("Add to Fragment", "fragment")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Button", ComicEditor.MenuCommand.DELETE)
-
 	# Fragment Submenu
 	var menu_fragment:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_fragment)
@@ -65,6 +46,28 @@ func add_menu_items(menu:PopupMenu):
 			menu_preset.set_item_checked(-1, presets.has(key))
 	menu_preset.add_separator()
 	menu_preset.add_item("Manage Presets / Defaults")
+	
+	# Main Button Menu
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("properties.svg"))), "Button Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_separator()
+	menu.add_submenu_item("Presets", "preset")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("order_up.svg"))), "Move Up", ComicEditor.MenuCommand.MOVE_UP)
+	if get_index() == 0:
+		menu.set_item_disabled(-1, true)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("order_down.svg"))), "Move Down", ComicEditor.MenuCommand.MOVE_DOWN)	
+	if get_index() == get_parent().get_child_count() - 1:
+		menu.set_item_disabled(-1, true)
+	menu.add_separator()
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Button", ComicEditor.MenuCommand.DELETE)
+
+
 
 func menu_fragment_index_pressed(index:int):
 	if index < Comic.book.page.fragments.keys().size():

@@ -161,4 +161,3 @@ func apply_eraser_properties():
 	eraser_mask.resize(eraser_size, eraser_size)
 	eraser_rect = Rect2i(0, 0, eraser_size, eraser_size)
 	eraser_offset = Vector2.ONE * (eraser_size * 0.5)
-

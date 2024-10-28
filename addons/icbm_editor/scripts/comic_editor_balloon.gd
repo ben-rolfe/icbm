@@ -84,25 +84,6 @@ func draw_widgets(layer:ComicWidgetLayer):
 	layer.draw_line(anchor + Vector2.LEFT * ComicWidget.RADIUS, anchor + Vector2.RIGHT * ComicWidget.RADIUS, ComicEditorBalloon.WIDGET_COLOR, ComicWidget.THICK)
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Balloon Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
-	menu.add_separator()
-	menu.add_submenu_item("Presets", "preset")
-	menu.add_submenu_item("Style", "style")
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Edge", ComicEditor.MenuCommand.RANDOMIZE)
-	if not edge_style.is_randomized:
-		menu.set_item_disabled(-1, true)
-	menu.add_separator()
-	menu.add_submenu_item("Layer", "layer")
-	menu.add_separator()
-	if fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "fragment.svg")), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "clear_fragment.svg")), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
-	else:
-		menu.add_submenu_item("Add to Fragment", "fragment")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Tail", ComicEditor.MenuCommand.ADD_TAIL)
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Balloon", ComicEditor.MenuCommand.DELETE)
-
 	# Fragment Submenu
 	var menu_fragment:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_fragment)
@@ -137,19 +118,39 @@ func add_menu_items(menu:PopupMenu):
 	menu_preset.add_item("Manage Presets / Defaults")
 
 	# Shape and Edge Style Submenu
-	var menu_style:PopupMenu = PopupMenu.new()
-	menu.add_child(menu_style)
-	menu_style.index_pressed.connect(menu_style_index_pressed)
-	menu_style.name = "style"
-	for key in Comic.edge_styles[shape.id]:
-		menu_style.add_icon_item(Comic.edge_styles[shape.id][key].editor_icon, Comic.edge_styles[shape.id][key].editor_name)
-		if key == edge_style.id:
-			menu_style.set_item_disabled(-1, true)
-	menu_style.add_separator("Shape")
-	for key in Comic.shapes:
-		menu_style.add_icon_item(Comic.shapes[key].editor_icon, Comic.shapes[key].editor_name)
-		if key == shape.id:
-			menu_style.set_item_disabled(-1, true)
+	#var menu_style:PopupMenu = PopupMenu.new()
+	#menu.add_child(menu_style)
+	#menu_style.index_pressed.connect(menu_style_index_pressed)
+	#menu_style.name = "style"
+	#for key in Comic.edge_styles[shape.id]:
+		#menu_style.add_icon_item(Comic.edge_styles[shape.id][key].editor_icon, Comic.edge_styles[shape.id][key].editor_name)
+		#if key == edge_style.id:
+			#menu_style.set_item_disabled(-1, true)
+	#menu_style.add_separator("Shape")
+	#for key in Comic.shapes:
+		#menu_style.add_icon_item(Comic.shapes[key].editor_icon, Comic.shapes[key].editor_name)
+		#if key == shape.id:
+			#menu_style.set_item_disabled(-1, true)
+			
+	# Main Balloon Menu
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "properties.svg")), "Balloon Properties", ComicEditor.MenuCommand.OPEN_PROPERTIES)
+	menu.add_separator()
+	menu.add_submenu_item("Presets", "preset")
+	#menu.add_submenu_item("Style", "style")
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("dice_", randi_range(1, 6), ".svg"))), "Rerandomize Edge", ComicEditor.MenuCommand.RANDOMIZE)
+	if not edge_style.is_randomized:
+		menu.set_item_disabled(-1, true)
+	menu.add_separator()
+	menu.add_submenu_item("Layer", "layer")
+	menu.add_separator()
+	if fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "fragment.svg")), str(fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "clear_fragment.svg")), str("Remove from ", fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "shape_balloon.svg")), "Add Tail", ComicEditor.MenuCommand.ADD_TAIL)
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Balloon", ComicEditor.MenuCommand.DELETE)
 
 func menu_fragment_index_pressed(index:int):
 	if index < Comic.book.page.fragments.keys().size():

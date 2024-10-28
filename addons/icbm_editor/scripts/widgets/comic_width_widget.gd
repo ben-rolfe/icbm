@@ -56,4 +56,3 @@ func menu_command_pressed(id:int):
 			if serves.width == 0 and not serves.collapse:
 				serves.clear_data("width")
 			serves.rebuild(true)
-

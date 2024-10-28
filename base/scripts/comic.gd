@@ -73,6 +73,7 @@ var _rex_sanitize_varname:RegEx = RegEx.new()
 
 
 #NOTE: That these events are emitted by the player saving and loading their game file, and NOT by the author saving a page (that emits editor_save) or by any page being loaded
+@warning_ignore("unused_signal")
 signal before_saved
 signal after_saved
 signal before_loaded

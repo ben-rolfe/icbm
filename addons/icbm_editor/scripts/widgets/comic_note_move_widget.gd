@@ -3,16 +3,6 @@ extends ComicMoveWidget
 
 
 func add_menu_items(menu:PopupMenu):
-	menu.add_submenu_item("Layer", "layer")
-	menu.add_separator()
-	if serves.fragment != "":
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(serves.fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
-		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", serves.fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
-	else:
-		menu.add_submenu_item("Add to Fragment", "fragment")
-	menu.add_separator()
-	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Note", ComicEditor.MenuCommand.DELETE)
-
 	# Fragment Submenu
 	var menu_fragment:PopupMenu = PopupMenu.new()
 	menu.add_child(menu_fragment)
@@ -31,6 +21,19 @@ func add_menu_items(menu:PopupMenu):
 	menu_layer.name = "layer"
 	for i in range(Comic.LAYERS.size() - 1, -1, -1):
 		menu_layer.add_icon_item(load(str(ComicEditor.DIR_ICONS, "checked.svg" if i == serves.layer else "unchecked.svg")), Comic.LAYERS[i])
+	
+	# Main Widget Menu
+	menu.add_submenu_item("Layer", "layer")
+	menu.add_separator()
+	if serves.fragment != "":
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("fragment.svg"))), str(serves.fragment.capitalize(), " Properties"), ComicEditor.MenuCommand.FRAGMENT_PROPERTIES)
+		menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, str("clear_fragment.svg"))), str("Remove from ", serves.fragment.capitalize()), ComicEditor.MenuCommand.CLEAR_FRAGMENT)
+	else:
+		menu.add_submenu_item("Add to Fragment", "fragment")
+	menu.add_separator()
+	menu.add_icon_item(load(str(ComicEditor.DIR_ICONS, "delete.svg")), "Remove Note", ComicEditor.MenuCommand.DELETE)
+
+
 
 
 func menu_command_pressed(id:int):
@@ -54,4 +57,3 @@ func menu_fragment_index_pressed(index:int):
 func menu_layer_index_pressed(index:int):
 	serves.layer = Comic.LAYERS.size() - 1 - index
 	serves.rebuild(true)
-
