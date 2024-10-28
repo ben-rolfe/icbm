@@ -77,7 +77,7 @@ func menu_command_pressed(id:int):
 			Comic.book.page.rebuild_widgets()
 		ComicEditor.MenuCommand.RANDOMIZE:
 			Comic.book.add_undo_step([ComicReversionData.new(serves.balloon)])
-			serves.data.seed = randi()
+			serves.data.rng_seed = randi()
 			serves.balloon.rebuild_tail(serves.oid)
 			Comic.book.page.redraw()
 		ComicEditor.MenuCommand.TOGGLE:
