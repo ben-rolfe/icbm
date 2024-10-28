@@ -73,17 +73,22 @@ var _rex_sanitize_varname:RegEx = RegEx.new()
 
 
 #NOTE: That these events are emitted by the player saving and loading their game file, and NOT by the author saving a page (that emits editor_save) or by any page being loaded
-@warning_ignore("unused_signal")
 signal before_saved
 signal after_saved
 signal before_loaded
 signal after_loaded
 
+# These signals are emitted from elesewhere (e.g. comic_editor.gd) and listened to from elsewhere (e.g. modules) - they are located here because this is the core autoload script
+@warning_ignore("unused_signal")
 signal editor_saved
+@warning_ignore("unused_signal")
 signal editor_renamed
+@warning_ignore("unused_signal")
 signal editor_deleted
 
+@warning_ignore("unused_signal")
 signal started
+@warning_ignore("unused_signal")
 signal page_changed
 signal quitted
 

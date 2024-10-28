@@ -1,7 +1,7 @@
 class_name ComicReversion
 extends RefCounted
 
-var o:CanvasItem
+var o:Node
 var focus_after:bool = true
 
 func _init():
@@ -10,5 +10,5 @@ func _init():
 func apply():
 	Comic.book.has_unsaved_changes = true
 	Comic.book.page.rebuild_lookups()
-	if focus_after and o.get_parent() != null:
+	if focus_after and o is CanvasItem and o.get_parent() != null:
 		Comic.book.selected_element = o

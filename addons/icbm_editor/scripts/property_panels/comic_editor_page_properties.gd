@@ -236,6 +236,7 @@ func _on_bg_color_closed():
 		var reversion:ComicReversionData = ComicReversionData.new(page)
 		reversion.data.bg_color = bg_color_before_changes
 		Comic.book.add_undo_step([reversion])
+		Comic.book.page.background.rebuild()
 
 func _on_bg_color_revert():
 	if not page.is_default("bg_color"):

@@ -22,4 +22,10 @@ func rebuild():
 	if new_texture != null:
 		texture = new_texture
 	else:
-		texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
+		texture = null
+		if Comic.book.page.bg_color == Color.BLACK:
+			texture = ImageTexture.create_from_image(Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8))
+		else:
+			var image = Image.create(int(Comic.size.x), int(Comic.size.y), false, Image.FORMAT_RGB8)
+			image.fill(Comic.book.page.bg_color)
+			texture = ImageTexture.create_from_image(image)
