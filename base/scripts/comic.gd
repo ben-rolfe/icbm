@@ -301,6 +301,11 @@ var default_presets:Dictionary = {
 			"edge_style": "burst",
 			"bold": true,
 		},
+		"moan": {
+			"edge_style": "wobble",
+			"italic": true,
+			"scale_box": 0.75,
+		},
 	},
 	"book": {
 		"": {
