@@ -183,7 +183,9 @@ func _show_page():
 	#print(history)
 	while history.size() > _history_size:
 		history.pop_front()
-	# Buttons and hotspots are not part of the page itself, so we need to clear them separately:
+	# Gui elements, Buttons, and hotspots are not part of the page itself, so we need to clear them separately:
+	for gui_element in gui_container.get_children():
+		gui_element.queue_free()
 	for button in buttons_container.get_children():
 		button.queue_free()
 	for hotspot in hotspots_container.get_children():
