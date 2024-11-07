@@ -86,6 +86,9 @@ func add_o(data:Dictionary) -> Variant:
 			"note":
 				o = ComicEditorNote.new(data, self)
 				layers[o.layer].add_child(o)
+			"line_edit":
+				o = ComicEditorLineEdit.new(data, self)
+				Comic.book.gui_container.add_child(o)
 		return o
 	else:
 		printerr("No otype in data: ", data)
@@ -108,7 +111,6 @@ func add_button(data:Dictionary = {}):
 	var button:ComicEditorButton = ComicEditorButton.new(data, self)
 	Comic.book.buttons_container.add_child(button)
 	Comic.book.add_undo_step([ComicReversionParent.new(button, null)])
-	print("Button Content: ", button.content)
 
 func add_line(data:Dictionary = {}):
 	data.otype = "line"
@@ -155,6 +157,13 @@ func add_image(data:Dictionary = {}):
 
 	Comic.book.add_undo_step([ComicReversionParent.new(image, null)])
 	redraw()
+
+func add_line_edit(data:Dictionary = {}):
+	data.otype = "line_edit"
+	data.anchor = ComicEditor.snap(Vector2(Comic.book.menu.position))
+	var line_edit:ComicEditorLineEdit = ComicEditorLineEdit.new(data, self)
+	Comic.book.gui_container.add_child(line_edit)
+	Comic.book.add_undo_step([ComicReversionParent.new(line_edit, null)])
 
 func rebuild_widgets():
 	if Comic.book.selected_element != null and Comic.book.selected_element.has_method("rebuild_widgets"):

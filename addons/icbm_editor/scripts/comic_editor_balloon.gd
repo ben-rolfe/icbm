@@ -4,13 +4,7 @@ extends ComicBalloon
 const WIDGET_COLOR:Color = Color.RED
 
 func _init(data:Dictionary, page:ComicPage):
-	#if data.has("ref"):
-		#Comic.book.safety_check_unique_ref(data.ref)
 	super(data, page)
-
-	#_default_edge = Comic.edges.values()[0]
-	#_default_shape = Comic.shapes.values()[0]
-
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	
 func apply_data():

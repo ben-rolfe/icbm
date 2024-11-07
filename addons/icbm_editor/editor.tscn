@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://2xtslp8w8ril"]
+[gd_scene load_steps=17 format=3 uid="uid://2xtslp8w8ril"]
 
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/comic_editor.gd" id="1_3vmmw"]
 [ext_resource type="Theme" uid="uid://clanbtt7hrhjb" path="res://theme/default.tres" id="1_gldbu"]
@@ -14,9 +14,10 @@
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_settings_properties.gd" id="10_2xp14"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_book_properties.gd" id="11_npbar"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_image_properties.gd" id="13_jcyyd"]
+[ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_line_edit_properties.gd" id="15_r24o8"]
 [ext_resource type="Script" path="res://addons/icbm_editor/scripts/property_panels/comic_editor_hotspot_properties.gd" id="15_va7ba"]
 
-[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "hotspot_properties", "page_container", "hotspots_container", "buttons_container")]
+[node name="ComicEditor" type="Control" node_paths=PackedStringArray("properties_panel", "balloon_properties", "button_properties", "kaboom_properties", "page_properties", "fragment_properties", "settings_properties", "book_properties", "image_properties", "hotspot_properties", "line_edit_properties", "page_container", "hotspots_container", "buttons_container", "gui_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,9 +37,11 @@ settings_properties = NodePath("Properties/MarginContainer/EditorSettings")
 book_properties = NodePath("Properties/MarginContainer/BookProperties")
 image_properties = NodePath("Properties/MarginContainer/ImageProperties")
 hotspot_properties = NodePath("Properties/MarginContainer/HotspotProperties")
+line_edit_properties = NodePath("Properties/MarginContainer/LineEditProperties")
 page_container = NodePath("Page Container")
 hotspots_container = NodePath("Hotspots Container")
 buttons_container = NodePath("Buttons Container")
+gui_container = NodePath("Gui Container")
 
 [node name="Page Container" type="SubViewportContainer" parent="."]
 layout_mode = 1
@@ -67,6 +70,11 @@ grow_vertical = 0
 mouse_filter = 2
 theme = ExtResource("2_uwmni")
 alignment = 2
+
+[node name="Gui Container" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Properties" type="PanelContainer" parent="."]
 visible = false
@@ -948,6 +956,92 @@ layout_mode = 2
 max_value = 999999.0
 
 [node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/ButtonProperties/Disappear"]
+layout_mode = 2
+
+[node name="LineEditProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("var_edit", "text_edit", "enabled_text_edit", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]
+visible = false
+layout_mode = 2
+script = ExtResource("15_r24o8")
+var_edit = NodePath("Var Name/Var Name LineEdit")
+text_edit = NodePath("Text/Text LineEdit")
+enabled_text_edit = NodePath("Enabled TextEdit")
+shown_check_box = NodePath("Shown CheckBox")
+appear_spin_box = NodePath("Appear/Appear SpinBox")
+appear_button = NodePath("Appear/Appear OptionButton")
+disappear_spin_box = NodePath("Disappear/Disappear SpinBox")
+disappear_button = NodePath("Disappear/Disappear OptionButton")
+
+[node name="Header" type="Label" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Text Entry Properties"
+
+[node name="Var Name" type="HBoxContainer" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+
+[node name="Var Name Label" type="Label" parent="Properties/MarginContainer/LineEditProperties/Var Name"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Var Name:"
+
+[node name="Var Name LineEdit" type="LineEdit" parent="Properties/MarginContainer/LineEditProperties/Var Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Text" type="HBoxContainer" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+
+[node name="Text Label" type="Label" parent="Properties/MarginContainer/LineEditProperties/Text"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Default Text:"
+
+[node name="Text LineEdit" type="LineEdit" parent="Properties/MarginContainer/LineEditProperties/Text"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Enabled label" type="Label" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+text = "Enabled? (true/yes/1)"
+
+[node name="Enabled TextEdit" type="TextEdit" parent="Properties/MarginContainer/LineEditProperties"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "true"
+placeholder_text = "Enter Commands..."
+
+[node name="Shown CheckBox" type="CheckBox" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+text = "Shown"
+
+[node name="Appear" type="HBoxContainer" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/LineEditProperties/Appear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Appear after:"
+
+[node name="Appear SpinBox" type="SpinBox" parent="Properties/MarginContainer/LineEditProperties/Appear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Appear OptionButton" type="OptionButton" parent="Properties/MarginContainer/LineEditProperties/Appear"]
+layout_mode = 2
+
+[node name="Disappear" type="HBoxContainer" parent="Properties/MarginContainer/LineEditProperties"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Properties/MarginContainer/LineEditProperties/Disappear"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+text = "Disappear after:"
+
+[node name="Disappear SpinBox" type="SpinBox" parent="Properties/MarginContainer/LineEditProperties/Disappear"]
+layout_mode = 2
+max_value = 999999.0
+
+[node name="Disappear OptionButton" type="OptionButton" parent="Properties/MarginContainer/LineEditProperties/Disappear"]
 layout_mode = 2
 
 [node name="HotspotProperties" type="VBoxContainer" parent="Properties/MarginContainer" node_paths=PackedStringArray("action_button", "action_target_button", "action_commands_textedit", "change_cursor_checkbox", "shown_check_box", "appear_spin_box", "appear_button", "disappear_spin_box", "disappear_button")]

@@ -261,7 +261,29 @@ var preset_properties:Dictionary = {
 		"auto_save": "bool",
 		"bg_color": "color",
 		"bg_share": "string",
-	}
+	},
+	"line_edit": {
+		"align": HORIZONTAL_ALIGNMENTS,
+		"anchor": "vector2",
+		"anchor_to": ANCHOR_POINTS,
+		"appear": "int",
+		"appear_type": DELAY_TYPES,
+		"default_text": "string",
+		"disappear": "int",
+		"disappear_type": DELAY_TYPES,
+		"edge_color": "color",
+		"edge_color_disabled": "color",
+		"edge_width": "int",
+		"enabled_test": "string",
+		"fill_color": "color",
+		"fill_color_disabled": "color",
+		"font_color": "color",
+		"font_color_disabled": "color",
+		"fragment": "string",
+		"shown": "bool",
+		"var_name": "string",
+		"width": "int",
+	},
 }
 var preset_property_misc_defaults = {
 	"balloon": {
@@ -381,7 +403,23 @@ var default_presets:Dictionary = {
 			"allow_back": true,
 			"allow_save": true,
 		}
-	}
+	},
+	"line_edit": {
+		"": {
+			"align": HORIZONTAL_ALIGNMENT_CENTER,
+			"enabled_test": "true",
+			"fill_color": Color.WHITE,
+			"fill_color_disabled": Color(0.6, 0.6, 0.6),
+			"font_color": Color.BLACK,
+			"font_color_disabled": Color(0.2, 0.2, 0.2),
+			"edge_color": Color.BLACK,
+			"edge_color_disabled": Color(0.2, 0.2, 0.2),
+			"edge_width": 2,
+			"shown": true,
+			"var_name": "~var",
+			"width": 288,
+		}
+	},
 }
 var get_preset_options:Dictionary = {
 	"shape": get_preset_options_shape,
@@ -487,6 +525,7 @@ func _ready():
 
 	add_editor_menu_item(2, "Add Button", str(ComicEditor.DIR_ICONS, "button.svg"), ComicEditor.menu_add_button)
 	add_editor_menu_item(2, "Add Hotspot", str(ComicEditor.DIR_ICONS, "hotspot.svg"), ComicEditor.menu_add_hotspot)
+	add_editor_menu_item(2, "Add Text Entry", str(ComicEditor.DIR_ICONS, "line_edit.svg"), ComicEditor.menu_add_line_edit)
 
 	#add_editor_menu_item(3, "Change Background", str(ComicEditor.DIR_ICONS, "background.svg"), ComicEditor.menu_change_background)
 	#add_editor_menu_item(3, "Clear Background", str(ComicEditor.DIR_ICONS, "no_background.svg"), ComicEditor.menu_clear_background)
@@ -737,6 +776,11 @@ func parse_rich_text_string(s: String) -> String:
 	if s == "":
 		s = " " # This is to ensure that empty speech balloons in the editor don't disappear entirely
 	return s
+
+func parse_user_string(s:String) -> String:
+	# Parses a user-entered string to a rich-text string.
+	#TODO: Stop being lazy and use a regex
+	return s.replace("[", "{{{LB_PLACEHOLDER}}}").replace("]", "[rb]").replace("{{{LB_PLACEHOLDER}}}", "[lb]")
 
 func parse_bool_string(s: String) -> bool:
 	s = s.strip_edges().to_lower()
@@ -1126,16 +1170,16 @@ func set_var(key:String, value:Variant):
 		# No preceding character - assume it's meant to go in vars.
 		vars[key] = value
 
-func get_var(key:String) -> Variant:
+func get_var(key:String, default:Variant = null) -> Variant:
 	if key[0] == "~":
 		# Remove optional tilde
 		key = key.substr(1)
-		return vars.get(key)
+		return vars.get(key, default)
 	elif key[0] == "@":
-		# Store in temp variables instead of vars
+		# Retrieve from temp variables instead of vars
 		# Remove at sign
 		key = key.substr(1)
-		return temp.get(key)
+		return temp.get(key, default)
 	else:
-		# No preceding character - assume it's meant to go in vars.
-		return vars.get(key)
+		# No preceding character - assume it's meant to be retrieved from vars.
+		return vars.get(key, default)

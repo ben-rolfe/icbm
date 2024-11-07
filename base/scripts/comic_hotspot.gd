@@ -193,4 +193,3 @@ func _data_set(key:Variant, value:Variant):
 		_data.erase(key)
 	else:
 		_data[key] = value
-

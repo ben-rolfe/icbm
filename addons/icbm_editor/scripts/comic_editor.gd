@@ -106,6 +106,7 @@ var redo_steps:Array
 @export var book_properties:ComicEditorBookProperties
 @export var image_properties:ComicEditorImageProperties
 @export var hotspot_properties:ComicEditorHotspotProperties
+@export var line_edit_properties:ComicEditorLineEditProperties
 # Probably don't need a property panel for lines?
 
 # ------------------------------------------------------------------------------
@@ -562,6 +563,9 @@ static func menu_add_button():
 static func menu_add_hotspot():
 	Comic.book.page.add_hotspot()	
 
+static func menu_add_line_edit():
+	Comic.book.page.add_line_edit()	
+
 static func menu_change_background():
 	ComicEditorImageExplorer.open(Comic.book.page.background.import_new_bg)
 
@@ -569,7 +573,7 @@ static func menu_clear_background():
 	Comic.book.page.background.clear()
 
 static func menu_add_line():
-	Comic.book.page.add_line()	
+	Comic.book.page.add_line()
 
 static func menu_add_note():
 	Comic.book.page.add_note()	

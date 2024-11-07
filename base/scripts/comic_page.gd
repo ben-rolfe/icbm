@@ -189,6 +189,9 @@ func add_o(o_data:Dictionary):
 		"note":
 			if o_data.has("content"):
 				Comic.parse_hidden_string(o_data.content)
+		"line_edit":
+			o = ComicLineEdit.new(o_data, self)
+			Comic.book.gui_container.add_child(o)
 
 func rebuild_lookups():
 	# Rather than attempt to maintain lookups through all the various possibilities of editor actions, undoing, and redoing, we just rebuild them after we perform any such action.

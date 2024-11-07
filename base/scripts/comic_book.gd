@@ -4,6 +4,7 @@ extends Control
 @export var page_container:SubViewportContainer
 @export var hotspots_container:Node2D
 @export var buttons_container:BoxContainer
+@export var gui_container:Control
 
 var aliases:Dictionary = {}
 var change_page:bool

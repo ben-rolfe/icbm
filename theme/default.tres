@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=8 format=3 uid="uid://clanbtt7hrhjb"]
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://clanbtt7hrhjb"]
 
 [ext_resource type="FontFile" uid="uid://c3pnj1ilhlb58" path="res://library/fonts/JetBrainsMono-Regular.ttf" id="1_86i2n"]
 [ext_resource type="FontFile" uid="uid://wbpda6tspm4v" path="res://library/fonts/Bangers-Regular.ttf" id="2_5ud2u"]
@@ -18,6 +18,9 @@ expand_margin_top = 6.0
 expand_margin_right = 12.0
 expand_margin_bottom = 6.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5oxk2"]
+bg_color = Color(1, 1, 1, 1)
+
 [resource]
 CodeEdit/font_sizes/font_size = 16
 CodeEdit/fonts/font = ExtResource("1_86i2n")
@@ -29,6 +32,9 @@ Label/constants/layer = 2
 Label/constants/outline_size = 8
 Label/font_sizes/font_size = 64
 Label/fonts/font = ExtResource("2_5ud2u")
+LineEdit/font_sizes/font_size = 28
+LineEdit/fonts/font = ExtResource("6_niw20")
+LineEdit/styles/normal = SubResource("StyleBoxFlat_5oxk2")
 MarginContainer/constants/margin_bottom = 12
 MarginContainer/constants/margin_left = 12
 MarginContainer/constants/margin_right = 12
