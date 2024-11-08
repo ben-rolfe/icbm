@@ -126,6 +126,12 @@ var oid:int:
 	set(value):
 		_data.oid = value
 
+var placeholder_color:Color:
+	get:
+		return _data_get("placeholder_color")
+	set(value):
+		_data_set("placeholder_color", value)
+
 var presets:Array:
 	get:
 		if not _data.has("presets"):
@@ -139,7 +145,7 @@ var shown:bool:
 		return _data_get("shown")
 	set(value):
 		_data_set("shown", value)
-		if not Comic.book is ComicEditor:
+		if not self is ComicEditorLineEdit:
 			if value:
 				show()
 			else:
@@ -185,8 +191,13 @@ func _init(data:Dictionary, page:ComicPage):
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 
-	if not self is ComicEditorLineEdit:
-		text = Comic.execute_embedded_code(default_text)
+	if self is ComicEditorLineEdit:
+		# Note that we do this in either case, we just to stuff both before and after in the other case.
+		apply_data()
+	else:
+		# If the var is not already set, then set it to the default
+		if not Comic.vars.has(var_name):
+			Comic.set_var(var_name, default_text)
 
 		if appear_type == 1: # Milliseconds delay
 			Comic.book.timers.push_back({
@@ -209,8 +220,10 @@ func _init(data:Dictionary, page:ComicPage):
 				"clicks": disappear,
 				"s": str("[store oid=", oid, " var=shown]false[/store]")
 			})
-
-	apply_data()
+		apply_data()
+		# We only do this once, on load, because we wouldn't want to clear a default of "Ben" in the middle of the user writing "Benjamin"
+		if text == default_text:
+			text = ""
 
 func apply_data():
 	_default_data = Comic.get_preset_data("line_edit", presets)
@@ -218,11 +231,12 @@ func apply_data():
 	var post_text:String
 
 	alignment = align
-			
+
 	text = Comic.parse_rich_text_string(Comic.get_var(var_name, default_text))
+	placeholder_text = default_text
 	position = anchor
 	size = Vector2(width, 0)
-	enabled = Comic.book is ComicEditor or Comic.parse_bool_string(Comic.execute_embedded_code(enabled_test))
+	enabled = self is ComicEditorLineEdit or Comic.parse_bool_string(Comic.execute_embedded_code(enabled_test))
 
 	set_theme_override()
 	if shown:
@@ -240,8 +254,9 @@ func _on_mouse_exited():
 	hovered = false
 	
 func set_theme_override():
+	add_theme_color_override("font_placeholder_color", placeholder_color)
 	style_box.set_border_width_all(edge_width)
-	if Comic.book is ComicEditor or enabled:
+	if self is ComicEditorLineEdit or enabled:
 		mouse_default_cursor_shape = Control.CURSOR_IBEAM
 		add_theme_color_override("font_color", font_color)
 		add_theme_color_override("caret_color", font_color)
@@ -249,7 +264,7 @@ func set_theme_override():
 		style_box.bg_color = fill_color
 		style_box.border_color = edge_color
 		# Although uneditable in the editor, the line_edit must be enabled to catch clicks, so its text is selectable, which we don't really want, so we hide it.
-		if Comic.book is ComicEditor:
+		if self is ComicEditorLineEdit:
 			add_theme_color_override("selection_color", Color.TRANSPARENT)
 			add_theme_color_override("font_selected_color", font_color)
 	else:
