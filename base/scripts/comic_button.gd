@@ -222,7 +222,7 @@ func apply_data():
 
 func _gui_input(event):
 	if enabled and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and hovered:
-			activate()
+		activate()
 
 func _input(event):
 	if enabled and event is InputEventKey:
@@ -237,21 +237,23 @@ func _on_mouse_exited():
 	hovered = false
 
 func activate():
-	match action:
-		Action.GO:
-			Comic.book.page_go(action_bookmark)
-		Action.BACK:
-			Comic.book.page_back()
-		Action.NEXT:
-			Comic.book.page_next()
-		Action.PREVIOUS:
-			Comic.book.page_previous()
-		Action.VISIT:
-			Comic.book.page_visit(action_bookmark)
-		Action.RETURN:
-			Comic.book.page_return()
-		Action.PARSE_COMMANDS:
-			Comic.parse_hidden_string(action_commands)
+	# We ignore button presses if we're already changing page.
+	if not Comic.book.change_page:
+		match action:
+			Action.GO:
+				Comic.book.page_go(action_bookmark)
+			Action.BACK:
+				Comic.book.page_back()
+			Action.NEXT:
+				Comic.book.page_next()
+			Action.PREVIOUS:
+				Comic.book.page_previous()
+			Action.VISIT:
+				Comic.book.page_visit(action_bookmark)
+			Action.RETURN:
+				Comic.book.page_return()
+			Action.PARSE_COMMANDS:
+				Comic.parse_hidden_string(action_commands)
 
 func set_theme_override():
 	if !enabled:

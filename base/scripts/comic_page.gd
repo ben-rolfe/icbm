@@ -233,21 +233,23 @@ func make_oid() -> int:
 	return last_oid
 	
 func activate():
-	match action:
-		ComicButton.Action.GO:
-			Comic.book.page_go(action_bookmark)
-		ComicButton.Action.BACK:
-			Comic.book.page_back()
-		ComicButton.Action.NEXT:
-			Comic.book.page_next()
-		ComicButton.Action.PREVIOUS:
-			Comic.book.page_previous()
-		ComicButton.Action.VISIT:
-			Comic.book.page_visit(action_bookmark)
-		ComicButton.Action.RETURN:
-			Comic.book.page_return()
-		ComicButton.Action.PARSE_COMMANDS:
-			Comic.parse_hidden_string(action_commands)
+	# We ignore page clicks if we're mid-transition.
+	if not Comic.book.transitioning:
+		match action:
+			ComicButton.Action.GO:
+				Comic.book.page_go(action_bookmark)
+			ComicButton.Action.BACK:
+				Comic.book.page_back()
+			ComicButton.Action.NEXT:
+				Comic.book.page_next()
+			ComicButton.Action.PREVIOUS:
+				Comic.book.page_previous()
+			ComicButton.Action.VISIT:
+				Comic.book.page_visit(action_bookmark)
+			ComicButton.Action.RETURN:
+				Comic.book.page_return()
+			ComicButton.Action.PARSE_COMMANDS:
+				Comic.parse_hidden_string(action_commands)
 
 func enter_hotspot(hotspot:ComicHotspot):
 	if not hovered_hotspots.has(hotspot):

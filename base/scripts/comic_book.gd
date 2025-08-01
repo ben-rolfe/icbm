@@ -4,9 +4,15 @@ extends Control
 @export var page_container:SubViewportContainer
 @export var hotspots_container:Node2D
 @export var buttons_container:BoxContainer
+@export var transition_mask:ColorRect
 @export var gui_container:Control
 
 var aliases:Dictionary = {}
+var transitioning:bool
+var transition_in:bool
+var transition_timer:float
+#TODO: Make this a property that the user can edit 
+var transition_speed:float = 2
 var change_page:bool
 var default_balloon_layer:int
 var history:Array = []
@@ -122,11 +128,30 @@ func screen_shot():
 	OS.shell_open(ProjectSettings.globalize_path(Comic.DIR_SCREENSHOTS))
 
 func _process(delta:float):
-	if change_page:
+	if transitioning:
+		if transition_in:
+			transition_timer -= delta * transition_speed
+			if transition_timer < 0:
+				transition_timer = 0
+				transition_in = false
+				change_page = true
+				# Putting this here to make sure the page doesn't change while still a little visible.
+				transition_mask.color.a = 1
+				_show_page()
+		else:
+			transition_timer += delta * transition_speed
+			if transition_timer > 1:
+				transition_timer = 1
+				transitioning = false
+				transition_in = true
+				print("end out")
+		transition_mask.color.a = 1 - transition_timer
+	elif change_page:
 		_show_page()
 	for i in range(timers.size() - 1, -1, -1):
 		timers[i].t -= delta
-		if timers[i].t < 0: 
+		# During a transition, timers will continue to tick, but they won't execute until after the transition is complete.
+		if timers[i].t < 0 and not transitioning: 
 			Comic.execute_embedded_code(timers[i].s)
 			timers.remove_at(i)
 
@@ -164,12 +189,12 @@ func double_clicked(target:CanvasItem, event:InputEvent):
 # This is for back calls initiated by the user right clicking or pressing the left arrow key.
 # Other ways of going back (such as a button or hotspot) don't test page.allow_back
 func back_if_allowed():
-	if page.allow_back:
+	if page.allow_back and not transitioning:
 		page_back()
 
 func _show_page():
 	change_page = false
-	
+
 	#Clear all non-persistent timers and counters on page change
 	for i in range(timers.size() - 1, -1, -1):
 		if not timers[i].has("persist"):
@@ -177,8 +202,7 @@ func _show_page():
 	for i in range(click_counters.size() - 1, -1, -1):
 		if not click_counters[i].has("persist"):
 			click_counters.remove_at(i)
-			
-	print("--- NEW PAGE ---")
+
 	history.push_back(Comic.vars.duplicate(true))
 	#print(history)
 	while history.size() > _history_size:
@@ -210,32 +234,30 @@ func page_back():
 	if history.size() > 1:
 		history.pop_back() # This is the vars history for the *current* page - we discard it.
 		Comic.vars = history.pop_back()	#behind it is the vars history for the previous page. We remove it and load it into vars - changing the page will add it back to the history.
-		print("Go back!")
-		print(history)
 		change_page = true
 
 func page_go(_bookmark:String):
 	bookmark = _bookmark
-	change_page = true
+	start_transition()
 
 func page_next():
 	bookmark = get_relative_bookmark(bookmark, 1)
-	change_page = true
+	start_transition()
 
 func page_previous():
 	bookmark = get_relative_bookmark(bookmark, -1)
-	change_page = true
+	start_transition()
 
 func page_return():
 	if Comic.vars._bookmarks.size() > 1:
 		Comic.vars._bookmarks.pop_back()
 	else:
 		printerr("Return was called when bookmarks contained only one value (perhaps visit hadn't been called or return was called multiple times)")
-	change_page = true
+	start_transition()
 
 func page_visit(_bookmark:String):
 	Comic.vars._bookmarks.push_back(_bookmark)
-	change_page = true
+	start_transition()
 
 func get_relative_bookmark_index(from_key:String, offset:int) -> int:
 	var index = bookmarks.find(from_key)
@@ -248,3 +270,13 @@ func get_relative_bookmark_index(from_key:String, offset:int) -> int:
 
 func get_relative_bookmark(from_key:String, offset:int) -> String:
 	return bookmarks[get_relative_bookmark_index(from_key, offset)]
+
+
+func start_transition():
+	if not transitioning:
+		transition_timer = 1
+		transitioning = true
+		transition_in = true
+		change_page = true
+
+	

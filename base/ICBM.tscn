@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://ce7u2ga1e5dd7" path="res://base/scripts/comic_book.gd" id="2_rftg7"]
 [ext_resource type="Theme" uid="uid://7p01lqx0eat7" path="res://theme/buttons_theme.tres" id="2_yifq1"]
 
-[node name="ComicReader" type="Control" node_paths=PackedStringArray("page_container", "hotspots_container", "buttons_container", "gui_container")]
+[node name="ComicReader" type="Control" node_paths=PackedStringArray("page_container", "hotspots_container", "buttons_container", "transition_mask", "gui_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,6 +17,7 @@ script = ExtResource("2_rftg7")
 page_container = NodePath("Page Container")
 hotspots_container = NodePath("Hotspots Container")
 buttons_container = NodePath("Buttons Container")
+transition_mask = NodePath("Transition Mask")
 gui_container = NodePath("Gui Container")
 
 [node name="Page Container" type="SubViewportContainer" parent="."]
@@ -46,6 +47,16 @@ grow_vertical = 0
 mouse_filter = 2
 theme = ExtResource("2_yifq1")
 alignment = 2
+
+[node name="Transition Mask" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
 
 [node name="Gui Container" type="Control" parent="."]
 anchors_preset = 0
